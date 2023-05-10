@@ -1,11 +1,13 @@
-html,
-body {
-  height: 100%;
+html {
+
   margin: 0;
+  padding-right: 30px;
+  width: 1920px;
+  height: 1080px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
 }
 #viewport {
   width: 1920px;
@@ -16,6 +18,7 @@ body {
   background-color: #1ec4ff;
   overflow: hidden;
 }
+
 
 #image_container {
   position: absolute;
