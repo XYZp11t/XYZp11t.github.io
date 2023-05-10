@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  
+  <script src="html2canvas.min.js"></script>
+  <script src="FileSaver.min.js"></script>
+  <script src="jszip.min.js"></script>  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <link rel="stylesheet" href="style.css"> 
+  <div id="viewport">
+ 
+    <div id="image_container">
+      <img id="team_image" src="" />
+    </div>
+    <img id="cover" src="icover.png">
+    <p id="question"></p>
+    
+    <div class="option-container" id="option_one">
+      <img src="bar_option1.png">
+      <div class="option-content">
+        <span class="option-letter">A.</span>
+        <span class="option-text"></span>
+      </div>
+    </div>
+    
+    <div class="option-container" id="option_two">
+      <img src="bar_option1.png">
+      <div class="option-content">
+        <span class="option-letter">B.</span>
+        <span class="option-text"></span>
+      </div>
+    </div>
+    
+    <div class="option-container" id="option_three">
+      <img src="bar_option1.png">
+      <div class="option-content">
+        <span class="option-letter">C.</span>
+        <span class="option-text"></span>
+      </div>
+    </div>
+    
+    <div class="option-container" id="option_four">
+      <img src="bar_option1.png">
+      <div class="option-content">
+        <span class="option-letter">D.</span>
+        <span class="option-text"></span>
+      </div>
+    </div>
+    
+    <img id="question_number" src="question_number.png">
+    <div id="question_number_text">1</div>
+    <img id="icono" src="icono.png" />
+  </div>
+    
+
+    
+    <script>
+
+      const images= ['tottenham.png','juventus.png', 'arsenal.png', 'r-madrid.png','manunited.png','boca.png','river.png','roma.png','america.png','chelsea.png','a-madrid.png','villareal.png','chivas.png','bilbao.png','barcelona.png','milan.png','mancity.png','sevilla.png','pumas.png','esapnyoñ.png',    'liverpool.png', 'bayern.png','psg.png','benfica.png','sanpablo.png','psv.png','inter.png', 'dortmund.png', 'porto.png', 'leipzig.png','besiktas.png', 'millonarios.png','nacional.png'];
+         
+
+      const questions = ['¿Qué club inglés es conocido como "Los Spurs"?', '¿Qué equipo italiano es conocido como "La Vecchia Signora"?', '¿Qué club inglés es conocido como "Los Gunners"?', '¿A qué club español se le conoce como “Los Merengues”?', '¿Qué club inglés es conocido como "Los Red Devils"?', '¿Qué equipo de Argentina se apoda "Xeneize"?', '¿Qué equipo argentino es apodado "El Millonario"?', '¿Qué equipo italiano es apodado "La Loba"?', '¿Qué club de fútbol mexicano es conocido como "Las Águilas"?', '¿A qué equipo se le apoda "Los Blues"?', '¿Qué club tiene el apodo “Los Colchoneros”?', '¿Qué equipo es apodado “El Submarino Amarillo”?', '¿Qué equipo es conocido como “Las Chivas”?', '¿Qué equipo español se apoda "Los Leones"?', '¿Qué equipo es conocido como “Culés”?', '¿Qué club italiano es apodado “Diavoli”?', '¿Qué club es apodado “Citezens”?', '¿Qué equipo español se apoda “Palanganas”?', '¿Qué equipo mexicano es apodado “Pumas”?', '¿Qué equipo de España se apoda "Pericos"?', '¿Qué club inglés es conocido como "Los Reds"?', '¿Qué equipo alemán es conocido como "Die Roten"?', '¿Qué club francés es conocido como "Les Parisiens"?', '¿Qué equipo portugués es conocido como "Águias"?', '¿Qué club brasileño es conocido como "Tricolor Paulista"?', '¿A qué equipo holandés se le conoce como "Los Granjeros"?', '¿Qué club italiano es conocido como "Nerazzurri"?', '¿Qué club alemán es conocido como "Die Schwarzgelben (Los negriamarillos)"?', '¿Qué equipo portugués es conocido como "Os Dragões"?', '¿Qué equipo alemán es conocido como "Los Toros Rojos"?', '¿Qué club turco es conocido como "Las Águilas Negras"?', '¿Qué equipo colombiano es conocido como "Los Embajadores"?', '¿Qué equipo colombiano es conocido como "Los Verdolagas"?'];
+
+      const optionTrue = ['Tottenham', 'Juventus', 'Arsenal', 'Real Madrid', 'Manchester United', 'Boca Juniors', 'River Plate', 'Roma', 'Club América', 'Chelsea', 'Atlético de Madrid', 'Villareal', 'CD Guadalajara', 'Athletic Club', 'FC Barcelona', 'AC Milan', 'Manchester City', 'Sevilla FC', 'UNAM', 'RCD Espanyol', 'Liverpool', 'Bayern Munich', 'Paris Saint-Germain', 'SL Benfica', 'São Paulo', 'PSV Eindhoven', 'Inter de Milan', 'Borussia Dortmund', 'FC Porto', 'RB Leipzig', 'Beşiktaş', 'Millonarios', 'Atlético Nacional'];
+
+      const optionFalseOne =['Manchester City', 'Napoli', 'Newcastle', 'Sevilla', 'Chealsea', 'Rivel Plate', 'Boca Juniors', 'Juventus', 'Monterrey', 'Manchester City', 'Real Betis', 'Real Sociedad', 'Atlas', 'Levante', 'Espanyol', 'Inter de Milan', 'Arsenal', 'Real Betis', 'Guadalajara', 'FC Barcelona', 'Manchester United', 'Borussia Dortmund', 'Olympique Lyonnais', 'Sporting CP', 'Flamengo', 'Ajax', 'Juventus', 'Bayern Munich', 'Sporting CP', 'Borussia Dortmund', 'Fenerbahçe', 'Atlético Nacional', 'Millonarios'];
+
+      const optionFalseTwo = ['Arsenal', 'AC Milan', 'Manchester United', 'Atlético de Madrid', 'Liverpool', 'Racing', 'Newlls', 'Inter de Milan', 'Guadalajara', 'Newcastle', 'Rayo Vallecano', 'Sevilla', 'Morelia', 'Granada', 'Girona', 'Sassuolo', 'Leicester City', 'Granada', 'Monterrey', 'UD Las Palmas', 'Tottenham Hotspur', 'RB Leipzig', 'AS Monaco', 'FC Porto', 'Palmeiras', 'Feyenoord', 'AC Milan', 'Schalke 04', 'SL Benfica', 'Bayern Munich', 'Galatasaray', 'Deportivo Cali', 'Deportivo Cali'];
+
+      const optionFalseThree = ['West Ham United', 'Roma', 'Wolves', 'Girona', 'Arsenal', 'Rosario central', 'Independiente', 'AC Milan', 'Club Toluca', 'Wolves', 'FC Barcelona', 'Celta de Vigo', 'Tigres', 'Celta de Vigo', 'Eibar', 'Napoli', 'Chelsea', 'Espanyol', 'Club América', 'Sevilla', 'Everton', 'Bayer Leverkusen', 'Stade Rennais', 'Vitória', 'Santos', 'FC Utrecht', 'Lazio', 'VfB Stuttgart', 'SC Braga', 'Eintracht Frankfurt', 'Trabzonspor', 'Independiente', 'Independiente'];
+
+      const optionElements = [
+        document.getElementById("option_one"),
+        document.getElementById("option_two"),
+        document.getElementById("option_three"),
+        document.getElementById("option_four"),
+      ];
+
+      //Transición
+      //const duration = 1; // Duración de la animación en segundos
+
+      let tl;
+
+
+//Imageness
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Opciones
+function getUniqueIncorrectOption(incorrectOptionArrays, usedIncorrectIndexes) {
+  let incorrectIndex;
+  do {
+    incorrectIndex = Math.floor(Math.random() * incorrectOptionArrays.length);
+  } while (usedIncorrectIndexes.includes(incorrectIndex));
+  return incorrectIndex;
+}
+
+function setOptions(index) {
+  const correctOptionIndex = Math.floor(Math.random() * 4);
+  const usedIncorrectIndexes = [];
+
+  optionElements.forEach((element, i) => {
+    const textElement = element.querySelector(".option-text");
+    if (i === correctOptionIndex) {
+      textElement.innerText = optionTrue[index];
+    } else {
+      const incorrectOptionArray = [optionFalseOne, optionFalseTwo, optionFalseThree];
+      const uniqueIncorrectIndex = getUniqueIncorrectOption(incorrectOptionArray, usedIncorrectIndexes);
+      usedIncorrectIndexes.push(uniqueIncorrectIndex);
+      const incorrectOption = incorrectOptionArray[uniqueIncorrectIndex][index];
+      textElement.innerText = incorrectOption;
+    }
+  });
+
+  setTimeout(() => {
+    optionElements[correctOptionIndex].classList.add("highlight");
+    optionElements.forEach((element, i) => {
+      if (i !== correctOptionIndex) {
+        element.classList.add("fade-out");
+      }
+    });
+
+
+    // Agregamos la clase 'transition' a ambas imágenes
+    document.getElementById("team_image").classList.add("transition");
+    document.getElementById("cover").classList.add("transition");
+
+    // Cambiamos la opacidad de las imágenes
+    document.getElementById("team_image").style.opacity = 1;
+    document.getElementById("cover").style.opacity = 0;
+
+    // Luego de un tiempo, volvemos a ocultar la imagen del equipo y mostramos la imagen cover
+    setTimeout(() => {
+      document.getElementById("team_image").style.opacity = 0.3;
+      document.getElementById("cover").style.opacity = 1;
+
+    }, 3000); // Ajusta este valor para controlar el tiempo que tarda en ocultarse nuevamente la imagen del equipo (en milisegundos)
+
+  }, 10000);
+
+  setTimeout(() => {
+    optionElements.forEach(element => {
+      element.classList.remove("highlight");
+      element.classList.remove("fade-out");
+      element.querySelector(".option-text").innerText = '';
+    });
+
+    if (index + 1 < questions.length) {
+      setTimeout(() => {
+        setOptions(index + 1);
+        setQuestionText(index + 1);
+      }, 1000);
+    }
+  }, 13000);
+}
+
+
+const duration = 1; // Duración de la animación en segundos
+
+      function transition() {
+        const icono = document.querySelector("#icono");
+        const questionNumber = document.querySelector("#question_number");
+
+        // Obtiene las coordenadas del elemento question_number
+        const questionNumberRect = questionNumber.getBoundingClientRect();
+
+        // Posiciona el icono sobre question_number
+        icono.style.position = "absolute";
+        icono.style.top = "100px";
+        icono.style.left = "-300px";
+
+        // Obtiene el centro del icono
+        const centerX = icono.clientWidth / 2;
+        const centerY = icono.clientHeight / 2;
+
+        // Aplica la transformación de origen al centro del icono
+        gsap.set(icono, {
+          transformOrigin: `${centerX}px ${centerY}px`,
+        });
+
+         // Reinicia la animación
+         gsap.set(icono, {
+           rotation: 0,
+           scale: 10, // Escala inicial (10 veces el tamaño original)
+         });
+       
+         const tl = gsap.timeline({
+           defaults: {
+             duration: duration,
+             ease: "none",
+           },
+         });
+
+        tl.to(icono, {
+          rotation: 270, // Grados de rotación
+          scale: 0.00005, // Escala final (0.0005% del tamaño original)
+        });
+      }
+
+
+function executeTransitionEvery(interval) {
+  const icono = document.querySelector("#icono");
+  icono.style.display = "block";
+  transition();
+  setTimeout(() => {
+    icono.style.display = "none";
+    executeTransitionEvery(interval);
+  }, interval + (1000 * duration));
+}
+
+setTimeout(() => {
+  executeTransitionEvery(13000);
+}, 13000);
+
+function setQuestionText(index) {
+  const questionText = questions[index];
+  const questionElement = document.getElementById("question");
+  const questionNumberElement = document.getElementById("question_number_text");
+  const teamImageElement = document.getElementById("team_image");
+  questionElement.innerHTML = `<span class="question-number"></span> ${questionText}`;
+  questionNumberElement.innerText = index + 1;
+  teamImageElement.src = "./imagenes/" + images[index]; // Añade el prefijo "./" a la fuente de la imagen
+
+  gsap.fromTo(
+    questionElement,
+    { opacity: 0, scale: 0.5 },
+    { duration: 0.5, opacity: 1, scale: 1, ease: "power3.out" }
+  );
+}
+
+
+
+// Mostrar las opciones y pregunta iniciales
+setOptions(0);
+setQuestionText(0);
+
+      // Aplica la animación wiggle a la imagen
+      function wiggle(element, intensity, duration) {
+        gsap.to(element, {
+          duration: duration,
+          x: gsap.utils.random(-intensity, intensity, true),
+          y: gsap.utils.random(-intensity, intensity, true),
+          onComplete: wiggle,
+          onCompleteParams: [element, intensity, duration],
+          ease: "none"
+        });
+      }
+
+      const questionNumber = document.getElementById("question_number");
+      wiggle(option_one, 3, 0.7);
+      wiggle(option_two, 3, 0.7);
+      wiggle(option_three, 3, 0.7);
+      wiggle(option_four, 3, 0.7);
+      wiggle(questionNumber, 5, 0.7);
+      wiggle(question_number_text,3,0.7);
+      wiggle(team_image, 3,0.7);
+      wiggle(cover, 3,0.7);
+      wiggle(question, 3,0.7);
+      // Mostrar las opciones iniciales
+      //setOptions(0);
+
+
+/*      let tl;
+
+
+//Imageness
+const startCaptureButton = document.querySelector("#startCapture");
+const stopCaptureButton = document.querySelector("#stopCapture");
+
+startCaptureButton.addEventListener("click", () => {
+  startCapturing();
+});
+
+stopCaptureButton.addEventListener("click", async () => {
+  capturing = false;
+  clearTimeout(capturingTimeout);
+  await downloadCapturedFrames();
+});
+
+// Añade esta función
+const downloadButton = document.querySelector("#downloadFrames");
+downloadButton.addEventListener("click", async () => {
+  if (capturing) {
+    capturing = false;
+    clearTimeout(capturingTimeout);
+    await downloadCapturedFrames();
+  } else {
+    startCapturing();
+  }
+});
+
+
+
+
+
+let capturingTimeout = null;
+
+let capturedFrames = [];
+
+let capturing = false;
+async function captureFrame() {
+  if (!capturing) return;
+
+  const container = document.getElementById("viewport");
+  await domtoimage.toPng(container).then(function (dataUrl) {
+    const base64 = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+    capturedFrames.push(base64);
+  }).catch(function (error) {
+    console.error("Error al capturar la imagen:", error);
+  });
+
+  if (capturing) {
+    capturingTimeout = setTimeout(captureFrame, 1000 / 12); // 30 fps
+  }
+}
+
+//ctrlZ
+
+
+
+function startCapturing() {
+  capturing = true;
+  captureFrame();
+}
+
+async function downloadCapturedFrames() {
+  const zip = new JSZip();
+  const folder = zip.folder("frames");
+
+  capturedFrames.forEach((frame, i) => {
+    folder.file(`frame${i}.png`, frame, { base64: true });
+  });
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  saveAs(blob, "frames.zip");
+}
+
+downloadButton.addEventListener("click", async () => {
+  if (capturing) {
+    capturing = false;
+    await downloadCapturedFrames();
+  } else {
+    startCapturing();
+  }
+});
+
+// Comienza a capturar cuando se carga la página.
+startCapturing();
+
+//ULTIMOCtrlZ
+*/
+
+
+/*function updateIconoAnimation() {
+  if (!tl.isActive()) {
+    // Si la animación no está activa, no hay nada que actualizar
+    return;
+  }
+
+  // Actualiza la animación de #icono
+  const progress = tl.progress();
+  const rotation = progress * 270;
+  const scale = 10 - (progress * (10 - 0.00005));
+  const icono = document.querySelector("#icono");
+
+  icono.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+
+  // Solicita el siguiente cuadro de animación
+  requestAnimationFrame(updateIconoAnimation);
+}
+
+// Comienza el bucle de animación cuando se carga la página
+requestAnimationFrame(updateIconoAnimation);*/
+/*function transition() {
+  const icono = document.querySelector("#icono");
+  const questionNumber = document.querySelector("#question_number");
+
+  // Obtiene las coordenadas del elemento question_number
+  const questionNumberRect = questionNumber.getBoundingClientRect();
+
+  // Posiciona el icono sobre question_number
+  icono.style.position = "absolute";
+  icono.style.top = `100px`;
+  icono.style.left = `-310px`;
+
+  // Obtiene el centro del icono
+  const centerX = icono.clientWidth / 2;
+  const centerY = icono.clientHeight / 2;
+
+  // Aplica la transformación de origen al centro del icono
+  gsap.set(icono, {
+    transformOrigin: `${centerX}px ${centerY}px`,
+  });
+
+  // Reinicia la animación
+  gsap.set(icono, {
+    rotation: 0,
+    scale: 10, // Escala inicial (10 veces el tamaño original)
+  });
+
+  tl = gsap.timeline({
+    defaults: {
+      duration: 1,
+      ease: "none",
+    },
+  });
+
+  tl.to(icono, {
+    rotation: 270, // Grados de rotación
+    scale: 0.00005, // Escala final (0.0005% del tamaño original)
+  });
+}
+
+function executeTransitionEvery(interval) {
+  const icono = document.querySelector("#icono");
+  icono.style.display = "block";
+  transition();
+  setTimeout(() => {
+    icono.style.display = "none";
+    executeTransitionEvery(interval);
+  }, interval + (1000 * tl.duration()));
+}
+
+setTimeout(() => {
+  executeTransitionEvery(13000);
+}, 13000);
+*/
+    </script>
+  </body>
+</html>
+
