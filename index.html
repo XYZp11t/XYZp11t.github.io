@@ -170,8 +170,8 @@ function setOptions(index) {
 
     if (index + 1 < questions.length) {
       setTimeout(() => {
-        setOptions(index );
-        setQuestionText(index );
+        setOptions(index + 1);
+        setQuestionText(index + 1);
       }, 1000);
     }
   }, 13000);
@@ -241,7 +241,7 @@ function setQuestionText(index) {
   const questionNumberElement = document.getElementById("question_number_text");
   const teamImageElement = document.getElementById("team_image");
   questionElement.innerHTML = `<span class="question-number"></span> ${questionText}`;
-  questionNumberElement.innerText = index + 1;
+  questionNumberElement.innerText = index ;
   teamImageElement.src = "./imagenes/" + images[index]; // Añade el prefijo "./" a la fuente de la imagen
 
   gsap.fromTo(
