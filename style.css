@@ -19,14 +19,13 @@ html {
   overflow: hidden;
 }
 
-
 #image_container {
   position: absolute;
   width: 600px; /* Cambia esto al tamaño deseado */
   height: 600px; /* Cambia esto al tamaño deseado */
   overflow: hidden; /* Esconde las partes de la imagen que excedan el contenedor */
-  right: -33px;
-  top: 330px;
+  right: -25px;
+  top: 360px;
 }
 
 #team_image {
@@ -34,17 +33,17 @@ html {
   height: 63%; /* La imagen ocupará el 100% del alto del contenedor */
   object-fit: cover;
   opacity: .3; /* Asegura que la imagen cubra todo el contenedor, manteniendo su relación de aspecto */
-  filter: drop-shadow(5px 10px 5px rgb(255, 196, 0));  
+  /*filter: drop-shadow(5px 10px 5px rgb(255, 196, 0));  */
 }
 
 #cover {
   position: absolute;
   width: 973px; /* Debe coincidir con las dimensiones de #team_image */
   height: 973px; /* Debe coincidir con las dimensiones de #team_image */
-  scale: 65%;
+  scale: 69%;
   object-fit: cover;
   right: -7%;
-  top: 3%;
+  top: 10%;
   filter: drop-shadow(5px 5px 5px rgb(123, 123, 247));
 }
 
