@@ -151,12 +151,18 @@ function setOptions(index) {
 
     // Cambiamos la opacidad de las imágenes
     document.getElementById("team_image").style.opacity = 1;
+    document.getElementById("image_container").style.right= ("-20px");
+    document.getElementById("image_container").style.top= ("370px");
+
+    document.getElementById("image_container").style.scale = 1.5;
     document.getElementById("cover").style.opacity = 0;
 
     // Luego de un tiempo, volvemos a ocultar la imagen del equipo y mostramos la imagen cover
     setTimeout(() => {
       document.getElementById("team_image").style.opacity = 0.3;
+      document.getElementById("image_container").style.scale = 0.7;
       document.getElementById("cover").style.opacity = 1;
+
 
     }, 3000); // Ajusta este valor para controlar el tiempo que tarda en ocultarse nuevamente la imagen del equipo (en milisegundos)
 
