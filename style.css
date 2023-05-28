@@ -13,26 +13,27 @@ html {
   width: 1920px;
   height: 1080px;
   position: relative;
-  border: 37px solid #1ec4ff;
+  border: 37px solid #4fd0ff;
+  overflow: hidden;;
   padding-left: 45px;
-  background-color: #1ec4ff;
+  background-color: #4fd0ff;
   overflow: hidden;
 }
 
 #image_container {
   position: absolute;
   width: 600px; /* Cambia esto al tamaño deseado */
-  height: 600px; /* Cambia esto al tamaño deseado */
+  height: 800px; /* Cambia esto al tamaño deseado */
   overflow: hidden; /* Esconde las partes de la imagen que excedan el contenedor */
-  right: -25px;
-  top: 360px;
+  right: 30px;
+  top: 300px;
 }
 
 #team_image {
-  width: 63%; /* La imagen ocupará el 100% del ancho del contenedor */
-  height: 63%; /* La imagen ocupará el 100% del alto del contenedor */
+  width: 70%; /* La imagen ocupará el 100% del ancho del contenedor */
+  height: 70%; /* La imagen ocupará el 100% del alto del contenedor */
   object-fit: cover;
-  opacity: .3; /* Asegura que la imagen cubra todo el contenedor, manteniendo su relación de aspecto */
+  opacity: 1; /* Asegura que la imagen cubra todo el contenedor, manteniendo su relación de aspecto */
   /*filter: drop-shadow(5px 10px 5px rgb(255, 196, 0));  */
 }
 
@@ -45,6 +46,7 @@ html {
   right: -7%;
   top: 10%;
   filter: drop-shadow(5px 5px 5px rgb(123, 123, 247));
+  opacity: 0;
 }
 
 .transition {
@@ -63,25 +65,25 @@ html {
 }
 
 #question_number{
-    scale: 55%;
+    scale: 58%;
     position: absolute;
-    top: 500px;
+    top: 480px;
     left: 510px;
     filter: drop-shadow( 5px 13px 13px #1c64e9);
 
 }
 
 #option_four{
-    top: 780px;
+    top: 830px;
     left: 500px;
-    scale: 65%;
+    scale: 60%;
     position: absolute;
     filter: drop-shadow( 5px 5px 5px magenta);
 }
 #option_three{
-    top: 780px;
+    top: 830px;
     left: -60px;
-    scale: 65%;
+    scale: 60%;
     position: absolute;
     filter: drop-shadow( 5px 5px 5px magenta);
 }
@@ -89,14 +91,14 @@ html {
 #option_two{
     top: 670px;
     left: 500px;
-    scale: 65%;
+    scale: 60%;
     position: absolute;
     filter: drop-shadow( 5px 5px 5px magenta);
 }
 #option_one{
     top: 670px;
     left: -60px;
-    scale: 65%;
+    scale: 60%;
     position: absolute;
     filter: drop-shadow( 5px 5px 5px magenta);
 }
@@ -128,16 +130,17 @@ html {
   }
   .option-text {
     position: absolute;
-    font-size: 55px;
+    font-size: 63px;
     color: #ffffff; /* Cambia el color del texto a blanco */
     font-family: 'Chilanka', sans-serif; /* Usa la fuente personalizada 'Chilanka' */
     font-weight: bold; /* Establece el texto en negrita */
     letter-spacing: 5px;
     text-shadow: 2px 2px 4px #000000;; /* Agrega una sombra negra al texto para mejorar la legibilidad */
     max-width: 1500px;
+
     /* Ajusta estos valores para posicionar el texto correctamente sobre las imágenes */
   
-    top: 40%;
+    top: 30%;
     left: 25%;
   }
 
@@ -168,14 +171,13 @@ html {
   font-family: 'Chilanka', sans-serif; /* Usa la fuente personalizada 'Chilanka' */
   font-weight: 10px bolder; /* Establece el t Color del texto, puedes cambiarlo según lo necesites */
   position: absolute;
-  top: 605px; /* Ajusta estos valores según la posición deseada */
+  top: 590px; /* Ajusta estos valores según la posición deseada */
   left: 613px; /* Ajusta estos valores según la posición deseada */
 }
   
 .option-container {
   position: relative;
 }
-
 
 
 
