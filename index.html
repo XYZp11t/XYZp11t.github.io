@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html   style="width: 1920px;
+height: 1080px;">
 <head>
   <meta charset="UTF-8">
-  
-  <script src="html2canvas.min.js"></script>
-  <script src="FileSaver.min.js"></script>
-  <script src="jszip.min.js"></script>  
+  <script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" id=""></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300&display=swap" rel="stylesheet">
@@ -65,23 +66,34 @@
     <img id="icono" src="icono.png" />
   </div>
     
-
     
     <script>
 
-        const images= ['a.png', 'a.png', 'b.png', 'johan.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png', 'j.png', 'k.png', 'l.png', 'm.png', 'n.png', 'o.png', 'p.png', 'q.png', 'r.png', 's.png', 't.png', 'u.png', 'v.png', 'w.png', 'x.png', 'y.png', 'z.png', 'za.png', 'zb.png', 'zc.png', 'zd.png', 'ze.png'];
-         
 
-         const questions = ['Control con el pecho', '¿Qué jugador argentino es conocido como "El Pibe de Oro"?', '¿Quién es el máximo goleador en la historia de la UEFA Champions League?', '¿Qué jugador holandés fue apodado "El Flaco" y ganó tres veces el Balón de Oro?', '¿Quién es el máximo goleador de La Liga Española?', '¿Qué futbolista croata ganó el Balón de Oro en 2018?', '¿Qué jugador colombiano anotó el mejor gol de la Copa del Mundo de 2014?', '¿Qué futbolista francés anotó un gol con la mano en la clasificación para la Copa del Mundo de 2010 contra Irlanda?', 'Quién anotó el gol con el que Argentina ganó la Copa América 2021 a Brasil?', 'Qué futbolista marcó el gol del triunfo de España vs Holanda en la final del mundial del 2010?', '¿Qué delantero sueco, marcó un gol de chilena espectacular desde 30 metros de distancia y se llevó el Premio Puskás al mejor gol del año 2012?', '¿Qué jugador y capitán del Real Madrid, marcó un gol de cabeza en el minuto 93 contra el Atlético de Madrid en la final de la UEFA Champions League 2013-2014?', '¿Qué delantero colombiano ganó la Bota de Oro como el máximo goleador del Copa del Mundo de 2014?', '¿A qué jugador comparan con Donatello, la tortuga ninja?', '¿Qué jugador galés marcó un gol de chilena en la final de la Champions League 2018?', '¿Qué jugador brasileño es conocido como "El Fenómeno"?', '¿Qué portero español es conocido como "San Iker"?', '¿Qué futbolista argentino es conocido como "El Kun"?', '¿Qué jugador brasileño es conocido como "O Rei"?', '¿Qué futbolista brasileño ganó el premio FIFA al Jugador del Año en 2005 y 2006?', '¿Qué futbolista uruguayo llevó a su equipo, el Atlético de Madrid, a ganar LaLiga en 2021?', '¿Qué futbolista es el máximo asistente en la historia de LaLiga?', '¿Qué futbolista alemán ganó la Bota de Oro de la Copa del Mundo de 2010?', '¿Qué futbolista francés ganó el premio al Mejor Jugador Joven en la Copa del Mundo de 2018?', '¿Qué jugador brasileño ganó el Balón de Oro 2007?', '¿Qué portero salvó a Argentina en la tanda de penales para ganar la Copa Mundial 2022?', '¿Qué jugador tiene record de balones de oro ganados?', '¿Quién anotó el gol llamado "La mano de Dios"?', 'Jugador que marcó un hat-trick en la final Argentina vs Francia del Mundial 2022', '¿Quién es el jugador que anotó 91 goles en un año calendario, estableciendo un récord mundial?', '¿Qué jugador logró el récord de más goles en un año calendario en 2012?', '¿Quién fue el jugador más caro de la historia del fútbol cuando se mudó del Barcelona al Paris Saint-Germain?', '¿Quién se convirtió en el jugador más joven en marcar en una final de la Copa del Mundo en 2018 desde Pelé en 1958?']
+
+      const images=['c.png','a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.jpg', 'i.png', 'j.png', 'k.png', 'l.png', 'm.jpg', 'n.jpg', 'o.png', 'p.jpg', 'r.jpg', 's.png', 't.png', 'u.png', 'v.png', 'w.jpg', 'zf.png', 'y.png', 'z.png', 'za.jpg', 'zc.jpg','ze.png', 'x.png', 'zg.png', 'zl.png', 'zm.jpg', 'zn.png'];
+
+         const questions = ['Control', '¿Cuál es la famosa ecuación de Albert Einstein que relaciona la energía con la masa?', '¿Cómo se expresa la segunda ley de Newton que relaciona la fuerza con la masa y la aceleración?', '¿Cuál es la ley de Coulomb que describe la fuerza entre dos cargas eléctricas?', '¿Cómo se expresa la ley de Ohm que relaciona la tensión, la corriente y la resistencia?', '¿Cuál es la ecuación de los gases ideales?', '¿Cuál es el teorema de Pitágoras para los triángulos rectángulos?', '¿Cuál es la ley de gravitación universal de Newton?', '¿Cuál es la ecuación de Schrödinger para la función de onda de una partícula?', '¿Cómo se expresa el primer principio de la termodinámica?', '¿Cómo se expresa la frecuencia (siendo T = periodo)?', "¿Con que está directamente relacionado el siguiente límite: f'(x)= lim h->0 (f(x+f)-f(x))/h", '¿Cómo se expresa la fuerza centrípeta para un objeto en movimiento circular?', '¿Cómo se calcula el momento lineal o cantidad de movimiento?', '¿Cuál es la fórmula para la energía potencial elástica?', '¿Cuál es la fórmula para la energía cinética?', '¿Cómo se expresa la ley de Gauss para campos eléctricos?', '¿Cuál es la ley de Boyle para los gases?', '¿Cuál es la fórmula cuadrática para resolver ecuaciones de segundo grado?', '¿Cuál es la fórmula para calcular el área de un círculo?', '¿Cómo se expresa la ecuación de onda?', '¿Cuál es la fórmula para calcular la circunferencia de un círculo?', '¿Cuál es la ley de Faraday de la inducción electromagnética?', '¿Cómo se calcula el área de un triángulo?', '¿Cómo se calcula el volumen de una esfera?', '¿Cómo se calcula el volumen de un cilindro?', '¿Cuál es la identidad de Euler para los números complejos?', '¿Cuál es la ecuación de Planck para la energía de un fotón?', '¿Cuál es la fórmula para la pendiente de una recta?', '¿Cuál es la fórmula para calcular el perímetro de un triángulo?', '¿Cuál es la fórmula del teorema de la suma de los ángulos internos de un triángulo?', '¿Cómo se calcula el volumen de un cubo?', '¿Cómo se llama esta fórmula: n₁sinθ₁ = n₂sinθ₂ que calcula la refracción de la luz?','¿A qué ley se refiere la siguiente relación? dS≥0 Siendo S = entropía'];
+
+
+//['Control', '¿Cuántos grados suman los ángulos internos de un triángulo?', '¿Cuántos lados tiene un dodecágono?', '¿Qué número (apróximado) representa la letra griega π?', '¿Cuál es la raiz cuadrada de 144?', '¿Cómo se llama a la línea que divide un círculo en dos partes iguales?', 'Un número natural mayor que 1 que tiene únicamente dos divisores positivos distintos: él mismo y el 1 se denomina número...', '¿Cuántos grados hay en un ángulo recto?', '¿Qué opción representa el teorema de pitágoras?', '¿Cómo se llama un polígono de 3 lados?', '¿Cuánto es 1000-100+10?', '¿Qué número es "V" en números romanos?', '¿Cómo se llama un polígono con todos los lados y ángulos iguales?', '¿Cómo se le llama a los ángulos menores que 45°', '¿Cuántos ceros tiene un millón?', '¿Cuál es la raíz cuadrada de 49?', '¿Cuánto es 3 elevado al cubo (3^3)?', '¿Cuántos grados suman los ángulos internos de un cuadrado?', '¿Cómo se le llama a los ángulos mayores que 180°?', '¿Qué letra equivale al 1000 en números romanos', 'Si un coche recorre 60 km en media hora, ¿a qué velocidad va?', '¿Cuántas caras tiene una pirámide de base cuadrada?', '¿Cuál es el valor de "x" si 2x = 8?', 'En multiplicación de signos - por + es igual a...', 'Si en una caja caben 25 bombones y tengo 100 bombones, ¿cuántas cajas necesito?', '¿Cuánto es el 15% de 200?', '¿Qué figura geométrica tiene 4 lados iguales pero no es un cuadrado?', '¿Cuánto es la mitad de 2 + 1', '¿Cuántos aristas tiene un cubo?', '¿Cuál es la suma de los 10 primeros números naturales? (sin contar el 0)', '¿Como se llama la recta que va desde el centro de un circulo a un punto de su perimétro?', '¿Cuál es el resultado de multiplicar (-1)*(-1)?', '¿Qué fórmula calcula el aŕea de un círculo?', 'Un ángulo mayor que 90° y menor a que 180° es conocido como:'];
 
    
-         const optionTrue = ['a', 'Maradona', 'CR7', 'Johan Cruyff', 'Lionel Messi', 'Luka Modrić', 'James Rodríguez', 'Thierry Henry', 'Ángel Di María', 'Andrés Iniesta', 'Zlatan', 'Sergio Ramos', 'James Rodríguez', 'Kyliam Mbappé', 'Gareth Bale', 'Ronaldo Nazario', 'Casillas', 'Sergio Agüero', 'Pelé', 'Ronaldinho', 'Luis Suárez', 'Lionel Messi', 'Thomas Müller', 'Kylian Mbappé', 'Kaká', '"Dibu" Martínez', 'Lionel Messi', 'Maradona', 'Kyliam Mbappé', 'Lionel Messi', 'Lionel Messi', 'Neymar', 'Kylian Mbappé'];
+         const optionTrue = ['a', '\\(E = mc^2\\)', '\\(F = ma\\)', '\\(F = k\\frac{q_1q_2}{r^2}\\)', '\\(V = IR\\)', '\\(PV = nRT\\)', '\\(a² + b² = c²\\)', '\\(F=G\\frac{m  M}{d^2}\\)', 'ĤΨ = EΨ', 'ΔU = Q - W', 'f=1/T', 'Derivadas', 'F = mv²/r', 'p = mv', '\\(U = \\frac{kx²}{2}\\)', '\\(K = \\frac{mv²}{2}\\)', '∮ₛ E • ds = Q/ε₀', 'P₁V₁ = P₂V₂', '\\( x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\\)', 'A = πr²', '\\(\\frac{∂²f}{∂t²} = v² \\frac{∂²f}{∂x²}\\)', 'C = 2πr', 'ε = - dΦ/dt', 'A = 1/2bh', '\\(V = \\frac{4}{3πr³}\\)', '\\(V = πr²h\\)', '\\(e^{iπ} + 1 = 0\\)', 'E = hν', '\\(m = \\frac{y_2-y_1}{x_2-x_1}\\)', 'P = a+b+c', 'α + β + γ = 180', '\\(V = a³\\)', 'Ley de Snell', 'Segunda ley de la Termodinámica'];
+
+
+ //['\\( x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\\)', '180°', '12', '3.1416', '12', 'Diámetro', 'Primo', '90°', '\\( c^{2} = a^{2} + b^{2} \\)', 'Triángulo', '910', '5', 'Regular', 'Agudos', '6', '7', '27', '360°', 'Cóncavo', 'M', '120 km/h', '5', '4', '-', '4', '30', 'Rombo', '2', '12', '55', 'Radio', '+1', 'πr²', 'Obtuso'];
+    
+        //7,13,17, 23 y 24, 25 26 27 29* 32 (exponentes)
+         const optionFalseOne =['b', '\\(E = \\frac{1}{2mv^2}\\)', '\\(F = mv\\)', '\\(F = \\frac{q_1}{q_2r}\\)', '\\(V = \\frac{I}{R}\\)', '\\(PV = \\frac{nR}{T}\\)', 'a + b = c', '\\(F=(G\\frac{m M}{d^2})^2\\)', 'Ĥ = EΨ', 'ΔU = Q + W', 'f = T', 'Integrales', 'F = mvr', 'p = m/v', 'U = kx²', 'K = mv²', '∮ₛ E • ds = Qε₀', '\\(\\frac{P_1}{V_1} = \\frac{P₂}{V₂}\\)', '\\(x = \\frac{-b \\pm \\sqrt{b^2+4ac}}{3a}\\)', 'A = 2πr', '\\(\\frac{∂f}{∂t} = v \\frac{∂f}{∂x}\\)', 'C = πr²', 'ε = dΦ/dt', 'A = bh', '\\(V = πr³\\)', '\\(V = πrh\\)', '\\(e^{iπ} - 1 = 0\\)', '\\(E = \\frac{h}{ν}\\)', '\\(m = \\frac{x_2 - x_1}{y_2 - y_1}\\)', 'P = abc', 'α + β + γ = 90', '\\(V = a²\\)', 'Ley de Newton', 'Primera ley de la Termodinámica'];
+
+//['\\(\\frac{P_1}{T_1} = \\frac{T_2}{P_2}\\)', '360°', '10', '3', '24', 'Perímetro', 'Irracional', '180°', 'F=ma', 'Trapecio', '990', '50', 'Idéntico', 'Obtusos', '7', '11', '9', '180°', 'Agudos', 'X', '60 km/h', '4', '3', '+', '3', '15', 'Pentágono', '3', '8', '57', 'Diámetro', '-1', '2πr', 'Recto'];
    
-         const optionFalseOne =['a', 'Pelé', 'Messi', 'Ruud Gullit', 'Cristiano Ronaldo', 'Ivan Rakitić', 'Radamel Falcao', 'Mbappé', 'Messi', 'Xavi', 'Cristiano Ronaldo', 'Marcelo', 'Radamel, Falcao', 'Zidane', 'Aaron Ramsey', 'Ronaldinho', 'David de Gea', 'Lionel Messi', 'Zico', 'Kaká', 'Edinson Cavani', 'Cristiano Ronaldo', 'Miroslav Klose', 'Antoine Griezmann', 'Ronaldinho', 'Franco Armani', 'Cristiano Ronaldo', 'Butragueño', 'Messi', 'Cristiano Ronaldo', 'Cristiano Ronaldo', 'Lionel Messi', 'Neymar'];
+         const optionFalseTwo =['c', '\\(E = mv^3\\)', '\\(F = \\frac{m}{a}\\)', '\\(F = k\\frac{q_1+q_2}{r}\\)', '\\(V = RI\\)', '\\(PV = \\frac{RT}{n}\\)', '\\(a² - b² = c²\\)', '\\(F=G\\frac{m + M}{d^2}\\)', 'ĤΨ = E', 'ΔU = Q/W', 'f=3/T', 'Sumatorias', 'F = mv/r', 'p = v/m', '\\(U = \\frac{1}{2kx}\\)', 'K = mv', '∮ₛE • ds = ε₀/Q', 'P₁V₁ = P₂+V₂', '\\(x = \\frac{b \\pm \\sqrt{b^3-4ac}}{6a}\\)', 'A = πr', '\\(\\frac{∂²f}{∂t} = v² \\frac{∂f}{∂x²}\\)', 'C = πr', 'ε = - dt/dΦ', 'A = bh/2', '\\(V = 4πr³\\)', '\\(V = \\frac{πr²}{2h}\\)', '\\(e^π + i = 0\\)', '\\(E = \\frac{ν}{h}\\)', 'm = (y₂-y₁)(x₂-x₁)', 'P = (a+b+c)/2', 'α + β + γ = 360', '\\(V = 3a\\)', 'Ley de senos', 'Ley de gravitación'];
+//['\\(∮E • dA = \\frac{Q}{ε₀}\\)' , '90°', '22', '6.1416', '44', 'Radio', 'Imaginario', '45°', '\\( E = mc^{2} \\)', 'Cuadrado', '900', '10', 'Simétrico', 'Graves', '5', '23', '6', '270°', 'Rectos', 'V', '30 km/h', '3', '6', '±', '5', '40', 'Rectángulo', '1.5', '16', '67', 'Seno', '∓1', 'πr/2', 'Cóncavo'];
    
-         const optionFalseTwo = ['a', 'Messi', 'Neymar', 'Van Basten', 'Benzema', 'Ivan Perišić', 'David Ospina', 'Zidane', '"Kun" Agüreo', 'David Villa', 'Gareth Bale', 'CR7', 'Davinson Sánchez', 'Eduardo Camavinga', 'Daniel James', 'Neymar', 'Pepe Reina', 'Diego Maradona', 'Ronaldo Nazario', 'Rivaldo', 'Diego Godín', 'Xavi Hernández', 'Mesut Özil', 'Paul Pogba', 'Ronaldo Nazario', 'Esteban Andrada', 'Ronaldinho', 'Messi', 'Benzema', 'Neymar', 'Neymar', 'Cristiano Ronaldo', 'Lionel Messi'];
-   
-         const optionFalseThree = ['a', 'Batistuta', 'Ronaldo Nazario', 'Dennis Bergkamp', 'Hugo Sánchez', 'Mateo Kovačić', 'JuanFer Quintero', 'Dembélé', 'Dibu Martínez', 'Sergio Ramos', 'Eden Hazard', 'Chicharito', 'JuanFer Quintero', 'Dembélé', 'Harry Kane', 'Kaká', 'Kepa Arrizabalaga', 'Gonzalo Higuaín', 'Ronaldinho', 'Neymar', 'Fernando Muslera', 'Andrés Iniesta', 'Lukas Podolski', 'Ousmane Dembélé', 'Neymar', 'Sergio Romero', 'Ronaldo Nazario', 'Jorge Valdano', 'Di Maria', 'Kylian Mbappé', 'Kylian Mbappé', 'Kylian Mbappé', 'Cristiano Ronaldo'];
+         const optionFalseThree = ['d', '\\(E = \\frac{m^2}{c}\\)', '\\(F = ma^2\\)', '\\(F = k\\frac{q_1q_2}{r}\\)', '\\(V = I+R\\)', '\\(PV = \\frac{nT}{R}\\)', '\\(a² + b² = 2c²\\)', '\\(F=G²\\frac{m M}{d}\\)', 'Ψ = E/Ĥ', 'ΔU = QW', 'f=T/3', 'Determinantes', 'F = mv²*r', '\\(p = mv^2\\)', 'U = kx', '\\(K = \\frac{1}{2mv}\\)', 'Q = ∮ₛE • ds * ε₀', 'P₁+V₁ = P₂+V₂', '\\(x = \\frac{± \\sqrt{(b² - 4ac)}} {a}\\)', 'A = 2πr²', '\\(\\frac{∂²f}{∂t²} = v \\frac{∂²f}{∂x}\\)', 'C = 2πr²', 'ε = dt/dΦ', 'A = 2bh', '\\(V = \\frac{πr³}{4}\\)', '\\(V = 2πr²h\\)', '\\(e^{iπ} = 1\\)', '\\(E = hν^2\\)', 'm = (x₂-y₁)(y₂-x₁)', 'P = 2(a+b+c)', 'α * β * γ = 180', '\\(V = 6a²\\)', 'Ley de cosenos', 'Ley de Boyle'];
+//['\\(\\frac{P_1}{V_1} = \\frac{P₂}{V₂}\\)', '270°', '20', '4', '10.4', 'Tangente', 'Simple', '360°', '\\(F=G({m M}/{d^2})\\)', 'Isoseles', '890', '3', 'Irregular', 'Cóncavo', '3', '98', '33', '90°', 'Obtusos', 'Z', '45 km/h', '6', '16', '∓', '6', '60', 'Trapecio', '4', '4', '100', 'Pi', '±1', 'π²r', 'Convexo'];
    
       const optionElements = [
         document.getElementById("option_one"),
@@ -91,24 +103,12 @@
       ];
 
       //Transición
-      //const duration = 1; // Duración de la animación en segundos
-
-      let tl;
-
+      function isLatex(option) {
+  // Comprueba si la opción comienza y termina con '\\(' y '\\)'
+  return option.trim().startsWith('\\(') && option.trim().endsWith('\\)');
+}
 
 //Imageness
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Opciones
 function getUniqueIncorrectOption(incorrectOptionArrays, usedIncorrectIndexes) {
@@ -124,17 +124,34 @@ function setOptions(index) {
   const usedIncorrectIndexes = [];
 
   optionElements.forEach((element, i) => {
-    const textElement = element.querySelector(".option-text");
-    if (i === correctOptionIndex) {
-      textElement.innerText = optionTrue[index];
-    } else {
-      const incorrectOptionArray = [optionFalseOne, optionFalseTwo, optionFalseThree];
-      const uniqueIncorrectIndex = getUniqueIncorrectOption(incorrectOptionArray, usedIncorrectIndexes);
-      usedIncorrectIndexes.push(uniqueIncorrectIndex);
-      const incorrectOption = incorrectOptionArray[uniqueIncorrectIndex][index];
-      textElement.innerText = incorrectOption;
-    }
-  });
+  const textElement = element.querySelector(".option-text");
+  if (i === correctOptionIndex) {
+    // Comprobar si la opción correcta debe ser interpretada como LaTeX
+    if (isLatex(optionTrue[index])) {
+  // Renderizar como LaTeX en el elemento de texto
+  // Nota: Se quitan los delimitadores '\\(' y '\\)' antes de renderizar
+  katex.render(optionTrue[index].slice(2, -2), textElement);
+} else {
+  // Establecer como texto normal
+  textElement.innerText = optionTrue[index];
+}
+  } else {
+    const incorrectOptionArray = [optionFalseOne, optionFalseTwo, optionFalseThree];
+    const uniqueIncorrectIndex = getUniqueIncorrectOption(incorrectOptionArray, usedIncorrectIndexes);
+    usedIncorrectIndexes.push(uniqueIncorrectIndex);
+    const incorrectOption = incorrectOptionArray[uniqueIncorrectIndex][index];
+    // Comprobar si la opción incorrecta debe ser interpretada como LaTeX
+    if (isLatex(incorrectOption)) {
+  // Renderizar como LaTeX en el elemento de texto
+  // Nota: Se quitan los delimitadores '\\(' y '\\)' antes de renderizar
+  katex.render(incorrectOption.slice(2, -2), textElement);
+} else {
+  // Establecer como texto normal
+  textElement.innerText = incorrectOption;
+}
+  }
+});
+
 
   setTimeout(() => {
     optionElements[correctOptionIndex].classList.add("highlight");
@@ -151,18 +168,17 @@ function setOptions(index) {
 
     // Cambiamos la opacidad de las imágenes
     document.getElementById("team_image").style.opacity = 1;
-    document.getElementById("image_container").style.right= ("-20px");
-    document.getElementById("image_container").style.top= ("370px");
+    //document.getElementById("image_container").style.right= ("-20px");
+    //document.getElementById("image_container").style.top= ("370px");
 
-    document.getElementById("image_container").style.scale = 1.5;
+    //document.getElementById("image_container").style.scale = 1.5;
     document.getElementById("cover").style.opacity = 0;
 
     // Luego de un tiempo, volvemos a ocultar la imagen del equipo y mostramos la imagen cover
     setTimeout(() => {
-      document.getElementById("team_image").style.opacity = 0.3;
-      document.getElementById("image_container").style.scale = 0.7;
-      document.getElementById("cover").style.opacity = 1;
-
+      //document.getElementById("team_image").style.opacity = 0.3;
+      //document.getElementById("image_container").style.scale = 0.7;
+      document.getElementById("cover").style.opacity = 0;
 
     }, 3000); // Ajusta este valor para controlar el tiempo que tarda en ocultarse nuevamente la imagen del equipo (en milisegundos)
 
@@ -248,7 +264,7 @@ function setQuestionText(index) {
   const questionNumberElement = document.getElementById("question_number_text");
   const teamImageElement = document.getElementById("team_image");
   questionElement.innerHTML = `<span class="question-number"></span> ${questionText}`;
-  questionNumberElement.innerText = index ;
+  questionNumberElement.innerText = index;
   teamImageElement.src = "./imagenes/" + images[index]; // Añade el prefijo "./" a la fuente de la imagen
 
   gsap.fromTo(
@@ -284,7 +300,7 @@ setQuestionText(0);
       wiggle(questionNumber, 5, 0.7);
       wiggle(question_number_text,3,0.7);
       wiggle(team_image, 3,0.7);
-      wiggle(cover, 3,0.7);
+      wiggle(cover, 6, 0.5);
       wiggle(question, 3,0.7);
       // Mostrar las opciones iniciales
       //setOptions(0);
