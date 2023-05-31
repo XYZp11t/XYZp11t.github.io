@@ -13,25 +13,25 @@ html {
   width: 1920px;
   height: 1080px;
   position: relative;
-  border: 37px solid #4fd0ff;
-  overflow: hidden;;
+  border: 37px solid #50f3a2;
+  overflow: hidden;
   padding-left: 45px;
-  background-color: #4fd0ff;
+  background-color: #50f3a2;
   overflow: hidden;
 }
 
 #image_container {
   position: absolute;
-  width: 600px; /* Cambia esto al tamaño deseado */
+  width: 800px; /* Cambia esto al tamaño deseado */
   height: 800px; /* Cambia esto al tamaño deseado */
   overflow: hidden; /* Esconde las partes de la imagen que excedan el contenedor */
-  right: 30px;
-  top: 300px;
+  right: -130px;
+  top: 250px;
 }
 
 #team_image {
-  width: 70%; /* La imagen ocupará el 100% del ancho del contenedor */
-  height: 70%; /* La imagen ocupará el 100% del alto del contenedor */
+  width: 80%; /* La imagen ocupará el 100% del ancho del contenedor */
+  height: 80%; /* La imagen ocupará el 100% del alto del contenedor */
   object-fit: cover;
   opacity: 1; /* Asegura que la imagen cubra todo el contenedor, manteniendo su relación de aspecto */
   /*filter: drop-shadow(5px 10px 5px rgb(255, 196, 0));  */
@@ -151,16 +151,16 @@ html {
   #question{
     position: absolute;
     font-size: 55px;
-    color: rgb(255, 255, 255);/*#ff2903; /* Cambia el color del texto a blanco */
+    color: rgb(88, 60, 189);/*#ff2903; /* Cambia el color del texto a blanco */
     font-family: 'El Messiri', sans-serif; /* Usa la fuente personalizada 'Chilanka' */
     font-weight: bolder; /* Establece el texto en negrita */
     letter-spacing: 1.5px;
-    text-shadow: 1px 1px 1px #d816ff; /* Agrega una sombra negra al texto para mejorar la legibilidad */
+    /*text-shadow: 1px 1px 1px #d816ff; /* Agrega una sombra negra al texto para mejorar la legibilidad */
     /* Ajusta estos valores para posicionar el texto correctamente sobre las imágenes */
     top: 100px;
     left: 60px;
     /*transform: translate(-50%, -50%);*/
-    max-width: 1300px; /* Establece un ancho máximo para el texto */
+    max-width: 60%; /* Establece un ancho máximo para el texto */
     word-wrap: break-word; /* Permite que las palabras se dividan en varias líneas si el texto supera el ancho máximo */
     line-height: 1.3; 
   }
