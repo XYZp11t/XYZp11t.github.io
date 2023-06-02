@@ -22,7 +22,7 @@ html {
 
 #image_container {
   position: absolute;
-  width: 800px; /* Cambia esto al tamaño deseado */
+  width: 850px; /* Cambia esto al tamaño deseado */
   height: 800px; /* Cambia esto al tamaño deseado */
   overflow: hidden; /* Esconde las partes de la imagen que excedan el contenedor */
   right: -130px;
