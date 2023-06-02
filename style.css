@@ -13,10 +13,10 @@ html {
   width: 1920px;
   height: 1080px;
   position: relative;
-  border: 37px solid #50f3a2;
+  border: 37px solid #ec7551;
   overflow: hidden;
   padding-left: 45px;
-  background-color: #50f3a2;
+  background-color: #ec7551;
   overflow: hidden;
 }
 
@@ -151,7 +151,7 @@ html {
   #question{
     position: absolute;
     font-size: 55px;
-    color: rgb(88, 60, 189);/*#ff2903; /* Cambia el color del texto a blanco */
+    color: rgb(71, 33, 206);/*#ff2903; /* Cambia el color del texto a blanco */
     font-family: 'El Messiri', sans-serif; /* Usa la fuente personalizada 'Chilanka' */
     font-weight: bolder; /* Establece el texto en negrita */
     letter-spacing: 1.5px;
