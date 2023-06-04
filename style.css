@@ -13,10 +13,10 @@ html {
   width: 1920px;
   height: 1080px;
   position: relative;
-  border: 37px solid #ec7551;
+  border: 37px solid #e8f577;
   overflow: hidden;
   padding-left: 45px;
-  background-color: #ec7551;
+  background-color: #e8f577;
   overflow: hidden;
 }
 
@@ -25,13 +25,13 @@ html {
   width: 850px; /* Cambia esto al tamaño deseado */
   height: 800px; /* Cambia esto al tamaño deseado */
   overflow: hidden; /* Esconde las partes de la imagen que excedan el contenedor */
-  right: -130px;
+  right: -200px;
   top: 250px;
 }
 
 #team_image {
-  width: 80%; /* La imagen ocupará el 100% del ancho del contenedor */
-  height: 80%; /* La imagen ocupará el 100% del alto del contenedor */
+  width: 70%; /* La imagen ocupará el 100% del ancho del contenedor */
+  height: 70%; /* La imagen ocupará el 100% del alto del contenedor */
   object-fit: cover;
   opacity: 1; /* Asegura que la imagen cubra todo el contenedor, manteniendo su relación de aspecto */
   /*filter: drop-shadow(5px 10px 5px rgb(255, 196, 0));  */
