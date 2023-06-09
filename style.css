@@ -13,10 +13,10 @@ html {
   width: 1920px;
   height: 1080px;
   position: relative;
-  border: 37px solid #73c0ff;
+  border: 37px solid #dd8d57;
   overflow: hidden;
   padding-left: 45px;
-  background-color: #73c0ff;
+  background-color: #dd8d57;
   overflow: hidden;
 }
 
@@ -130,18 +130,18 @@ html {
   }
   .option-text {
     position: absolute;
-    font-size: 63px;
+    font-size: 68px;
     color: #ffffff; /* Cambia el color del texto a blanco */
     font-family: 'Chilanka', sans-serif; /* Usa la fuente personalizada 'Chilanka' */
     font-weight: bold; /* Establece el texto en negrita */
     letter-spacing: 5px;
     text-shadow: 2px 2px 4px #000000;; /* Agrega una sombra negra al texto para mejorar la legibilidad */
     max-width: 1500px;
-
+    text-align: left;
     /* Ajusta estos valores para posicionar el texto correctamente sobre las imágenes */
   
-    top: 30%;
-    left: 25%;
+    top: 33%;
+    left: 23%;
   }
 
    .fade-out {
@@ -157,7 +157,7 @@ html {
     letter-spacing: 1.5px;
     /*text-shadow: 1px 1px 1px #d816ff; /* Agrega una sombra negra al texto para mejorar la legibilidad */
     /* Ajusta estos valores para posicionar el texto correctamente sobre las imágenes */
-    top: 100px;
+    top: 113px;
     left: 60px;
     /*transform: translate(-50%, -50%);*/
     max-width: 60%; /* Establece un ancho máximo para el texto */

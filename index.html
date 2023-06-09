@@ -69,20 +69,19 @@ height: 1080px;">
     
     <script>
 
-      const images=[ 'a.png', 'a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png','J.png', 'k.png', 'l.png', 'm.png', 'n.png','ñ.gif', 'o.png', 'p.png', 'q.png', 'r.png', 's.png', 't.png', 'u.png', 'v.png', 'w.png', 'x.png', 'y.png', 'z.png', 'za.png', 'zb.png', 'zc.png', 'zd.png', 'ze.png', 'zf.png'];
+      const images=[ 'a.png', 'a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png','j.png', 'k.png', 'l.png', 'm.png', 'n.png','ñ.png', 'o.png', 'p.png', 'q.png', 'r.png', 's.png', 't.png', 'u.png', 'v.png', 'w.png', 'x.png', 'y.png', 'z.png', 'za.png', 'zb.png', 'zc.png', 'zd.png', 'ze.png', 'zf.png'];
 
-         const questions = ['Control', '¿Cuál es el valor de "x" si 2x = 8?', '¿Cuál es la fórmula química del ácido sulfúrico?', '¿Cuál es la unidad básica de la vida?', '¿Cuál de las siguientes estructuras se encuentra en el núcleo de la célula?', '¿Cuál es el país más grande del mundo?', '¿Cómo se llama el compuesto CH4?', '¿Quién formuló la ecuación E=mc²?', '¿Dónde se encuentra la Torre de Pisa?', '¿Cuál de los siguientes es el órgano encargado de la digestión de los alimentos en el cuerpo humano?', 'Si en una caja caben 25 bombones y tengo 100 bombones, ¿cuántas cajas necesito para guardar todos los bombones?', 'Un ángulo mayor que 90° y menor que 180° es conocido como:', '¿Qué nombre recibe la capa externa de la piel?', '¿Cuál es la capital de Brasil?', '¿Cuál es el resultado de multiplicar (-1)*(-1)?', '¿Cuál es el principal gas responsable del efecto invernadero?', '¿Cuál es el órgano encargado de la filtración de la sangre en el cuerpo humano?', '¿Qué gas se libera durante la fotosíntesis?', '¿En qué país se encuentra el Machu Picchu?', '¿Qué nombre recibe la molécula de CO2?', '¿Cuál es el órgano encargado de producir la insulina en el cuerpo humano?', '¿Cuál es la primera ley de Newton?', '¿Qué mide un termómetro?', '¿Cuál es la fuerza más débil conocida?', '¿Cuál de los siguientes no es un tipo de músculo?', '¿Cuál de las siguientes glándulas produce la hormona del crecimiento?', '¿Qué faraón egipcio es conocido por sus monumentos en Abu Simbel?', '¿Quién propuso la electrodinámica cuántica?', '¿Quién descubrió la penicilina?', '¿Cuántos grados hay en un ángulo recto?', '¿Cuál es el lago más grande del mundo?', '¿Quién descubrió el electrón?', '¿Qué pintor holandés es famoso por pintar "La noche estrellada"?', '¿Quién propuso la existencia de las ondas gravitatorias?'];
+         const questions = ['Control', '¿Qué es un ácido en términos de pH?', '¿En qué unidad se mide la resistencia eléctrica?', '¿Cuál es la fórmula química del amoníaco?', '¿Qué carga tiene un protón?', '¿Qué reina de Francia es conocida por decir "Que coman pastel", aunque probablemente nunca lo dijo?', '¿Qué regla establece que no puede haber dos fermiones en el mismo estado cuántico dentro del mismo sistema cuántico?', '¿Cuál es la raíz cuadrada de 49?', '¿Cómo se llama a la línea que divide un círculo en dos partes iguales?', '¿Cuál es el continente más grande del mundo?', '¿Cuál es el nombre del proceso mediante el cual las plantas liberan agua en forma de vapor?', '¿Cuál es el símbolo químico del Estaño?', '¿En qué año fue la Declaración de Independencia de los Estados Unidos?', '¿Qué número es la letra "V" en números romanos?', '¿Cómo se llama la energía en movimiento?', '¿En qué país se encuentran las pirámides de Guiza?', '¿Qué tipo de energía produce la respiración celular?', '¿Cómo se llama la recta que va desde el centro de un circulo a un punto de su perímetro?', '¿Cuál es la capital de Suecia?', 'Si un coche recorre 60 km en media hora, ¿a qué velocidad va?', '¿En qué continente se encuentra Nueva Zelanda?', '¿Qué es un gluón?', '¿Cómo se llama la tabla donde se organizan los elementos químicos?', '¿En qué país se encuentra el volcán Krakatoa?', '¿Cuál es el país más grande de África?', '¿En qué continente se encuentra la montaña Kilimanjaro?', '¿Cuál es la montaña más alta de América?', '¿Quién fue el primer hombre en realizar vuelos bien planeados, repetidos y exitosos con planeadores?', '¿Qué mide el decibelio?', '¿Cuál es la capital de Dinamarca?', '¿Cuál es el elemento más ligero de la tabla periódica?', '¿En qué país se encuentra el Taj Mahal?', '¿En dónde se encuentra el canal artificial navegable llamado Canal de Suez?', '¿Cuál es la molécula del agua?'];
 
 
    
-         const optionTrue = ['a', '4', 'H2SO4', 'Célula', 'ADN', 'Rusia', 'Metano', 'Albert Einstein', 'Italia', 'Estómago', '4', 'Obtuso', 'Epidermis', 'Brasilia', '+1', 'Dióxido de carbono', 'Riñón', 'Oxígeno', 'Perú', 'Dióxido de carbono', 'Páncreas', 'Ley de Inercia', 'Temperatura', 'Gravitatoria', 'Nervioso', 'Glándula pituitaria', 'Ramsés II', 'Paul Dirac', 'Alexander Fleming', '90', 'Mar Caspio', 'J.J. Thomson', 'Vincent Van Gogh', 'Albert Einstein'];
+         const optionTrue = ['a', 'Sustancia con pH<7', 'Ohmios', 'NH3', 'Carga positiva', 'María Antonieta', 'Exclusión de Pauli', '7', 'Diámetro', 'Asia', 'Transpiración', 'Sn', '1776', '5', 'Cinética', 'Egipto', 'Energía química (ATP)', 'Radio', 'Estocolmo', '120 km/h', 'Oceanía', 'Partícula que une quarks', 'Tabla periódica', 'Indonesia', 'Argelia', 'Africa', 'Aconcagua', 'Otto Lilienthal', 'La intensidad del sonido', 'Copenhague', 'Hidrógeno', 'India', 'Egipto', 'H2O'];
 
-         const optionFalseOne = ['b', '3', 'H2O', 'Átomo', 'Cloroplasto', 'Canadá', 'Etano', 'Max Planck', 'Francia', 'Riñón', '3', 'Recto', 'Dermis', 'Río de Janeiro', '-1', 'Oxígeno', 'Hígado', 'Dióxido de carbono', 'Chile', 'Monóxido de carbono', 'Hígado', 'Fuerza', 'Presión', 'Electromagnética', 'Esquelético', 'Glándula tiroides', 'Tutankamón', 'Max Planck', 'Marie Curie', '180', 'Lago Superior', 'Albert Einstein', 'Piet Mondrian', 'Isaac Newton'];
+         const optionFalseOne = ['b', 'Sust ancia con pH>7', 'Amperios', 'NH4', 'Carga negativa', 'Juana de Arco', 'Regla de la mano derecha', '11', 'Perímetro', 'África', 'Fotosíntesis', 'Tn', '1583', '50', 'Potencial', 'Marruecos', 'Energía solar', 'Diámetro', 'Oslo', '60 km/h', 'Africa', 'Partícula de luz', 'Tabla de elementos', 'Japón', 'Congo', 'América', 'Kilimanjaro', 'Wilbur Wright', 'La cantidad de luz', 'Estocolmo', 'Helio', 'China', 'Sudáfrica', 'O6H'];
 
-         const optionFalseTwo = ['c', '6', 'H2SO3', 'Molécula', 'Ribosoma', 'China', 'Metanol', 'Niels Bohr', 'España', 'Pulmón', '5', 'Cóncavo', 'Hipopodermis', 'Sao Paulo', '∓1', 'Nitrógeno', 'Páncreas', 'Nitrógeno', 'Bolivia', 'Cobre', 'Riñón', 'Acción y reacción', 'Humedad', 'Nuclear fuerte', 'Cardíaco', 'Glándula suprarrenal', 'Cleopatra', 'Albert Einstein', 'Louis Pasteur', '45', 'Lago Baikal', 'Marie Curie', 'Johannes Vermeer', 'Niels Bohr'];
-         
-         const optionFalseThree = ['d', '16', 'HSO4', 'Organelo', 'Mitocondria', 'Estados Unidos', 'Metileno', 'Richard Feynman', 'Portugal', 'Hígado', '6', 'Convexo', 'Tejido subcutáneo', 'Salvador', '±1', 'Metano', 'Estómago', 'Hidrógeno', 'Argentina', 'Cloro', 'Estómago', 'Gravitación', 'Velocidad', 'Nuclear débil', 'Liso', 'Glándula pancreática', 'Nefertiti', 'Erwin Schrödinger', 'Isaac Newton', '180', 'Lago Victoria', 'Ernest Rutherford', 'Rembrandt', 'Richard Feynman'];
+         const optionFalseTwo = ['c', 'Sustancia con pH=7', 'Voltios', 'NH2', 'Positiva y negativa', 'Catalina de Medici', 'Gravitación universal', '23', 'Radio', 'América', 'Respiración', 'St', '1888', '10', 'Térmica', 'Italia', 'Energía térmica', 'Seno', 'Copenhague', '30 km/h', 'América', 'Partícula de calor', 'Tabla química', 'Italia', 'Sudán', 'Europa', 'Everest', 'Orville Wright', 'La cantidad de calor', 'Oslo', 'Litio', 'Tailandia', 'India', 'H3O2'];
 
+         const optionFalseThree = ['d', 'Sustancia con pH=14', 'Wattios', 'N2H4', 'Neutra', 'María de Médicis', 'Teorema de Pitágoras', '98', 'Tangente', 'Antártida', 'Evaporación', 'Ts', '1350', '3', 'Eléctrica', 'Brasil', 'Energía eléctrica', 'Pi', 'Helsinki', '45 km/h', 'Europa', 'Partícula de gravedad', 'Tabla de Mendeleev', 'Filipinas', 'Libia', 'Asia', 'Denali', 'Louis Blériot', 'La presión atmosférica', 'Helsinki', 'Carbono', 'Nepal', 'China', 'H2O6'];
 
       const optionElements = [
         document.getElementById("option_one"),
@@ -171,7 +170,7 @@ function setOptions(index) {
 
     }, 3000); // Ajusta este valor para controlar el tiempo que tarda en ocultarse nuevamente la imagen del equipo (en milisegundos)
 
-  }, 10000);
+  }, 1000);
 
   setTimeout(() => {
     optionElements.forEach(element => {
@@ -186,7 +185,7 @@ function setOptions(index) {
         setQuestionText(index + 1);
       }, 1000);
     }
-  }, 13000);
+  }, 1300); 
 }
 
 
