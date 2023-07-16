@@ -13,7 +13,8 @@ nombres_imagenes = []
 for nombre in nombres_archivos:
     if nombre.endswith(".jpg") or nombre.endswith(".png"):
         nombres_imagenes.append(nombre)
-
+        
+nombres_imagenes.sort()
 # Imprimir la lista de nombres de imagen
 print(nombres_imagenes)
 print(len(nombres_imagenes))

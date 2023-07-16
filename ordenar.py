@@ -1,73 +1,42 @@
-A = [
-['¿Qué club inglés es conocido como "Los Spurs"?', 'Tottenham', 'Manchester City', 'Arsenal', 'West Ham United'],
- 
-['¿Qué equipo italiano es conocido como "La Vecchia Signora"?', 'Juventus', 'Napoli', 'AC Milan', 'Roma'],
+A = [['¿Cuál es la suma de los 10 primeros números naturales? (sin contar el 0)', '55', '57', '67', '100'], 
+['¿En qué país se encuentra el río Misisipi?', 'Estados Unidos', 'Canadá', 'México', 'Brasil'], 
+['¿Qué emperador romano construyó un muro en Gran Bretaña?', 'Adriano', 'Augusto', 'Nerón', 'Julio César'], 
+['¿Cuál de los siguientes no es un tipo de tejido animal?', 'Clorofílico', 'Epitelial', 'Muscular', 'Nervioso'], 
+['¿Cuál de los siguientes es un hueso del cráneo humano?', 'Frontal', 'Fémur', 'Costilla', 'Húmero'], 
+['¿Cuál de los siguientes es el órgano encargado de la producción de la bilis?', 'Hígado', 'Riñón', 'Pulmón', 'Páncreas'], 
+['¿Qué elemento tiene el símbolo químico Na?', 'Sodio', 'Nitrógeno', 'Neón', 'Níquel'], 
+['¿Cómo se le llama a los ángulos menores que 45°', 'Agudos', 'Obtusos', 'Graves', 'Cóncavo'], 
+['¿Cuál es la principal función de las enzimas en los seres vivos?', 'Catalizar reacciones químicas', 'Transportar oxígeno', 'Producir energía', 'Regular la temperatura corporal'], 
+['¿Qué faraón egipcio es conocido por su máscara funeraria de oro?', 'Tutankamón', 'Ramsés II', 'Cleopatra', 'Nefertiti'], 
+['En multiplicación de signos - por + es igual a...', '-', '+', '±', '∓'], 
+['¿Quién fue el último zar de Rusia?', 'Nicolás II', 'Alejandro III', 'Alejandro II', 'Pedro III'], 
+['¿En qué país se encentra el volcán Popocatépetl?', 'México', 'Perú', 'Honduras', 'Colombia'], 
+['¿Cuál es el otro nombre común de la vitamina C?', 'Ácido ascórbico', 'Vitamina B12', 'Vitamina D', 'Ácido fólico'], 
+['¿Qué emperador romano legalizó el cristianismo?', 'Constantino', 'Nerón', 'Augusto', 'Julio César'], 
+['¿Cuál es el estado de la materia donde las partículas están más juntas?', 'Sólido', 'Líquido', 'Gaseoso', 'Plasma'], 
+['¿Cuál es la raiz cuadrada de 144?', '12', '24', '44', '10.4'], 
+['¿Qué famoso físico propuso las tres leyes del movimiento?', 'Isaac Newton', 'Albert Einstein', 'Galileo Galilei', 'Nikola Tesla'], 
+['¿Cuál de los siguientes no es un tipo de tejido animal?', 'Clorofílico', 'Epitelial', 'Muscular', 'Nervioso'], 
+['¿Qué elemento es el más abundante en el universo?', 'Hidrógeno', 'Oxígeno', 'Helio', 'Nitrógeno'], 
+['¿En qué año se celebraron los primeros Juegos Olímpicos modernos?', '1896', '1900', '1912', '1880'], 
+['¿En qué país se encuentra el río Ganges?', 'India', 'Bangladesh', 'Nepal', 'Bután'], 
+['¿Cuál es el símbolo químico del hierro?', 'Fe', 'H', 'He', 'I'], 
+['¿En qué año se formó la Unión Europea?', '1993', '1989', '1995', '2000'], 
+['¿Cuál es el nombre del pigmento responsable de dar color a la piel?', 'Melanina', 'Clorofila', 'Hemoglobina', 'Bilirrubina'], 
+['¿Qué arquitecto diseñó la Sagrada Familia en Barcelona?', 'Antoni Gaudí', 'Pablo Picasso', 'Salvador Dalí', 'Joan Miró'], 
+['¿Cuál de los siguientes es un ejemplo de una proteína?', 'Hemoglobina', 'Glucosa', 'ADN', 'Vitamina C'], 
+['¿Cuál es el nombre de la molécula responsable del transporte de oxígeno en la sangre?', 'Hemoglobina', 'Insulina', 'Enzima', 'Melanina'], 
+['¿Cuál es la ley de Ohm?', 'V=IR', 'E=mc^2', 'F=ma', 'a=v/t'], 
+['¿Qué mide el espectro electromagnético?', 'Longitud de onda', 'Carga eléctrica', 'Corriente', 'Voltaje'], 
+['¿Cuál es el elemento más electronegativo?', 'Flúor', 'Oxígeno', 'Nitrógeno', 'Cloro'], 
+['¿En qué ciudad se encuentra la Estatua de la Libertad?', 'Nueva York', 'Washington D.C.', 'Chicago', 'Boston'], 
+['¿Qué número (apróximado) representa la letra griega π?', '3.1416', '3', '6.1416', '4']]
 
-['¿Qué club inglés es conocido como "Los Gunners"?', 'Arsenal', 'Newcastle', 'Manchester United', 'Wolves'],
-
-['¿A qué club español se le conoce como “Los Merengues”?', 'Real Madrid', 'Sevilla', 'Atlético de Madrid', 'Girona'],
-
-['¿Qué club inglés es conocido como "Los Red Devils"?', 'Manchester United', 'Chealsea', 'Liverpool', 'Arsenal'],
-
-['¿Qué equipo de argentina se apoda "Xeneize"?', 'Boca Juniors', 'Rivel Plate', 'Racing', 'Rosario central'],
-
-['¿Qué equipo argentino es apodado "El Millonario"?', 'River Plate', 'Boca Juniors', 'Newlls', 'Independiente'],
-
-['¿Qué equipo italiano es apodado "La Loba"?', 'Roma', 'Juventus', 'Inter de Milan', 'AC Milan'],
-
-['¿Qué club de fútbol mexicano es conocido como "Las Águilas"?', 'Club América', 'Monterrey', 'Guadalajara', 'Club Toluca'],
-
-['¿Qué equipo se apoda "Los Blues"?', 'Chelsea', 'Manchester City' , 'Newcastle', 'Wolves'],
-
-['¿Qué club tiene el apodo “Los Colchoneros”?', 'Atlético de Madrid', 'Real Betis','Rayo Vallecano', 'FC Barcelona'],
-
-['¿Qué equipo es apodado “El Submarino Amarillo”?', 'Villareal', 'Real Sociedad', 'Sevilla', 'Celta de Vigo'],
-
-['¿Qué equipo es conocido como “Las Chivas”?', 'CD Guadalajara', 'Atlas', 'Morelia', 'Tigres'],
-
-['¿Qué equipo español se apoda "Los Leones"?', 'Athletic Club', 'Levante', 'Granada', 'Celta de Vigo'],
-
-['¿Qué equipo es conocido como “Culés”?', 'FC Barcelona', 'Espanyol', 'Girona', 'Eibar'],
-
-['¿Qué club italiano es apodado “Diavoli”?', 'AC Milan', 'Inter de Milan', 'Sassuolo', 'Napoli'],
-
-['¿Cuál club es apodado “Citezens”?', 'Manchester City', 'Arsenal', 'Leicester City', 'Chelsea'],
-
-['¿Qué equipo español se apoda “Palanganas”?', 'Sevilla FC', 'Real Betis', 'Granada', 'Espanyol'], 
-
-['¿Qué equipo mexicano es apodado “Pumas”?', 'Universidad Nacional (UNAM)', 'Guadalajara', 'Monterrey', 'Club América'],
-
-['¿Qué equipo de España se apoda "Pericos"?', 'RCD Espanyol', 'FC Barcelona', 'UD Las Palmas', 'Sevilla'],
-
-['¿Qué club inglés es conocido como "Los Reds"?', 'Liverpool', 'Manchester United', 'Tottenham Hotspur', 'Everton'],
-
-['¿Qué equipo alemán es conocido como "Die Roten"?', 'Bayern Munich', 'Borussia Dortmund', 'RB Leipzig', 'Bayer Leverkusen'],
-
-['¿Qué club francés es conocido como "Les Parisiens"?', 'Paris Saint-Germain', 'Olympique Lyonnais', 'AS Monaco', 'Stade Rennais'],
-
-['¿Qué equipo portugués es conocido como "Águias"?', 'SL Benfica', 'Sporting CP', 'FC Porto', 'Vitória de Guimarães'],
-
-['¿Qué club brasileño es conocido como "Tricolor Paulista"?', 'São Paulo', 'Flamengo', 'Palmeiras', 'Santos'],
-
-['¿Qué equipo holandés es conocido como "Los Granjeros"?', 'PSV Eindhoven', 'Ajax', 'Feyenoord', 'FC Utrecht'],
-
-['¿Qué club italiano es conocido como "Nerazzurri"?', 'Inter de Milan', 'Juventus', 'AC Milan', 'Lazio'],
-
-['¿Qué club alemán es conocido como "Die Schwarzgelben (Los negriamarillos)"?', 'Borussia Dortmund', 'Bayern Munich', 'Schalke 04', 'VfB Stuttgart'],
-
-['¿Qué equipo portugués es conocido como "Os Dragões"?', 'FC Porto', 'Sporting CP', 'SL Benfica', 'SC Braga'],
-
-['¿Qué equipo alemán es conocido como "Los Toros Rojos"?','RB Leipzig', 'Borussia Dortmund', 'Bayern Munich', 'Eintracht Frankfurt'],
-['¿Qué club turco es conocido como "Las Águilas Negras"?', 'Beşiktaş', 'Fenerbahçe', 'Galatasaray', 'Trabzonspor'],
-['¿Qué equipo colombiano es conocido como "Los Embajadores"?', 'Millonarios', 'Atlético Nacional', 'Deportivo Cali', 'Independiente Santa Fe'],
-['¿Qué equipo colombiano es conocido como "Los Verdolagas"?', 'Atlético Nacional', 'Millonarios', 'Deportivo Cali', 'Independiente Santa Fe']
-]
-
-P=[]
-T=[]
-I1=[]
-I2=[]
-I3=[]
+P=['Control']
+T=['a']
+I1=['b']
+I2=['c']
+I3=['d']
 a=0
 for i in A:
     P.append(i[0])
@@ -78,13 +47,15 @@ for i in A:
     a+=1
 
 #for i in T:
-#    print(i)
-#print(P)
-#print(T)
-#print(I1)
-#print(I2)
-#print(I3)
-#print(a)
+print(a)
+print(P)
+print(a)
+print(T)
+print(a)
+print(I1)
+print(a)
+print(I2)
+print(a)
 
 a=['tottenham.png','juventus.png', 'arsenal.png', 'r-madrid.png','manunited.png','boca.png','river.png','roma.png','america.png','chelsea.png','a-madrid.png','villareal.png','chivas.png','bilbao.png','barcelona.png','milan.png','mancity.png','sevilla.png','pumas.png','esapnyoñ.png',    'liverpool.png', 'bayern.png','psg.png','benfica.png','sanpablo.png','psv.png','inter.png', 'dortmund.png', 'porto.png', 'leipzig.png','besiktas.png', 'millonarios.png','nacional.png']
 aa=[] 
@@ -112,4 +83,4 @@ for x in a,b,c,d,e,f:
     if z==3:
         break
         
-print(aa, bb, cc, dd, ee, ff)
+#print(aa, bb, cc, dd, ee, ff)
