@@ -18,6 +18,7 @@ height: 1080px;">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <link rel="stylesheet" href="style.css"> 
@@ -28,38 +29,34 @@ height: 1080px;">
     </div>
     <img id="cover" src="icover.png">
     <p id="question"></p>
-    
-    <div class="option-container" id="option_one">
-      <img src="bar_option1.png">
-      <div class="option-content">
-        <span class="option-letter">A.</span>
-        <span class="option-text"></span>
+   
+  
+
+      <div class="option-container" id="option_one">
+        <img src="bar_option1.png">
+        <div class="option-content">
+          <span class="option-letter">A.</span>
+          <span class="option-text"></span>
+        </div>
       </div>
-    </div>
-    
-    <div class="option-container" id="option_two">
-      <img src="bar_option1.png">
-      <div class="option-content">
-        <span class="option-letter">B.</span>
-        <span class="option-text"></span>
+      
+      <div class="option-container" id="option_two">
+        <img src="bar_option1.png">
+        <div class="option-content">
+          <span class="option-letter">B.</span>
+          <span class="option-text"></span>
+        </div>
       </div>
-    </div>
-    
-    <div class="option-container" id="option_three">
-      <img src="bar_option1.png">
-      <div class="option-content">
-        <span class="option-letter">C.</span>
-        <span class="option-text"></span>
+      
+      <div class="option-container" id="option_three">
+        <img src="bar_option1.png">
+        <div class="option-content">
+          <span class="option-letter">C.</span>
+          <span class="option-text"></span>
+        </div>
       </div>
-    </div>
     
-    <div class="option-container" id="option_four">
-      <img src="bar_option1.png">
-      <div class="option-content">
-        <span class="option-letter">D.</span>
-        <span class="option-text"></span>
-      </div>
-    </div>
+    
     
     <img id="question_number" src="question_number.png">
     <div id="question_number_text">1</div>
@@ -69,25 +66,24 @@ height: 1080px;">
     
     <script>
 
-      const images=[ 'a.png', 'a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png','j.png', 'k.png', 'l.png', 'm.png', 'n.png','ñ.png', 'o.png', 'p.png', 'q.png', 'r.png', 's.png', 't.png', 'u.png', 'v.png', 'w.png', 'x.png', 'y.png', 'z.png', 'za.png', 'zb.png', 'zc.png', 'zd.png', 'ze.png', 'zf.png'];
+      const images=[ 'a.png', 'a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png','j.png', 'k.png', 'l.png', 'm.png', 'n.png', 'o.png', 'p.png', 'q.png', 'r.png', 's.png', 't.png', 'u.png', 'v.png', 'w.png', 'x.png', 'y.png', 'z.png', 'za.png', 'zb.png', 'zc.png', 'zd.png', 'ze.png', 'zf.png', 'zg.png'];
 
-         const questions = ['Control', '¿Qué es un ácido en términos de pH?', '¿En qué unidad se mide la resistencia eléctrica?', '¿Cuál es la fórmula química del amoníaco?', '¿Qué carga tiene un protón?', '¿Qué reina de Francia es conocida por decir "Que coman pastel", aunque probablemente nunca lo dijo?', '¿Qué regla establece que no puede haber dos fermiones en el mismo estado cuántico dentro del mismo sistema cuántico?', '¿Cuál es la raíz cuadrada de 49?', '¿Cómo se llama a la línea que divide un círculo en dos partes iguales?', '¿Cuál es el continente más grande del mundo?', '¿Cuál es el nombre del proceso mediante el cual las plantas liberan agua en forma de vapor?', '¿Cuál es el símbolo químico del Estaño?', '¿En qué año fue la Declaración de Independencia de los Estados Unidos?', '¿Qué número es la letra "V" en números romanos?', '¿Cómo se llama la energía en movimiento?', '¿En qué país se encuentran las pirámides de Guiza?', '¿Qué tipo de energía produce la respiración celular?', '¿Cómo se llama la recta que va desde el centro de un circulo a un punto de su perímetro?', '¿Cuál es la capital de Suecia?', 'Si un coche recorre 60 km en media hora, ¿a qué velocidad va?', '¿En qué continente se encuentra Nueva Zelanda?', '¿Qué es un gluón?', '¿Cómo se llama la tabla donde se organizan los elementos químicos?', '¿En qué país se encuentra el volcán Krakatoa?', '¿Cuál es el país más grande de África?', '¿En qué continente se encuentra la montaña Kilimanjaro?', '¿Cuál es la montaña más alta de América?', '¿Quién fue el primer hombre en realizar vuelos bien planeados, repetidos y exitosos con planeadores?', '¿Qué mide el decibelio?', '¿Cuál es la capital de Dinamarca?', '¿Cuál es el elemento más ligero de la tabla periódica?', '¿En qué país se encuentra el Taj Mahal?', '¿En dónde se encuentra el canal artificial navegable llamado Canal de Suez?', '¿Cuál es la molécula del agua?'];
-
+         const questions =['Control', '¿Cuál es la suma de los 10 primeros números naturales? (sin contar el 0)', '¿En qué país se encuentra el río Misisipi?', '¿Cuál de los siguientes países no pertenece al Reino Unido?', '¿Cuál de los siguientes no es un tipo de tejido animal?', '¿Cuál de los siguientes es un hueso del cráneo humano?', '¿Cuál de los siguientes es el órgano encargado de la producción de la bilis?', '¿Qué elemento tiene el símbolo químico Na?', '¿Cómo se le llama a los ángulos menores que 45°?', '¿Cuál es la principal función de las enzimas en los seres vivos?', '¿Qué faraón egipcio es conocido por su máscara funeraria de oro?', 'En multiplicación de signos - (menos) por + (más) es igual a...', '¿Quién fue el último zar de Rusia?', '¿En qué país se encentra el volcán Popocatépetl?', '¿Cuál es el otro nombre común de la vitamina C?', '¿Qué emperador romano legalizó el cristianismo?', '¿Cuál es el estado de la materia donde las partículas están más juntas?', '¿Cuál es la raiz cuadrada de 144?', '¿Qué famoso físico propuso las tres leyes del movimiento?', '¿Cuál es la capital de Uruguay?', '¿Qué elemento es el más abundante en el universo?', '¿En qué año se celebraron los primeros Juegos Olímpicos modernos?', '¿En qué país se encuentra el río Ganges?', '¿Cuál es el símbolo químico del hierro?', '¿En qué año se formó la Unión Europea?', '¿Cuál es el nombre del pigmento responsable de dar color a la piel?', '¿Qué arquitecto diseñó la Sagrada Familia en Barcelona?', '¿Cuál de los siguientes es un ejemplo de una proteína?', '¿Cuál es el nombre de la molécula responsable del transporte de CO2 en la sangre?', '¿Cuál es la ley de Ohm?', '¿Qué conforma al espectro electromagnético?', '¿Cuál es el elemento más electronegativo?', '¿En qué ciudad se encuentra la Estatua de la Libertad?', '¿Qué número (apróximado) representa a la letra griega π (pi)?']
+;
 
    
-         const optionTrue = ['a', 'Sustancia con pH<7', 'Ohmios', 'NH3', 'Carga positiva', 'María Antonieta', 'Exclusión de Pauli', '7', 'Diámetro', 'Asia', 'Transpiración', 'Sn', '1776', '5', 'Cinética', 'Egipto', 'Energía química (ATP)', 'Radio', 'Estocolmo', '120 km/h', 'Oceanía', 'Partícula que une quarks', 'Tabla periódica', 'Indonesia', 'Argelia', 'Africa', 'Aconcagua', 'Otto Lilienthal', 'La intensidad del sonido', 'Copenhague', 'Hidrógeno', 'India', 'Egipto', 'H2O'];
+         const optionTrue = ['Catalizar reacc químicas', '55', 'Estados Unidos', 'Islandia', 'Clorofílico', 'Frontal', 'Hígado', 'Sodio', 'Agudos', 'Catalizar reacc químicas', 'Tutankamón', '- menos', 'Nicolás II', 'México', 'Ácido ascórbico', 'Constantino I', 'Sólido', '12', 'Isaac Newton', 'Montevideo', 'Hidrógeno', '1896', 'India', 'Fe', '1993', 'Melanina', 'Antoni Gaudí', 'Hemoglobina', 'Hemoglobina', 'V=IR', 'Longitudes de ondas', 'Flúor', 'Nueva York', '3.1416'];
 
-         const optionFalseOne = ['b', 'Sust ancia con pH>7', 'Amperios', 'NH4', 'Carga negativa', 'Juana de Arco', 'Regla de la mano derecha', '11', 'Perímetro', 'África', 'Fotosíntesis', 'Tn', '1583', '50', 'Potencial', 'Marruecos', 'Energía solar', 'Diámetro', 'Oslo', '60 km/h', 'Africa', 'Partícula de luz', 'Tabla de elementos', 'Japón', 'Congo', 'América', 'Kilimanjaro', 'Wilbur Wright', 'La cantidad de luz', 'Estocolmo', 'Helio', 'China', 'Sudáfrica', 'O6H'];
+         const optionFalseOne = ['E=mc²', '57', 'Canadá', 'Gales', 'Epitelial', 'Fémur', 'Riñón', 'Nitrógeno', 'Obtusos', 'Transportar oxígeno', 'Ramsés II', '+ más', 'Alejandro III', 'Perú', 'Vitamina B12', 'Nerón', 'Líquido', '24', 'Albert Einstein', 'Bogotá', 'Oxígeno', '1900', 'Bután', 'H', '1989', 'Clorofila', 'Pablo Picasso', 'Glucosa', 'Insulina', 'E=mc²', 'Cargas eléctricas', 'Oxígeno', 'Washington D.C.', '2.718'];
 
-         const optionFalseTwo = ['c', 'Sustancia con pH=7', 'Voltios', 'NH2', 'Positiva y negativa', 'Catalina de Medici', 'Gravitación universal', '23', 'Radio', 'América', 'Respiración', 'St', '1888', '10', 'Térmica', 'Italia', 'Energía térmica', 'Seno', 'Copenhague', '30 km/h', 'América', 'Partícula de calor', 'Tabla química', 'Italia', 'Sudán', 'Europa', 'Everest', 'Orville Wright', 'La cantidad de calor', 'Oslo', 'Litio', 'Tailandia', 'India', 'H3O2'];
-
-         const optionFalseThree = ['d', 'Sustancia con pH=14', 'Wattios', 'N2H4', 'Neutra', 'María de Médicis', 'Teorema de Pitágoras', '98', 'Tangente', 'Antártida', 'Evaporación', 'Ts', '1350', '3', 'Eléctrica', 'Brasil', 'Energía eléctrica', 'Pi', 'Helsinki', '45 km/h', 'Europa', 'Partícula de gravedad', 'Tabla de Mendeleev', 'Filipinas', 'Libia', 'Asia', 'Denali', 'Louis Blériot', 'La presión atmosférica', 'Helsinki', 'Carbono', 'Nepal', 'China', 'H2O6'];
+         const optionFalseTwo = ['c', '67', 'México', 'Escocia', 'Muscular', 'Costilla', 'Pulmón', 'Neón', 'Graves', 'Producir energía', 'Cleopatra', '± más menos', 'Alejandro II', 'Honduras', 'Vitamina D', 'Augusto', 'Gaseoso', '44', 'Galileo Galilei', 'Buenos Aires', 'Helio', '1912', 'Nepal', 'He', '1995', 'Hemoglobina', 'Salvador Dalí', 'ADN', 'Enzima', 'F=ma', 'Corrientes', 'Nitrógeno', 'Chicago', '1.618'];
+        
 
       const optionElements = [
         document.getElementById("option_one"),
         document.getElementById("option_two"),
         document.getElementById("option_three"),
-        document.getElementById("option_four"),
+        
       ];
 
       //Transición
@@ -108,7 +104,7 @@ function getUniqueIncorrectOption(incorrectOptionArrays, usedIncorrectIndexes) {
 }
 
 function setOptions(index) {
-  const correctOptionIndex = Math.floor(Math.random() * 4);
+  const correctOptionIndex = Math.floor(Math.random() * 3);
   const usedIncorrectIndexes = [];
 
   optionElements.forEach((element, i) => {
@@ -124,7 +120,7 @@ function setOptions(index) {
   textElement.innerText = optionTrue[index];
 }
   } else {
-    const incorrectOptionArray = [optionFalseOne, optionFalseTwo, optionFalseThree];
+    const incorrectOptionArray = [optionFalseOne, optionFalseTwo];
     const uniqueIncorrectIndex = getUniqueIncorrectOption(incorrectOptionArray, usedIncorrectIndexes);
     usedIncorrectIndexes.push(uniqueIncorrectIndex);
     const incorrectOption = incorrectOptionArray[uniqueIncorrectIndex][index];
@@ -170,7 +166,7 @@ function setOptions(index) {
 
     }, 3000); // Ajusta este valor para controlar el tiempo que tarda en ocultarse nuevamente la imagen del equipo (en milisegundos)
 
-  }, 10000);
+  }, 1000);
 
   setTimeout(() => {
     optionElements.forEach(element => {
@@ -185,7 +181,7 @@ function setOptions(index) {
         setQuestionText(index + 1);
       }, 1000);
     }
-  }, 13000); 
+  }, 1300); 
 }
 
 
@@ -281,15 +277,11 @@ setQuestionText(0);
       }
 
       const questionNumber = document.getElementById("question_number");
-      wiggle(option_one, 3, 0.7);
-      wiggle(option_two, 3, 0.7);
-      wiggle(option_three, 3, 0.7);
-      wiggle(option_four, 3, 0.7);
       wiggle(questionNumber, 5, 0.7);
       wiggle(question_number_text,3,0.7);
       wiggle(team_image, 3,0.7);
       wiggle(cover, 6, 0.5);
-      wiggle(question, 3,0.7);
+      
       // Mostrar las opciones iniciales
       //setOptions(0);
 
