@@ -3,7 +3,7 @@
 ---
 
 <div class="modelo-container">
-  <div id="contenedor-modelo">
+  <div id="contenedor-modelo" style="position:relative;">
     <canvas id="modelo-canvas"></canvas>
     <div id="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
@@ -12,11 +12,7 @@
     <div id="error" class="error-overlay" style="display: none;">
       <p>Error al cargar el modelo. Verifica la consola para más detalles.</p>
     </div>
-  </div>
-  <div class="controles">
-    <button id="btn-reset">Resetear Vista</button>
-    <button id="btn-rotar">Rotar Modelo</button>
-    <div class="controles-checkbox" id="controles-checkbox">
+    <div class="controles-checkbox floating" id="controles-checkbox">
       <div class="controles-header" id="controles-header">
         <span>Capas solares</span>
         <button id="btn-minimizar" aria-label="Minimizar">-</button>
@@ -26,8 +22,13 @@
         <label><input type="checkbox" id="chk-cromosfera" checked> Ver cromosfera</label>
       </div>
     </div>
+    <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
+  </div>
+  <div class="controles">
+    <button id="btn-reset">Resetear Vista</button>
+    <button id="btn-rotar">Rotar Modelo</button>
     <div class="info">
-      <p>Usa el mouse para navegar: Click + arrastrar para rotar, scroll para zoom</p>
+      <p>Usa el <b>scroll</b> para zoom. (Rotación deshabilitada)</p>
     </div>
   </div>
 </div>
@@ -74,6 +75,9 @@
     const controles = new OrbitControls(camara, renderizador.domElement);
     controles.enableDamping = true;
     controles.dampingFactor = 0.05;
+    controles.enableRotate = true; // Permitir rotación con mouse
+    controles.enablePan = false;   // No permitir arrastrar el modelo fuera de su posición
+    // controles.minAzimuthAngle = controles.maxAzimuthAngle = undefined; // (Opcional: limitar ángulos)
 
     // Iluminación
     const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.6);
@@ -85,9 +89,9 @@
 
     // Cargar el modelo GLB
     const loader = new GLTFLoader();
-    let modelo = null;
+    let modelo: any = null;
     let rotacionAutomatica = false;
-    /** @type {Record<string, THREE.Mesh | undefined>} */
+    /** @type {Record<string, any>} */
     let meshes = {
       fotosferaExterior: undefined,
       cromosferaExterior: undefined,
@@ -107,33 +111,33 @@
       if (!meshes) return;
       if (corteActivo) {
         // Mostrar solo el sol cortado
-        if (meshes.nucleo) meshes.nucleo.visible = true;
-        if (meshes.zonaRadiativaCorte) meshes.zonaRadiativaCorte.visible = true;
-        if (meshes.zonaConvectivaCorte) meshes.zonaConvectivaCorte.visible = true;
-        if (meshes.fotosferaCorteT) meshes.fotosferaCorteT.visible = true;
-        if (meshes.fotosferaCorte) meshes.fotosferaCorte.visible = true;
-        if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = cromosferaActiva;
-        if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = cromosferaActiva;
+        if (meshes.nucleo) (meshes.nucleo as any).visible = true;
+        if (meshes.zonaRadiativaCorte) (meshes.zonaRadiativaCorte as any).visible = true;
+        if (meshes.zonaConvectivaCorte) (meshes.zonaConvectivaCorte as any).visible = true;
+        if (meshes.fotosferaCorteT) (meshes.fotosferaCorteT as any).visible = true;
+        if (meshes.fotosferaCorte) (meshes.fotosferaCorte as any).visible = true;
+        if (meshes.cromosferaCorteT) (meshes.cromosferaCorteT as any).visible = cromosferaActiva;
+        if (meshes.cromosferaCorte) (meshes.cromosferaCorte as any).visible = cromosferaActiva;
         // Ocultar sol completo
-        if (meshes.fotosferaExterior) meshes.fotosferaExterior.visible = false;
-        if (meshes.cromosferaExterior) meshes.cromosferaExterior.visible = false;
+        if (meshes.fotosferaExterior) (meshes.fotosferaExterior as any).visible = false;
+        if (meshes.cromosferaExterior) (meshes.cromosferaExterior as any).visible = false;
         // Si la cromosfera está desactivada, ocultar cromosfera cortada
         if (!cromosferaActiva) {
-          if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = false;
-          if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = false;
+          if (meshes.cromosferaCorteT) (meshes.cromosferaCorteT as any).visible = false;
+          if (meshes.cromosferaCorte) (meshes.cromosferaCorte as any).visible = false;
         }
       } else {
         // Mostrar solo el sol completo
-        if (meshes.fotosferaExterior) meshes.fotosferaExterior.visible = true;
-        if (meshes.cromosferaExterior) meshes.cromosferaExterior.visible = cromosferaActiva;
+        if (meshes.fotosferaExterior) (meshes.fotosferaExterior as any).visible = true;
+        if (meshes.cromosferaExterior) (meshes.cromosferaExterior as any).visible = cromosferaActiva;
         // Ocultar sol cortado
-        if (meshes.nucleo) meshes.nucleo.visible = false;
-        if (meshes.zonaRadiativaCorte) meshes.zonaRadiativaCorte.visible = false;
-        if (meshes.zonaConvectivaCorte) meshes.zonaConvectivaCorte.visible = false;
-        if (meshes.fotosferaCorteT) meshes.fotosferaCorteT.visible = false;
-        if (meshes.fotosferaCorte) meshes.fotosferaCorte.visible = false;
-        if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = false;
-        if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = false;
+        if (meshes.nucleo) (meshes.nucleo as any).visible = false;
+        if (meshes.zonaRadiativaCorte) (meshes.zonaRadiativaCorte as any).visible = false;
+        if (meshes.zonaConvectivaCorte) (meshes.zonaConvectivaCorte as any).visible = false;
+        if (meshes.fotosferaCorteT) (meshes.fotosferaCorteT as any).visible = false;
+        if (meshes.fotosferaCorte) (meshes.fotosferaCorte as any).visible = false;
+        if (meshes.cromosferaCorteT) (meshes.cromosferaCorteT as any).visible = false;
+        if (meshes.cromosferaCorte) (meshes.cromosferaCorte as any).visible = false;
       }
     }
 
@@ -146,7 +150,7 @@
         escena.add(modelo);
 
         // Centrar el modelo
-        const box = new THREE.Box3().setFromObject(modelo);
+        const box = new THREE.Box3().setFromObject(modelo as any);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         
@@ -159,7 +163,7 @@
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = camara.fov * (Math.PI / 180);
         let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 2;
+        cameraZ *= 1.1; // Más cerca para que el modelo se vea grande
         camara.position.set(cameraZ, cameraZ, cameraZ);
         camara.lookAt(0, 0, 0);
         
@@ -167,9 +171,9 @@
         controles.update();
 
         // Mapear los meshes relevantes
-        modelo.traverse((obj) => {
-          if (obj.isMesh) {
-            const mesh = obj;
+        (modelo as any).traverse((obj: any) => {
+          if (obj.type === 'Mesh') {
+            const mesh = obj as any;
             switch (mesh.name) {
               case 'Fotosfera_Exterior':
                 meshes.fotosferaExterior = mesh;
@@ -265,9 +269,17 @@
         if (modelo) {
           modelo.rotation.set(0, 0, 0);
         }
-        camara.position.set(10, 10, 10);
+        // Ajustar la cámara para que el modelo se vea más grande
+        const box = new THREE.Box3().setFromObject(modelo as any);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camara.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+        cameraZ *= 1.1;
+        camara.position.set(cameraZ, cameraZ, cameraZ);
         camara.lookAt(0, 0, 0);
-        controles.reset();
+        controles.target.set(0, 0, 0);
+        controles.update();
       });
     }
 
@@ -305,6 +317,16 @@
       });
     }
 
+    // Pantalla completa en móvil
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (btnFullscreen && contenedor) {
+      btnFullscreen.addEventListener('click', () => {
+        if (contenedor.requestFullscreen) {
+          contenedor.requestFullscreen();
+        }
+      });
+    }
+
     window.addEventListener('resize', onWindowResize);
     animar();
   });
@@ -317,6 +339,38 @@
     gap: 1rem;
     max-width: 1200px;
     margin: 0 auto;
+  }
+
+  .floating {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 20;
+    min-width: 220px;
+    max-width: 90vw;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .fullscreen-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 21;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .fullscreen-btn:active, .fullscreen-btn:focus {
+    background: #e0e0e0;
   }
 
   #contenedor-modelo {
@@ -456,6 +510,28 @@
       flex-direction: row;
       justify-content: center;
       flex-wrap: wrap;
+    }
+    .floating {
+      top: 0.5rem;
+      left: 0.5rem;
+      min-width: 150px;
+      font-size: 0.95rem;
+      padding: 0.5rem;
+    }
+    /* .fullscreen-btn { display: flex; }  Ya está visible en todos los dispositivos */
+    #contenedor-modelo.fullscreen {
+      height: 100vh !important;
+      width: 100vw !important;
+      border-radius: 0;
+    }
+  }
+  @media (max-width: 480px) {
+    #contenedor-modelo {
+      height: 250px;
+    }
+    .floating {
+      min-width: 120px;
+      font-size: 0.9rem;
     }
   }
 </style>
