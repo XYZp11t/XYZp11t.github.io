@@ -16,6 +16,16 @@
   <div class="controles">
     <button id="btn-reset">Resetear Vista</button>
     <button id="btn-rotar">Rotar Modelo</button>
+    <div class="controles-checkbox" id="controles-checkbox">
+      <div class="controles-header" id="controles-header">
+        <span>Capas solares</span>
+        <button id="btn-minimizar" aria-label="Minimizar">-</button>
+      </div>
+      <div class="controles-opciones" id="controles-opciones">
+        <label><input type="checkbox" id="chk-corte" checked> Aplicar corte</label>
+        <label><input type="checkbox" id="chk-cromosfera" checked> Ver cromosfera</label>
+      </div>
+    </div>
     <div class="info">
       <p>Usa el mouse para navegar: Click + arrastrar para rotar, scroll para zoom</p>
     </div>
@@ -77,6 +87,55 @@
     const loader = new GLTFLoader();
     let modelo = null;
     let rotacionAutomatica = false;
+    /** @type {Record<string, THREE.Mesh | undefined>} */
+    let meshes = {
+      fotosferaExterior: undefined,
+      cromosferaExterior: undefined,
+      nucleo: undefined,
+      zonaRadiativaCorte: undefined,
+      zonaConvectivaCorte: undefined,
+      fotosferaCorteT: undefined,
+      fotosferaCorte: undefined,
+      cromosferaCorteT: undefined,
+      cromosferaCorte: undefined
+    };
+    let corteActivo = true;
+    let cromosferaActiva = true;
+
+    // Función para actualizar visibilidad de las capas
+    function actualizarVisibilidad() {
+      if (!meshes) return;
+      if (corteActivo) {
+        // Mostrar solo el sol cortado
+        if (meshes.nucleo) meshes.nucleo.visible = true;
+        if (meshes.zonaRadiativaCorte) meshes.zonaRadiativaCorte.visible = true;
+        if (meshes.zonaConvectivaCorte) meshes.zonaConvectivaCorte.visible = true;
+        if (meshes.fotosferaCorteT) meshes.fotosferaCorteT.visible = true;
+        if (meshes.fotosferaCorte) meshes.fotosferaCorte.visible = true;
+        if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = cromosferaActiva;
+        if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = cromosferaActiva;
+        // Ocultar sol completo
+        if (meshes.fotosferaExterior) meshes.fotosferaExterior.visible = false;
+        if (meshes.cromosferaExterior) meshes.cromosferaExterior.visible = false;
+        // Si la cromosfera está desactivada, ocultar cromosfera cortada
+        if (!cromosferaActiva) {
+          if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = false;
+          if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = false;
+        }
+      } else {
+        // Mostrar solo el sol completo
+        if (meshes.fotosferaExterior) meshes.fotosferaExterior.visible = true;
+        if (meshes.cromosferaExterior) meshes.cromosferaExterior.visible = cromosferaActiva;
+        // Ocultar sol cortado
+        if (meshes.nucleo) meshes.nucleo.visible = false;
+        if (meshes.zonaRadiativaCorte) meshes.zonaRadiativaCorte.visible = false;
+        if (meshes.zonaConvectivaCorte) meshes.zonaConvectivaCorte.visible = false;
+        if (meshes.fotosferaCorteT) meshes.fotosferaCorteT.visible = false;
+        if (meshes.fotosferaCorte) meshes.fotosferaCorte.visible = false;
+        if (meshes.cromosferaCorteT) meshes.cromosferaCorteT.visible = false;
+        if (meshes.cromosferaCorte) meshes.cromosferaCorte.visible = false;
+      }
+    }
 
     console.log('Intentando cargar modelo desde: /models/capas_test7.glb');
 
@@ -106,6 +165,44 @@
         
         controles.target.set(0, 0, 0);
         controles.update();
+
+        // Mapear los meshes relevantes
+        modelo.traverse((obj) => {
+          if (obj.isMesh) {
+            const mesh = obj;
+            switch (mesh.name) {
+              case 'Fotosfera_Exterior':
+                meshes.fotosferaExterior = mesh;
+                break;
+              case 'Cromosfera_Exterior':
+                meshes.cromosferaExterior = mesh;
+                break;
+              case 'Nucleo':
+                meshes.nucleo = mesh;
+                break;
+              case 'Zona_Radiativa_Corte':
+                meshes.zonaRadiativaCorte = mesh;
+                break;
+              case 'Zona_Convectiva_Corte':
+                meshes.zonaConvectivaCorte = mesh;
+                break;
+              case 'Fotosfera_Corte_T':
+                meshes.fotosferaCorteT = mesh;
+                break;
+              case 'Fotosfera_Corte':
+                meshes.fotosferaCorte = mesh;
+                break;
+              case 'Cromosfera_Corte_T':
+                meshes.cromosferaCorteT = mesh;
+                break;
+              case 'Cromosfera_Corte':
+                meshes.cromosferaCorte = mesh;
+                break;
+            }
+          }
+        });
+        // Inicializar visibilidad
+        actualizarVisibilidad();
 
         // Ocultar loading
         if (loadingElement) {
@@ -178,6 +275,33 @@
       btnRotar.addEventListener('click', () => {
         rotacionAutomatica = !rotacionAutomatica;
         btnRotar.textContent = rotacionAutomatica ? 'Detener Rotación' : 'Rotar Modelo';
+      });
+    }
+
+    // Listeners para los checkboxes
+    const chkCorte = document.getElementById('chk-corte');
+    const chkCromosfera = document.getElementById('chk-cromosfera');
+    if (chkCorte instanceof HTMLInputElement) {
+      chkCorte.addEventListener('change', (e) => {
+        corteActivo = chkCorte.checked;
+        actualizarVisibilidad();
+      });
+    }
+    if (chkCromosfera instanceof HTMLInputElement) {
+      chkCromosfera.addEventListener('change', (e) => {
+        cromosferaActiva = chkCromosfera.checked;
+        actualizarVisibilidad();
+      });
+    }
+    // Minimizar controles
+    const btnMinimizar = document.getElementById('btn-minimizar');
+    const controlesOpciones = document.getElementById('controles-opciones');
+    let controlesMinimizados = false;
+    if (btnMinimizar && controlesOpciones) {
+      btnMinimizar.addEventListener('click', () => {
+        controlesMinimizados = !controlesMinimizados;
+        controlesOpciones.style.display = controlesMinimizados ? 'none' : 'block';
+        btnMinimizar.textContent = controlesMinimizados ? '+' : '-';
       });
     }
 
@@ -277,6 +401,50 @@
 
   .info p {
     margin: 0;
+  }
+
+  .controles-checkbox {
+    background: #f7f7fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    padding: 1rem;
+    min-width: 220px;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .controles-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  .controles-header button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #333;
+    padding: 0 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .controles-header button:hover {
+    background: #e0e0e0;
+  }
+  .controles-opciones {
+    display: block;
+    transition: display 0.2s;
+  }
+  .controles-opciones label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+    cursor: pointer;
   }
 
   @media (max-width: 768px) {
