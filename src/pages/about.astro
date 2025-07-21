@@ -1,0 +1,159 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Acerca del Proyecto - Capas Solares">
+  <main>
+    <h1>Acerca del Proyecto</h1>
+    
+    <section class="info-section">
+      <h2>Modelo 3D de Capas Solares</h2>
+      <p>
+        Este proyecto presenta una visualización interactiva en 3D de las capas solares,
+        permitiendo explorar la estructura del Sol de manera inmersiva y educativa.
+      </p>
+      
+      <div class="features">
+        <h3>Características del Visualizador:</h3>
+        <ul>
+          <li>🎮 <strong>Controles Interactivos:</strong> Rotación, zoom y navegación con el mouse</li>
+          <li>🎨 <strong>Iluminación Realista:</strong> Sombras y efectos de luz para mejor visualización</li>
+          <li>📱 <strong>Responsive:</strong> Funciona en dispositivos móviles y de escritorio</li>
+          <li>⚡ <strong>Rendimiento Optimizado:</strong> Renderizado eficiente con Three.js</li>
+          <li>🔄 <strong>Rotación Automática:</strong> Opción para rotación automática del modelo</li>
+        </ul>
+      </div>
+      
+      <div class="tech-stack">
+        <h3>Tecnologías Utilizadas:</h3>
+        <ul>
+          <li><strong>Astro:</strong> Framework web para el frontend</li>
+          <li><strong>Three.js:</strong> Biblioteca 3D para WebGL</li>
+          <li><strong>GLTF Loader:</strong> Carga de modelos 3D en formato GLB</li>
+          <li><strong>OrbitControls:</strong> Controles de navegación 3D</li>
+        </ul>
+      </div>
+    </section>
+    
+    <section class="navigation">
+      <h3>Navegación</h3>
+      <div class="nav-buttons">
+        <a href="/" class="btn-primary">Ver Modelo 3D</a>
+        <a href="/about" class="btn-secondary">Acerca del Proyecto</a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+  }
+
+  .info-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    color: #34495e;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+  }
+
+  h3 {
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+    font-size: 1.3rem;
+  }
+
+  p {
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  .features ul, .tech-stack ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .features li, .tech-stack li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+    color: #555;
+  }
+
+  .features li:last-child, .tech-stack li:last-child {
+    border-bottom: none;
+  }
+
+  .features li strong, .tech-stack li strong {
+    color: #2c3e50;
+  }
+
+  .navigation {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary:hover, .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    main {
+      padding: 1rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    .nav-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style> 

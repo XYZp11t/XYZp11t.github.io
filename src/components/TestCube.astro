@@ -1,0 +1,75 @@
+---
+// Componente de prueba con un cubo simple
+---
+
+<div class="test-container">
+  <canvas id="test-canvas"></canvas>
+  <div class="info">
+    <p>Prueba de Three.js - Cubo rotando</p>
+  </div>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('test-canvas');
+    
+    if (!canvas) {
+      console.error('No se encontró el canvas de prueba');
+      return;
+    }
+
+    const ancho = 400;
+    const alto = 300;
+
+    // Configuración básica
+    const escena = new THREE.Scene();
+    const camara = new THREE.PerspectiveCamera(75, ancho / alto, 0.1, 1000);
+    const renderizador = new THREE.WebGLRenderer({ canvas });
+    
+    renderizador.setSize(ancho, alto);
+    escena.background = new THREE.Color(0x2c3e50);
+
+    // Crear un cubo simple
+    const geometria = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cubo = new THREE.Mesh(geometria, material);
+    escena.add(cubo);
+
+    camara.position.z = 5;
+
+    // Función de animación
+    function animar() {
+      requestAnimationFrame(animar);
+      
+      cubo.rotation.x += 0.01;
+      cubo.rotation.y += 0.01;
+      
+      renderizador.render(escena, camara);
+    }
+
+    animar();
+    console.log('Cubo de prueba creado exitosamente');
+  });
+</script>
+
+<style>
+  .test-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  #test-canvas {
+    border: 2px solid #3498db;
+    border-radius: 8px;
+  }
+
+  .info {
+    text-align: center;
+    color: #666;
+  }
+</style> 

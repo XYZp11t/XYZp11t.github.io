@@ -1,0 +1,293 @@
+---
+// Componente para visualizar el modelo 3D de capas solares
+---
+
+<div class="modelo-container">
+  <div id="contenedor-modelo">
+    <canvas id="modelo-canvas"></canvas>
+    <div id="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Cargando modelo 3D...</p>
+    </div>
+    <div id="error" class="error-overlay" style="display: none;">
+      <p>Error al cargar el modelo. Verifica la consola para más detalles.</p>
+    </div>
+  </div>
+  <div class="controles">
+    <button id="btn-reset">Resetear Vista</button>
+    <button id="btn-rotar">Rotar Modelo</button>
+    <div class="info">
+      <p>Usa el mouse para navegar: Click + arrastrar para rotar, scroll para zoom</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const contenedor = document.getElementById('contenedor-modelo');
+    const canvas = document.getElementById('modelo-canvas');
+    const loadingElement = document.getElementById('loading');
+    const errorElement = document.getElementById('error');
+    
+    if (!contenedor || !canvas) {
+      console.error('No se encontraron los elementos del contenedor');
+      return;
+    }
+
+    const ancho = contenedor.clientWidth;
+    const alto = contenedor.clientHeight;
+
+    console.log('Iniciando visualizador 3D...');
+    console.log('Dimensiones del canvas:', ancho, 'x', alto);
+
+    // Configuración de la escena
+    const escena = new THREE.Scene();
+    escena.background = new THREE.Color(0x1a1a1a);
+
+    // Configuración de la cámara
+    const camara = new THREE.PerspectiveCamera(75, ancho / alto, 0.1, 1000);
+    camara.position.set(10, 10, 10);
+
+    // Configuración del renderizador
+    const renderizador = new THREE.WebGLRenderer({ 
+      canvas, 
+      antialias: true
+    });
+    renderizador.setSize(ancho, alto);
+    renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Controles de órbita
+    const controles = new OrbitControls(camara, renderizador.domElement);
+    controles.enableDamping = true;
+    controles.dampingFactor = 0.05;
+
+    // Iluminación
+    const luzAmbiente = new THREE.AmbientLight(0xffffff, 0.6);
+    escena.add(luzAmbiente);
+
+    const luzDireccional = new THREE.DirectionalLight(0xffffff, 1.0);
+    luzDireccional.position.set(10, 10, 5);
+    escena.add(luzDireccional);
+
+    // Cargar el modelo GLB
+    const loader = new GLTFLoader();
+    let modelo = null;
+    let rotacionAutomatica = false;
+
+    console.log('Intentando cargar modelo desde: /models/capas_test7.glb');
+
+    loader.load('/models/capas_test7.glb', 
+      (gltf) => {
+        console.log('Modelo cargado exitosamente:', gltf);
+        modelo = gltf.scene;
+        escena.add(modelo);
+
+        // Centrar el modelo
+        const box = new THREE.Box3().setFromObject(modelo);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        
+        console.log('Dimensiones del modelo:', size);
+        console.log('Centro del modelo:', center);
+        
+        modelo.position.sub(center);
+        
+        // Ajustar la cámara
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camara.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+        cameraZ *= 2;
+        camara.position.set(cameraZ, cameraZ, cameraZ);
+        camara.lookAt(0, 0, 0);
+        
+        controles.target.set(0, 0, 0);
+        controles.update();
+
+        // Ocultar loading
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+
+        console.log('Modelo configurado y listo para renderizar');
+      }, 
+      (xhr) => {
+        const progress = (xhr.loaded / xhr.total * 100);
+        console.log('Progreso de carga:', progress + '%');
+        if (loadingElement) {
+          const pElement = loadingElement.querySelector('p');
+          if (pElement) {
+            pElement.textContent = `Cargando modelo 3D... ${Math.round(progress)}%`;
+          }
+        }
+      }, 
+      (error) => {
+        console.error('Error al cargar el modelo:', error);
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        if (errorElement) {
+          errorElement.style.display = 'flex';
+        }
+      }
+    );
+
+    // Función de animación
+    function animar() {
+      requestAnimationFrame(animar);
+      
+      if (modelo && rotacionAutomatica) {
+        modelo.rotation.y += 0.01;
+      }
+      
+      controles.update();
+      renderizador.render(escena, camara);
+    }
+
+    // Manejo de redimensionamiento
+    function onWindowResize() {
+      if (!contenedor) return;
+      
+      const nuevoAncho = contenedor.clientWidth;
+      const nuevoAlto = contenedor.clientHeight;
+      
+      camara.aspect = nuevoAncho / nuevoAlto;
+      camara.updateProjectionMatrix();
+      renderizador.setSize(nuevoAncho, nuevoAlto);
+    }
+
+    // Controles de botones
+    const btnReset = document.getElementById('btn-reset');
+    const btnRotar = document.getElementById('btn-rotar');
+
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (modelo) {
+          modelo.rotation.set(0, 0, 0);
+        }
+        camara.position.set(10, 10, 10);
+        camara.lookAt(0, 0, 0);
+        controles.reset();
+      });
+    }
+
+    if (btnRotar) {
+      btnRotar.addEventListener('click', () => {
+        rotacionAutomatica = !rotacionAutomatica;
+        btnRotar.textContent = rotacionAutomatica ? 'Detener Rotación' : 'Rotar Modelo';
+      });
+    }
+
+    window.addEventListener('resize', onWindowResize);
+    animar();
+  });
+</script>
+
+<style>
+  .modelo-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  #contenedor-modelo {
+    width: 100%;
+    height: 600px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  #modelo-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .loading-overlay, .error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 10;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .controles {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .controles button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .controles button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .controles button:active {
+    transform: translateY(0);
+  }
+
+  .info {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .info p {
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    #contenedor-modelo {
+      height: 400px;
+    }
+    
+    .controles {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>

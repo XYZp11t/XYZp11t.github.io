@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ModeloGLB from '../components/CapasSolares.astro';
+---
+
+<Layout title="Visualización de Modelo 3D - Capas Solares">
+  <main>
+    <header class="page-header">
+      <h1>🌞 Visualización de Modelo 3D - Capas Solares</h1>
+      <p>Explora el modelo 3D de las capas solares. Puedes rotar, hacer zoom y navegar por el modelo.</p>
+    </header>
+    
+    <ModeloGLB />
+    
+    <footer class="page-footer">
+      <div class="nav-links">
+        <a href="/about" class="nav-link">ℹ️ Acerca del Proyecto</a>
+        <a href="/" class="nav-link">🏠 Inicio</a>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .page-header p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .page-footer {
+    margin-top: auto;
+    padding: 2rem 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+  }
+
+  .nav-link:hover {
+    color: #495057;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 768px) {
+    .page-header h1 {
+      font-size: 2rem;
+    }
+    
+    .nav-links {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+</style>
