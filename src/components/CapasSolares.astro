@@ -20,17 +20,14 @@
       <div class="controles-opciones" id="controles-opciones">
         <label><input type="checkbox" id="chk-corte" checked> Aplicar corte</label>
         <label><input type="checkbox" id="chk-cromosfera" checked> Ver cromosfera</label>
+        <button id="btn-reset" class="control-btn">Resetear Vista</button>
+        <button id="btn-rotar" class="control-btn">Rotar Modelo</button>
       </div>
     </div>
     <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
   </div>
-  <div class="controles">
-    <button id="btn-reset">Resetear Vista</button>
-    <button id="btn-rotar">Rotar Modelo</button>
-    <div class="info">
-      <p>Usa el <b>scroll</b> para zoom. (Rotación deshabilitada)</p>
-    </div>
-  </div>
+  <!-- Elimina la sección de controles principal -->
+  <!-- <div class="controles"> ... </div> -->
 </div>
 
 <script>
@@ -159,6 +156,9 @@
         
         modelo.position.sub(center);
         
+        // Rotar azimutalmente por defecto
+        modelo.rotation.set(0, -Math.PI/2, 0);
+        
         // Ajustar la cámara
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = camara.fov * (Math.PI / 180);
@@ -264,10 +264,11 @@
     const btnReset = document.getElementById('btn-reset');
     const btnRotar = document.getElementById('btn-rotar');
 
+    // Botón Resetear Vista: ahora pone el modelo en Y = -Math.PI/2
     if (btnReset) {
       btnReset.addEventListener('click', () => {
         if (modelo) {
-          modelo.rotation.set(0, 0, 0);
+          modelo.rotation.set(0, -Math.PI/2, 0);
         }
         // Ajustar la cámara para que el modelo se vea más grande
         const box = new THREE.Box3().setFromObject(modelo as any);
@@ -317,12 +318,47 @@
       });
     }
 
-    // Pantalla completa en móvil
+    // Pantalla completa en móvil mejorada
     const btnFullscreen = document.getElementById('btn-fullscreen');
+    let isFullscreen = false;
+    let orientationLocked = false;
     if (btnFullscreen && contenedor) {
-      btnFullscreen.addEventListener('click', () => {
-        if (contenedor.requestFullscreen) {
-          contenedor.requestFullscreen();
+      btnFullscreen.addEventListener('click', async () => {
+        if (!isFullscreen) {
+          if (contenedor.requestFullscreen) {
+            await contenedor.requestFullscreen();
+            isFullscreen = true;
+            // Forzar orientación horizontal en móvil
+            if (window.screen.orientation && window.innerWidth < 800) {
+              try {
+                await (window.screen.orientation as any).lock('landscape');
+                orientationLocked = true;
+              } catch (e) {
+                // Puede fallar en algunos navegadores
+                orientationLocked = false;
+              }
+            }
+          }
+        } else {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+            isFullscreen = false;
+            // Restaurar orientación
+            if (window.screen.orientation && orientationLocked) {
+              try {
+                await (window.screen.orientation as any).unlock();
+              } catch (e) {}
+              orientationLocked = false;
+            }
+          }
+        }
+      });
+      // Detectar salida de fullscreen por otros medios
+      document.addEventListener('fullscreenchange', () => {
+        isFullscreen = !!document.fullscreenElement;
+        if (!isFullscreen && window.screen.orientation && orientationLocked) {
+          try { (window.screen.orientation as any).unlock(); } catch (e) {}
+          orientationLocked = false;
         }
       });
     }
