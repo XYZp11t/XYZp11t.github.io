@@ -22,6 +22,7 @@
         <label><input type="checkbox" id="chk-cromosfera" checked> Ver cromosfera</label>
         <button id="btn-reset" class="control-btn">Resetear Vista</button>
         <button id="btn-rotar" class="control-btn">Rotar Modelo</button>
+        <button id="btn-textura-cromosfera" class="control-btn">Cambiar textura</button>
       </div>
     </div>
     <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
@@ -95,7 +96,7 @@
     const loader = new GLTFLoader();
     let modelo: any = null;
     let rotacionAutomatica = false;
-    /** @type {Record<string, any>} */
+    /** @type {Record<string, THREE.Mesh | undefined>} */
     let meshes = {
       fotosferaExterior: undefined,
       cromosferaExterior: undefined,
@@ -300,6 +301,15 @@
     // Listeners para los checkboxes
     const chkCorte = document.getElementById('chk-corte');
     const chkCromosfera = document.getElementById('chk-cromosfera');
+    // Forzar estado inicial checked en DOM y variables
+    if (chkCorte instanceof HTMLInputElement) {
+      chkCorte.checked = true;
+      corteActivo = true;
+    }
+    if (chkCromosfera instanceof HTMLInputElement) {
+      chkCromosfera.checked = true;
+      cromosferaActiva = true;
+    }
     if (chkCorte instanceof HTMLInputElement) {
       chkCorte.addEventListener('change', (e) => {
         corteActivo = chkCorte.checked;
@@ -328,6 +338,16 @@
     const btnFullscreen = document.getElementById('btn-fullscreen');
     let isFullscreen = false;
     let orientationLocked = false;
+    // Mejorar resize tras salir de fullscreen
+    function forceResizeAfterFullscreen() {
+      setTimeout(() => {
+        onWindowResize();
+        if (canvas && contenedor) {
+          canvas.style.width = '100%';
+          canvas.style.height = '100%';
+        }
+      }, 100); // Espera breve para asegurar que el DOM se reajuste
+    }
     if (btnFullscreen && contenedor) {
       btnFullscreen.addEventListener('click', async () => {
         if (!isFullscreen) {
@@ -366,18 +386,65 @@
           try { (window.screen.orientation as any).unlock(); } catch (e) {}
           orientationLocked = false;
         }
-        // Ajustar tamaño del canvas y contenedor al salir de pantalla completa
-        onWindowResize();
-        // Asegurar que el canvas ocupe el 100% del contenedor
-        if (canvas && contenedor) {
-          canvas.style.width = '100%';
-          canvas.style.height = '100%';
+        // Forzar resize tras salir de fullscreen
+        forceResizeAfterFullscreen();
+      });
+    }
+    // También forzar resize en el evento resize de la ventana
+    window.addEventListener('resize', onWindowResize);
+    animar();
+
+    // --- Cambiar textura de la cromosfera ---
+    const btnTexturaCromosfera = document.getElementById('btn-textura-cromosfera');
+    let texturaAlternativaCargada = false;
+    let texturaOriginalCromosfera: THREE.Texture | null = null;
+    let texturaOriginalCromosferaCorte: THREE.Texture | null = null;
+    let texturaOriginalCromosferaCorteT: THREE.Texture | null = null;
+    let texturaAlternativa: THREE.Texture | null = null;
+    if (btnTexturaCromosfera) {
+      btnTexturaCromosfera.addEventListener('click', () => {
+        if (!meshes.cromosferaExterior && !meshes.cromosferaCorte && !meshes.cromosferaCorteT) return;
+        // Cargar textura alternativa si no está cargada
+        if (!texturaAlternativa) {
+          const loader = new THREE.TextureLoader();
+          loader.load('/2k_sun.jpg', (tex) => {
+            texturaAlternativa = tex;
+            aplicarTexturaCromosfera();
+          });
+        } else {
+          aplicarTexturaCromosfera();
         }
       });
     }
-
-    window.addEventListener('resize', onWindowResize);
-    animar();
+    function aplicarTexturaCromosfera() {
+      // Guardar texturas originales la primera vez
+      if (!texturaOriginalCromosfera && meshes.cromosferaExterior) {
+        texturaOriginalCromosfera = ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
+      }
+      if (!texturaOriginalCromosferaCorte && meshes.cromosferaCorte) {
+        texturaOriginalCromosferaCorte = ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
+      }
+      if (!texturaOriginalCromosferaCorteT && meshes.cromosferaCorteT) {
+        texturaOriginalCromosferaCorteT = ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
+      }
+      // Alternar textura
+      texturaAlternativaCargada = !texturaAlternativaCargada;
+      if (meshes.cromosferaExterior) {
+        ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosfera;
+        ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
+      }
+      if (meshes.cromosferaCorte) {
+        ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosferaCorte;
+        ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
+      }
+      if (meshes.cromosferaCorteT) {
+        ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosferaCorteT;
+        ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
+      }
+      if (btnTexturaCromosfera) {
+        btnTexturaCromosfera.textContent = texturaAlternativaCargada ? 'Restaurar textura' : 'Cambiar textura';
+      }
+    }
   });
 </script>
 
@@ -540,6 +607,9 @@
   .controles-opciones {
     display: block;
     transition: display 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   .controles-opciones label {
     display: flex;
@@ -548,6 +618,11 @@
     font-size: 1rem;
     margin-bottom: 0.3rem;
     cursor: pointer;
+  }
+  .controles-opciones button {
+    display: block;
+    width: 100%;
+    margin: 0;
   }
 
   @media (max-width: 768px) {
