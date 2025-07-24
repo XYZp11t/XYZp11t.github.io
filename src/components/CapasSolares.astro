@@ -351,29 +351,12 @@
     }
     const esIOS = isIOS();
     const esSafari = isSafari();
-    let pseudoFullscreenActivo = false;
     // Mensaje para iOS
     function mostrarMensajeIOS() {
-      alert('El modo pantalla completa no es soportado en este dispositivo. Puedes girar tu dispositivo para una mejor experiencia.');
+      alert('El modo pantalla completa no es soportado en este dispositivo. Usa el dispositivo en horizontal para mejor experiencia.');
     }
-    // Guardar tamaño original del contenedor
-    const contenedorOriginalStyles = contenedor ? {
-      width: contenedor.style.width,
-      height: contenedor.style.height,
-      position: contenedor.style.position,
-      top: contenedor.style.top,
-      left: contenedor.style.left,
-      zIndex: contenedor.style.zIndex
-    } : {};
-    function restaurarContenedorOriginal() {
-      if (!contenedor) return;
-      contenedor.style.width = contenedorOriginalStyles.width || '100%';
-      contenedor.style.height = contenedorOriginalStyles.height || '600px';
-      contenedor.style.position = contenedorOriginalStyles.position || '';
-      contenedor.style.top = contenedorOriginalStyles.top || '';
-      contenedor.style.left = contenedorOriginalStyles.left || '';
-      contenedor.style.zIndex = contenedorOriginalStyles.zIndex || '';
-    }
+    // En iOS, no manipular estilos para pseudo-fullscreen
+    // Solo mostrar mensaje y no hacer nada más
     // Forzar render inmediato tras resize/orientación
     function forceRender() {
       if (modelo) renderizador.render(escena, camara);
@@ -394,28 +377,8 @@
     if (btnFullscreen && contenedor) {
       btnFullscreen.addEventListener('click', async () => {
         if (esIOS || esSafari) {
-          // Pseudo-fullscreen para iOS/Safari
-          if (!pseudoFullscreenActivo) {
-            contenedor.style.position = 'fixed';
-            contenedor.style.top = '0';
-            contenedor.style.left = '0';
-            contenedor.style.width = '100vw';
-            contenedor.style.height = '100vh';
-            contenedor.style.zIndex = '9999';
-            pseudoFullscreenActivo = true;
-            mostrarMensajeIOS();
-            setTimeout(() => {
-              onWindowResize();
-              forceRender();
-            }, 100);
-          } else {
-            restaurarContenedorOriginal();
-            pseudoFullscreenActivo = false;
-            setTimeout(() => {
-              onWindowResize();
-              forceRender();
-            }, 100);
-          }
+          mostrarMensajeIOS();
+          return;
         } else {
           if (!isFullscreen) {
             if (contenedor.requestFullscreen) {
@@ -524,6 +487,11 @@
     gap: 1rem;
     max-width: 1200px;
     margin: 0 auto;
+    /* Safe area para iPhone notch */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
   .floating {
@@ -561,6 +529,11 @@
   #contenedor-modelo {
     width: 100%;
     height: 600px;
+    /* Safe area para iPhone notch */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -741,6 +714,10 @@
   @media (max-width: 768px) {
     #contenedor-modelo {
       height: 400px;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
     
     .controles {
@@ -767,6 +744,10 @@
   @media (max-width: 480px) {
     #contenedor-modelo {
       height: 250px;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
     .floating {
       min-width: 0;
