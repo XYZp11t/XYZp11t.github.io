@@ -342,43 +342,71 @@
     const btnFullscreen = document.getElementById('btn-fullscreen');
     let isFullscreen = false;
     let orientationLocked = false;
-    // Mejorar resize tras salir de fullscreen
-    function forceResizeAfterFullscreen() {
-      setTimeout(() => {
-        onWindowResize();
-        if (canvas && contenedor) {
-          canvas.style.width = '100%';
-          canvas.style.height = '100%';
-        }
-      }, 100); // Espera breve para asegurar que el DOM se reajuste
+    // Detectar iOS/Safari
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(typeof window === 'undefined') && (window as any).MSStream === undefined;
+    }
+    function isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+    const esIOS = isIOS();
+    const esSafari = isSafari();
+    let pseudoFullscreenActivo = false;
+    // Mensaje para iOS
+    function mostrarMensajeIOS() {
+      alert('El modo pantalla completa no es soportado en este dispositivo. Puedes girar tu dispositivo para una mejor experiencia.');
     }
     if (btnFullscreen && contenedor) {
       btnFullscreen.addEventListener('click', async () => {
-        if (!isFullscreen) {
-          if (contenedor.requestFullscreen) {
-            await contenedor.requestFullscreen();
-            isFullscreen = true;
-            // Forzar orientación horizontal en móvil
-            if (window.screen.orientation && window.innerWidth < 800) {
-              try {
-                await (window.screen.orientation as any).lock('landscape');
-                orientationLocked = true;
-              } catch (e) {
-                // Puede fallar en algunos navegadores
-                orientationLocked = false;
-              }
-            }
+        if (esIOS || esSafari) {
+          // Pseudo-fullscreen para iOS/Safari
+          if (!pseudoFullscreenActivo) {
+            contenedor.style.position = 'fixed';
+            contenedor.style.top = '0';
+            contenedor.style.left = '0';
+            contenedor.style.width = '100vw';
+            contenedor.style.height = '100vh';
+            contenedor.style.zIndex = '9999';
+            pseudoFullscreenActivo = true;
+            mostrarMensajeIOS();
+            onWindowResize();
+          } else {
+            contenedor.style.position = '';
+            contenedor.style.top = '';
+            contenedor.style.left = '';
+            contenedor.style.width = '';
+            contenedor.style.height = '';
+            contenedor.style.zIndex = '';
+            pseudoFullscreenActivo = false;
+            onWindowResize();
           }
         } else {
-          if (document.exitFullscreen) {
-            await document.exitFullscreen();
-            isFullscreen = false;
-            // Restaurar orientación
-            if (window.screen.orientation && orientationLocked) {
-              try {
-                await (window.screen.orientation as any).unlock();
-              } catch (e) {}
-              orientationLocked = false;
+          if (!isFullscreen) {
+            if (contenedor.requestFullscreen) {
+              await contenedor.requestFullscreen();
+              isFullscreen = true;
+              // Forzar orientación horizontal en móvil
+              if (window.screen.orientation && window.innerWidth < 800) {
+                try {
+                  await (window.screen.orientation as any).lock('landscape');
+                  orientationLocked = true;
+                } catch (e) {
+                  // Puede fallar en algunos navegadores
+                  orientationLocked = false;
+                }
+              }
+            }
+          } else {
+            if (document.exitFullscreen) {
+              await document.exitFullscreen();
+              isFullscreen = false;
+              // Restaurar orientación
+              if (window.screen.orientation && orientationLocked) {
+                try {
+                  await (window.screen.orientation as any).unlock();
+                } catch (e) {}
+                orientationLocked = false;
+              }
             }
           }
         }
@@ -391,7 +419,13 @@
           orientationLocked = false;
         }
         // Forzar resize tras salir de fullscreen
-        forceResizeAfterFullscreen();
+        setTimeout(() => {
+          onWindowResize();
+          if (canvas && contenedor) {
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+          }
+        }, 100);
       });
     }
     // También forzar resize en el evento resize de la ventana
