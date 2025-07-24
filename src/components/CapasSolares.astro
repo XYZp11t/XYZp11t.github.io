@@ -359,27 +359,11 @@
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
-    // Ajustar tamaño del contenedor según orientación y plataforma
+    // En móvil, el tamaño del contenedor lo controla el CSS (media queries). No manipular height/width por JS.
     function ajustarContenedorPorOrientacion() {
+      // No hacer nada salvo en desktop si se quiere un alto fijo (opcional)
       if (!contenedor) return;
-      // No tocar estilos en Safari iOS (ya funciona bien)
-      if (esIOS && esSafari) return;
-      // Limpiar estilos inline
-      contenedor.style.width = '';
-      contenedor.style.height = '';
-      contenedor.style.margin = '';
-      contenedor.style.padding = '';
-      // Detectar orientación
-      const isLandscape = window.innerWidth > window.innerHeight;
-      if (isMobile()) {
-        contenedor.style.width = '100%';
-        if (isLandscape) {
-          contenedor.style.height = '250px'; // Horizontal móvil
-        } else {
-          contenedor.style.height = '400px'; // Vertical móvil
-        }
-      } else {
-        contenedor.style.width = '100%';
+      if (!(isMobile()) && !(esIOS && esSafari)) {
         contenedor.style.height = '600px';
       }
     }
@@ -518,11 +502,10 @@
     gap: 1rem;
     max-width: 1200px;
     margin: 0 auto;
-    /* Safe area para iPhone notch */
+    /* Safe area para iPhone notch (solo top/bottom) */
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
+    box-sizing: border-box;
   }
 
   .floating {
@@ -558,23 +541,39 @@
   }
 
   #contenedor-modelo {
-    width: 100%;
-    height: 600px;
-    /* Safe area para iPhone notch */
+    width: 90vw;
+    max-width: 90vw;
+    min-width: 90vw;
+    height: 400px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Safe area para iPhone notch (solo top/bottom) */
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
+    box-sizing: border-box;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
+  }
+
+  /* Media queries para móvil vertical y horizontal */
+  @media (max-width: 900px) and (orientation: portrait) {
+    #contenedor-modelo {
+      height: 300px;
+    }
+  }
+  @media (max-width: 900px) and (orientation: landscape) {
+    #contenedor-modelo {
+      height: 400px;
+    }
   }
 
   #modelo-canvas {
     width: 100%;
     height: 100%;
     display: block;
+    box-sizing: border-box;
   }
 
   .loading-overlay, .error-overlay {
@@ -638,7 +637,7 @@
 
   .info {
     text-align: center;
-    color: #666;
+    color: #8f8f8f;
     font-size: 0.9rem;
   }
 
