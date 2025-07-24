@@ -355,20 +355,48 @@
     function mostrarMensajeIOS() {
       alert('El modo pantalla completa no es soportado en este dispositivo. Usa el dispositivo en horizontal para mejor experiencia.');
     }
-    // En iOS, no manipular estilos para pseudo-fullscreen
-    // Solo mostrar mensaje y no hacer nada más
+    // Detectar si es móvil
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    // Ajustar tamaño del contenedor según orientación y plataforma
+    function ajustarContenedorPorOrientacion() {
+      if (!contenedor) return;
+      // No tocar estilos en Safari iOS (ya funciona bien)
+      if (esIOS && esSafari) return;
+      // Limpiar estilos inline
+      contenedor.style.width = '';
+      contenedor.style.height = '';
+      contenedor.style.margin = '';
+      contenedor.style.padding = '';
+      // Detectar orientación
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (isMobile()) {
+        contenedor.style.width = '100vw';
+        if (isLandscape) {
+          contenedor.style.height = '400px'; // Horizontal móvil
+        } else {
+          contenedor.style.height = '600px'; // Vertical móvil
+        }
+      } else {
+        contenedor.style.width = '100%';
+        contenedor.style.height = '600px';
+      }
+    }
     // Forzar render inmediato tras resize/orientación
     function forceRender() {
       if (modelo) renderizador.render(escena, camara);
     }
     // Escuchar orientationchange y resize
     window.addEventListener('orientationchange', () => {
+      ajustarContenedorPorOrientacion();
       setTimeout(() => {
         onWindowResize();
         forceRender();
       }, 100);
     });
     window.addEventListener('resize', () => {
+      ajustarContenedorPorOrientacion();
       setTimeout(() => {
         onWindowResize();
         forceRender();
@@ -412,6 +440,7 @@
       });
       // Detectar salida de fullscreen por otros medios
       document.addEventListener('fullscreenchange', () => {
+        ajustarContenedorPorOrientacion();
         isFullscreen = !!document.fullscreenElement;
         if (!isFullscreen && window.screen.orientation && orientationLocked) {
           try { (window.screen.orientation as any).unlock(); } catch (e) {}
@@ -424,6 +453,8 @@
         }, 100);
       });
     }
+    // Ajuste inicial al cargar
+    ajustarContenedorPorOrientacion();
     animar();
 
     // --- Cambiar textura de la cromosfera ---
