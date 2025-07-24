@@ -372,11 +372,11 @@
       // Detectar orientación
       const isLandscape = window.innerWidth > window.innerHeight;
       if (isMobile()) {
-        contenedor.style.width = '100vw';
+        contenedor.style.width = '100%';
         if (isLandscape) {
-          contenedor.style.height = '400px'; // Horizontal móvil
+          contenedor.style.height = '250px'; // Horizontal móvil
         } else {
-          contenedor.style.height = '600px'; // Vertical móvil
+          contenedor.style.height = '400px'; // Vertical móvil
         }
       } else {
         contenedor.style.width = '100%';
