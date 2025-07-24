@@ -257,14 +257,14 @@
 
     // Manejo de redimensionamiento
     function onWindowResize() {
-      if (!contenedor) return;
-      
+      if (!contenedor || !canvas) return;
       const nuevoAncho = contenedor.clientWidth;
       const nuevoAlto = contenedor.clientHeight;
-      
       camara.aspect = nuevoAncho / nuevoAlto;
       camara.updateProjectionMatrix();
       renderizador.setSize(nuevoAncho, nuevoAlto);
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
     }
 
     // Controles de botones
@@ -356,6 +356,41 @@
     function mostrarMensajeIOS() {
       alert('El modo pantalla completa no es soportado en este dispositivo. Puedes girar tu dispositivo para una mejor experiencia.');
     }
+    // Guardar tamaño original del contenedor
+    const contenedorOriginalStyles = contenedor ? {
+      width: contenedor.style.width,
+      height: contenedor.style.height,
+      position: contenedor.style.position,
+      top: contenedor.style.top,
+      left: contenedor.style.left,
+      zIndex: contenedor.style.zIndex
+    } : {};
+    function restaurarContenedorOriginal() {
+      if (!contenedor) return;
+      contenedor.style.width = contenedorOriginalStyles.width || '100%';
+      contenedor.style.height = contenedorOriginalStyles.height || '600px';
+      contenedor.style.position = contenedorOriginalStyles.position || '';
+      contenedor.style.top = contenedorOriginalStyles.top || '';
+      contenedor.style.left = contenedorOriginalStyles.left || '';
+      contenedor.style.zIndex = contenedorOriginalStyles.zIndex || '';
+    }
+    // Forzar render inmediato tras resize/orientación
+    function forceRender() {
+      if (modelo) renderizador.render(escena, camara);
+    }
+    // Escuchar orientationchange y resize
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        onWindowResize();
+        forceRender();
+      }, 100);
+    });
+    window.addEventListener('resize', () => {
+      setTimeout(() => {
+        onWindowResize();
+        forceRender();
+      }, 100);
+    });
     if (btnFullscreen && contenedor) {
       btnFullscreen.addEventListener('click', async () => {
         if (esIOS || esSafari) {
@@ -369,16 +404,17 @@
             contenedor.style.zIndex = '9999';
             pseudoFullscreenActivo = true;
             mostrarMensajeIOS();
-            onWindowResize();
+            setTimeout(() => {
+              onWindowResize();
+              forceRender();
+            }, 100);
           } else {
-            contenedor.style.position = '';
-            contenedor.style.top = '';
-            contenedor.style.left = '';
-            contenedor.style.width = '';
-            contenedor.style.height = '';
-            contenedor.style.zIndex = '';
+            restaurarContenedorOriginal();
             pseudoFullscreenActivo = false;
-            onWindowResize();
+            setTimeout(() => {
+              onWindowResize();
+              forceRender();
+            }, 100);
           }
         } else {
           if (!isFullscreen) {
@@ -421,15 +457,10 @@
         // Forzar resize tras salir de fullscreen
         setTimeout(() => {
           onWindowResize();
-          if (canvas && contenedor) {
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-          }
+          forceRender();
         }, 100);
       });
     }
-    // También forzar resize en el evento resize de la ventana
-    window.addEventListener('resize', onWindowResize);
     animar();
 
     // --- Cambiar textura de la cromosfera ---
