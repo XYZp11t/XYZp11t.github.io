@@ -20,10 +20,59 @@
       <div class="controles-opciones" id="controles-opciones">
         <label><input type="checkbox" id="chk-corte" checked> Aplicar corte</label>
         <label><input type="checkbox" id="chk-cromosfera" checked> Ver cromosfera</label>
+        <label><input type="checkbox" id="chk-labels" checked> Mostrar etiquetas</label>
         <button id="btn-reset" class="control-btn">Resetear Vista</button>
         <button id="btn-rotar" class="control-btn">Rotar Modelo</button>
         <button id="btn-textura-cromosfera" class="control-btn">Cambiar textura</button>
       </div>
+    </div>
+    
+    <!-- Contenedor de etiquetas -->
+    <div id="labels-container" class="labels-container">
+      <!-- Etiquetas estáticas -->
+      <div id="label-nucleo" class="layer-label" data-layer="nucleo">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Núcleo</span>
+      </div>
+      
+      <div id="label-zonaRadiativa" class="layer-label" data-layer="zonaRadiativa">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Zona Radiativa</span>
+      </div>
+      
+      <div id="label-zonaConvectiva" class="layer-label" data-layer="zonaConvectiva">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Zona Convectiva</span>
+      </div>
+      
+      <div id="label-fotosfera" class="layer-label" data-layer="fotosfera">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Fotosfera</span>
+      </div>
+      
+      <div id="label-cromosfera" class="layer-label" data-layer="cromosfera">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Cromosfera</span>
+      </div>
+      
+      <!-- SVG para las líneas -->
+      <svg id="label-lines" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="lines-container">
+        <line class="label-line" data-layer="nucleo"></line>
+        <line class="label-line" data-layer="zonaRadiativa"></line>
+        <line class="label-line" data-layer="zonaConvectiva"></line>
+        <line class="label-line" data-layer="fotosfera"></line>
+        <line class="label-line" data-layer="cromosfera"></line>
+      </svg>
     </div>
     <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
   </div>
@@ -110,6 +159,131 @@
     };
     let corteActivo = true;
     let cromosferaActiva = true;
+    let labelsActivos = true;
+    
+    // Variables para las etiquetas
+    const labelsContainer = document.getElementById('labels-container');
+    const labelLines = document.getElementById('label-lines');
+    
+    // Hotspots 3D para cada capa (posiciones en el modelo 3D)
+    const hotspots3D = {
+      nucleo: new THREE.Vector3(0, 0, 0),
+      zonaRadiativa: new THREE.Vector3(0.15, 0.5, 0),
+      zonaConvectiva: new THREE.Vector3(0.35, 0.8, 0),
+      fotosfera: new THREE.Vector3(0.905, 0.4, 0),
+      cromosfera: new THREE.Vector3(0.988, 0.2, 0)
+    };
+    
+    // Posiciones 2D de las etiquetas (porcentajes del canvas)
+    const labelPositions = {
+      nucleo: { x: 55, y: 40 },
+      zonaRadiativa: { x: 65, y: 45 },
+      zonaConvectiva: { x: 70, y: 50 },
+      fotosfera: { x: 75, y: 55 },
+      cromosfera: { x: 80, y: 60 }
+    };
+    
+    // Referencias a los elementos DOM de las etiquetas
+    const labelElements = {
+      nucleo: document.getElementById('label-nucleo'),
+      zonaRadiativa: document.getElementById('label-zonaRadiativa'),
+      zonaConvectiva: document.getElementById('label-zonaConvectiva'),
+      fotosfera: document.getElementById('label-fotosfera'),
+      cromosfera: document.getElementById('label-cromosfera')
+    };
+    
+    // Referencias a las líneas SVG
+    const lineElements = {
+      nucleo: labelLines?.querySelector('[data-layer="nucleo"]') as SVGLineElement,
+      zonaRadiativa: labelLines?.querySelector('[data-layer="zonaRadiativa"]') as SVGLineElement,
+      zonaConvectiva: labelLines?.querySelector('[data-layer="zonaConvectiva"]') as SVGLineElement,
+      fotosfera: labelLines?.querySelector('[data-layer="fotosfera"]') as SVGLineElement,
+      cromosfera: labelLines?.querySelector('[data-layer="cromosfera"]') as SVGLineElement
+    };
+
+    // Función para proyectar coordenadas 3D a 2D
+    function proyectar3Da2D(posicion3D: THREE.Vector3): { x: number, y: number } {
+      // Crear un vector temporal para la proyección
+      const vector = posicion3D.clone();
+      
+      // Aplicar la transformación del modelo (rotación, posición, etc.)
+      if (modelo) {
+        vector.applyMatrix4(modelo.matrixWorld);
+      }
+      
+      // Proyectar usando la cámara
+      vector.project(camara);
+      
+      // Convertir a coordenadas de pantalla
+      const canvasRect = canvas?.getBoundingClientRect();
+      if (!canvasRect) return { x: 0, y: 0 };
+      
+      const x = (vector.x * 0.5 + 0.5) * canvasRect.width;
+      const y = (-vector.y * 0.5 + 0.5) * canvasRect.height;
+      
+      return { x, y };
+    }
+
+    // Función para ajustar posiciones de hotspots 3D (para debugging)
+    function ajustarHotspot3D(capa: string, x: number, y: number, z: number) {
+      if (hotspots3D[capa as keyof typeof hotspots3D]) {
+        hotspots3D[capa as keyof typeof hotspots3D].set(x, y, z);
+        console.log(`Hotspot ${capa} ajustado a:`, x, y, z);
+      }
+    }
+
+    // Función para actualizar posición de las etiquetas
+    function actualizarPosicionEtiquetas() {
+      if (!modelo || !canvas) return;
+      
+      // Obtener las dimensiones actuales del canvas
+      const canvasRect = canvas.getBoundingClientRect();
+      const canvasWidth = canvasRect.width;
+      const canvasHeight = canvasRect.height;
+      
+      Object.keys(labelElements).forEach(key => {
+        const labelElement = labelElements[key as keyof typeof labelElements];
+        const lineElement = lineElements[key as keyof typeof lineElements];
+        const hotspot3D = hotspots3D[key as keyof typeof hotspots3D];
+        const labelPos = labelPositions[key as keyof typeof labelPositions];
+        
+        if (!labelElement || !lineElement) return;
+        
+        // Determinar si mostrar la etiqueta
+        let mostrar = labelsActivos && corteActivo;
+        
+        // Si las etiquetas están activas y el corte está activo, verificar cromosfera
+        if (mostrar && key === 'cromosfera' && !cromosferaActiva) {
+          mostrar = false;
+        }
+        
+        if (mostrar) {
+          // Calcular posición en píxeles basada en porcentajes
+          const x = (labelPos.x / 100) * canvasWidth;
+          const y = (labelPos.y / 100) * canvasHeight;
+          
+          // Proyectar el hotspot 3D a coordenadas 2D
+          const hotspot2D = proyectar3Da2D(hotspot3D);
+          
+          // Mostrar elementos
+          labelElement.style.display = 'block';
+          lineElement.style.display = 'block';
+          
+          // Posicionar etiqueta
+          labelElement.style.left = x + 'px';
+          labelElement.style.top = y + 'px';
+          
+          // Configurar línea SVG desde la etiqueta hacia el hotspot proyectado
+          lineElement.setAttribute('x1', x.toString());
+          lineElement.setAttribute('y1', y.toString());
+          lineElement.setAttribute('x2', hotspot2D.x.toString());
+          lineElement.setAttribute('y2', hotspot2D.y.toString());
+        } else {
+          labelElement.style.display = 'none';
+          lineElement.style.display = 'none';
+        }
+      });
+    }
 
     // Función para actualizar visibilidad de las capas
     function actualizarVisibilidad() {
@@ -216,6 +390,20 @@
         // Inicializar visibilidad
         actualizarVisibilidad();
 
+        // Añadir eventos de clic a las etiquetas
+        Object.keys(labelElements).forEach(key => {
+          const labelElement = labelElements[key as keyof typeof labelElements];
+          if (labelElement) {
+            labelElement.addEventListener('click', () => {
+              console.log('Clic en etiqueta:', key);
+              // Aquí se añadirá la funcionalidad de mostrar información
+            });
+          }
+        });
+
+        // Inicializar posición de etiquetas
+        actualizarPosicionEtiquetas();
+
         // Ocultar loading
         if (loadingElement) {
           loadingElement.style.display = 'none';
@@ -253,6 +441,9 @@
       
       controles.update();
       renderizador.render(escena, camara);
+      
+      // Actualizar posición de etiquetas en cada frame
+      actualizarPosicionEtiquetas();
     }
 
     // Manejo de redimensionamiento
@@ -265,6 +456,11 @@
       renderizador.setSize(nuevoAncho, nuevoAlto);
       canvas.style.width = '100%';
       canvas.style.height = '100%';
+      
+      // Actualizar posición de etiquetas después del resize
+      setTimeout(() => {
+        actualizarPosicionEtiquetas();
+      }, 100);
     }
 
     // Controles de botones
@@ -301,6 +497,8 @@
     // Listeners para los checkboxes
     const chkCorte = document.getElementById('chk-corte');
     const chkCromosfera = document.getElementById('chk-cromosfera');
+    const chkLabels = document.getElementById('chk-labels');
+    
     // Forzar estado inicial checked en DOM y variables
     if (chkCorte instanceof HTMLInputElement) {
       chkCorte.checked = true;
@@ -310,16 +508,29 @@
       chkCromosfera.checked = true;
       cromosferaActiva = true;
     }
+    if (chkLabels instanceof HTMLInputElement) {
+      chkLabels.checked = true;
+      labelsActivos = true;
+    }
+    
     if (chkCorte instanceof HTMLInputElement) {
       chkCorte.addEventListener('change', (e) => {
         corteActivo = chkCorte.checked;
         actualizarVisibilidad();
+        actualizarPosicionEtiquetas();
       });
     }
     if (chkCromosfera instanceof HTMLInputElement) {
       chkCromosfera.addEventListener('change', (e) => {
         cromosferaActiva = chkCromosfera.checked;
         actualizarVisibilidad();
+        actualizarPosicionEtiquetas();
+      });
+    }
+    if (chkLabels instanceof HTMLInputElement) {
+      chkLabels.addEventListener('change', (e) => {
+        labelsActivos = chkLabels.checked;
+        actualizarPosicionEtiquetas();
       });
     }
     // Minimizar controles
@@ -377,6 +588,7 @@
       setTimeout(() => {
         onWindowResize();
         forceRender();
+        actualizarPosicionEtiquetas();
       }, 100);
     });
     window.addEventListener('resize', () => {
@@ -384,6 +596,7 @@
       setTimeout(() => {
         onWindowResize();
         forceRender();
+        actualizarPosicionEtiquetas();
       }, 100);
     });
     if (btnFullscreen && contenedor) {
@@ -434,6 +647,7 @@
         setTimeout(() => {
           onWindowResize();
           forceRender();
+          actualizarPosicionEtiquetas();
         }, 100);
       });
     }
@@ -441,6 +655,77 @@
     ajustarContenedorPorOrientacion();
     animar();
 
+    // Funciones de debugging para ajustar hotspots y labels
+    (window as any).ajustarHotspot3D = ajustarHotspot3D;
+    (window as any).hotspots3D = hotspots3D;
+    
+    // Función para ajustar posiciones de labels 2D (para debugging)
+    function ajustarLabel2D(capa: string, x: number, y: number) {
+      if (labelPositions[capa as keyof typeof labelPositions]) {
+        // Convertir coordenadas de píxeles a porcentajes
+        if (!canvas) return;
+        const canvasRect = canvas.getBoundingClientRect();
+        const porcentajeX = (x / canvasRect.width) * 100;
+        const porcentajeY = (y / canvasRect.height) * 100;
+        
+        labelPositions[capa as keyof typeof labelPositions].x = porcentajeX;
+        labelPositions[capa as keyof typeof labelPositions].y = porcentajeY;
+        
+        console.log(`Label ${capa} ajustado a:`, x, y, `(${porcentajeX.toFixed(1)}%, ${porcentajeY.toFixed(1)}%)`);
+        actualizarPosicionEtiquetas();
+      }
+    }
+    
+    // Función para obtener las posiciones actuales de las etiquetas
+    function obtenerPosicionesLabels() {
+      console.log('Posiciones actuales de las etiquetas (porcentajes):');
+      Object.keys(labelPositions).forEach(capa => {
+        const pos = labelPositions[capa as keyof typeof labelPositions];
+        console.log(`${capa}: x=${pos.x.toFixed(1)}%, y=${pos.y.toFixed(1)}%`);
+      });
+    }
+    
+    // Función para posicionar etiquetas usando porcentajes del canvas
+    function posicionarEtiquetaPorcentaje(capa: string, porcentajeX: number, porcentajeY: number) {
+      if (labelPositions[capa as keyof typeof labelPositions]) {
+        labelPositions[capa as keyof typeof labelPositions].x = porcentajeX;
+        labelPositions[capa as keyof typeof labelPositions].y = porcentajeY;
+        console.log(`Label ${capa} posicionado en: ${porcentajeX}%, ${porcentajeY}%`);
+        actualizarPosicionEtiquetas();
+      }
+    }
+    
+    // Función para posicionar todas las etiquetas usando porcentajes
+    function posicionarTodasEtiquetasPorcentaje() {
+      const posiciones = {
+        nucleo: { x: 55, y: 40 },
+        zonaRadiativa: { x: 65, y: 45 },
+        zonaConvectiva: { x: 70, y: 50 },
+        fotosfera: { x: 75, y: 55 },
+        cromosfera: { x: 80, y: 60 }
+      };
+      
+      Object.keys(posiciones).forEach(capa => {
+        const pos = posiciones[capa as keyof typeof posiciones];
+        posicionarEtiquetaPorcentaje(capa, pos.x, pos.y);
+      });
+    }
+    
+    (window as any).ajustarLabel2D = ajustarLabel2D;
+    (window as any).obtenerPosicionesLabels = obtenerPosicionesLabels;
+    (window as any).posicionarEtiquetaPorcentaje = posicionarEtiquetaPorcentaje;
+    (window as any).posicionarTodasEtiquetasPorcentaje = posicionarTodasEtiquetasPorcentaje;
+    (window as any).labelPositions = labelPositions;
+    
+    console.log('Funciones de debugging disponibles:');
+    console.log('- ajustarHotspot3D(capa, x, y, z)');
+    console.log('- hotspots3D (objeto con todas las posiciones)');
+    console.log('- ajustarLabel2D(capa, x, y)');
+    console.log('- obtenerPosicionesLabels()');
+    console.log('- posicionarEtiquetaPorcentaje(capa, porcentajeX, porcentajeY)');
+    console.log('- posicionarTodasEtiquetasPorcentaje()');
+    console.log('- labelPositions (objeto con todas las posiciones en porcentajes)');
+ 
     // --- Cambiar textura de la cromosfera ---
     const btnTexturaCromosfera = document.getElementById('btn-textura-cromosfera');
     let texturaAlternativaCargada = false;
@@ -791,5 +1076,118 @@
       font-size: 0.88rem;
       padding: 0.1rem;
     }
+  }
+
+  /* Estilos para las etiquetas */
+  .labels-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 15;
+    overflow: visible;
+    font-family: Arial, sans-serif;
+  }
+
+  .lines-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 14;
+    overflow: visible;
+  }
+
+  .label-line {
+    stroke: #00eaff;
+    stroke-width: 3;
+    stroke-dasharray: none;
+    opacity: 1;
+  }
+
+  /* Estilos para las etiquetas mejorados */
+  .layer-label {
+    position: absolute !important;
+    background: rgba(20, 40, 80, 0.98) !important;
+    border: 2px solid #00eaff !important;
+    border-radius: 10px !important;
+    padding: 8px 16px 8px 10px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5em !important;
+    user-select: none !important;
+    transform: translateZ(0) !important;
+    font-family: Arial, sans-serif !important;
+    line-height: 1.2 !important;
+  }
+  .layer-label:hover {
+    background: #001b63 !important;
+    color: #ff00b3 !important;
+    border-color: #cf68e9;
+    box-shadow: 0 4px 16px rgba(91, 158, 37, 0.822);
+    scale: 1.05;
+  }
+  .layer-label .info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+  }
+  .layer-label .info-icon svg {
+    display: block;
+    stroke: #00fcef;
+    background: #2a003d;
+    border-radius: 50%;
+    padding: 1px;
+  }
+  .layer-label:hover .info-icon svg {
+    stroke: #ff00b3;
+    background: #000f3f;
+  }
+  .layer-label .label-text {
+    display: inline-block;
+    vertical-align: middle;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Cambiar la línea SVG a continua y color cyan brillante */
+  .label-line {
+    stroke: #00eaff;
+    stroke-width: 3;
+    stroke-dasharray: none;
+    opacity: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 234, 255, 0.3));
+  }
+  
+  /* Asegurar que las etiquetas sean visibles en todos los navegadores */
+  .layer-label {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    backface-visibility: hidden !important;
+  }
+  
+  /* Estilo específico para etiquetas cuando están activas */
+  .layer-label[style*="display: block"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  /* Estilo específico para etiquetas cuando están ocultas */
+  .layer-label[style*="display: none"] {
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 </style>
