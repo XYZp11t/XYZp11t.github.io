@@ -74,7 +74,31 @@
         <line class="label-line" data-layer="cromosfera"></line>
       </svg>
     </div>
-    <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
+
+    <!-- Ventana de información -->
+    <div id="info-window" class="info-window" style="display: none;">
+      <div class="info-window-content">
+        <div class="info-window-header">
+          <h3 id="info-window-title"></h3>
+          <button id="info-window-close" class="info-window-close" aria-label="Cerrar">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" height="24" fill="#000000">
+              <path d="m11.414 10 2.829 2.828a1 1 0 0 1-1.415 1.415L10 11.414l-2.828 2.829a1 1 0 1 1-1.415-1.415L8.586 10 5.757 7.172a1 1 0 0 1 1.415-1.415L10 8.586l2.828-2.829a1 1 0 0 1 1.415 1.415L11.414 10zM10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" fill="#000000"/>
+            </svg>
+          </button>
+        </div>
+        <div class="info-window-body" id="info-window-body">
+          <!-- El contenido se llenará dinámicamente -->
+        </div>
+      </div>
+    </div>
+    <button id="btn-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">
+      <svg class="fullscreen-icon enter" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+        <path d="M16 3H22V9H20V5H16V3ZM2 3H8V5H4V9H2V3ZM20 19V15H22V21H16V19H20ZM4 19H8V21H2V15H4V19Z" fill="#000000"/>
+      </svg>
+      <svg class="fullscreen-icon exit" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" style="display: none;">
+        <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="#000000"/>
+      </svg>
+    </button>
   </div>
   <!-- Elimina la sección de controles principal -->
   <!-- <div class="controles"> ... </div> -->
@@ -165,22 +189,73 @@
     const labelsContainer = document.getElementById('labels-container');
     const labelLines = document.getElementById('label-lines');
     
+    // Datos de las capas solares
+    const capasData = {
+      nucleo: {
+        nombre: "Núcleo",
+        descripcion: "El corazón del Sol donde ocurre la fusión nuclear. Átomos de hidrógeno se fusionan para formar helio, liberando una inmensa cantidad de energía. Es un reactor de fusión natural que produce toda la luz y el calor del Sol, vital para la vida en la Tierra.",
+        extension: "175 mil km desde el centro",
+        temperatura: "15 millones °C",
+        densidad: "150 g/cm³ (10 veces mayor que el oro)",
+        fenomenos_clave: ["Fusión nuclear (hidrógeno a helio)"],
+        porcentaje_radio_solar: "~25%"
+      },
+      zonaRadiativa: {
+        nombre: "Zona Radiativa",
+        descripcion: "Capa donde la energía del núcleo viaja hacia afuera por radiación. Los fotones son absorbidos y reemitidos repetidamente, haciendo que su viaje sea extremadamente lento (hasta un millón de años para un solo fotón).",
+        extension: "De 175 mil km a 488 mil km desde el centro",
+        espesor: "310 mil km",
+        temperatura: "De 7 millones °C a 2 millones °C",
+        densidad: "Decae de 20 g/cm³ a 0.2 g/cm³",
+        fenomenos_clave: ["Transporte de energía por radiación", "Viaje lento de fotones"],
+        porcentaje_radio_solar: "~25% a ~70%"
+      },
+      zonaConvectiva: {
+        nombre: "Zona Convectiva",
+        descripcion: "Última capa interna, donde el transporte de energía cambia a convección. Columnas de plasma caliente suben, se enfrían y descienden, llevando la energía hacia las capas externas. Genera un patrón granulado en la superficie visible del Sol.",
+        extension: "De 488 mil km a 700 mil km (aproximadamente, hasta la superficie visible)",
+        espesor: "200 mil km",
+        temperatura: "Desciende desde la Zona Radiativa hasta unos 5,500 °C en la superficie visible",
+        densidad: "Menor que en la Zona Radiativa",
+        fenomenos_clave: ["Transporte de energía por convección", "Celdas de convección"],
+        porcentaje_radio_solar: "~70% a ~100%"
+      },
+      fotosfera: {
+        nombre: "Fotosfera",
+        descripcion: "La 'superficie' visible del Sol de donde proviene la mayor parte de la luz solar. No es sólida y presenta fenómenos como manchas solares y granulación.",
+        distancia_radio: "Superficie visible del Sol",
+        espesor: "100 km",
+        temperatura: "5,500 °C (3,400 °C en las manchas solares)",
+        fenomenos_clave: ["Manchas solares", "Granulación"],
+        porcentaje_radio_solar: "100%"
+      },
+      cromosfera: {
+        nombre: "Cromosfera",
+        descripcion: "Capa atmosférica por encima de la fotosfera. Normalmente opacada por la luz de la fotosfera, pero visible como un halo rojizo durante los eclipses totales o con filtros H-alpha. Es muy dinámica, con chorros de gas llamados espículas.",
+        distancia_radio: "Justo por encima de la fotosfera",
+        espesor: "2,000 km",
+        temperatura: "De 5,500 °C a 20,000 °C",
+        fenomenos_clave: ["Tono rosado (emisión de hidrógeno)", "Espículas"],
+        porcentaje_radio_solar: "Ligeramente por encima del 100%"
+      }
+    };
+    
     // Hotspots 3D para cada capa (posiciones en el modelo 3D)
     const hotspots3D = {
       nucleo: new THREE.Vector3(0, 0, 0),
-      zonaRadiativa: new THREE.Vector3(0.15, 0.5, 0),
+      zonaRadiativa: new THREE.Vector3(0.25, 0.4, 0),
       zonaConvectiva: new THREE.Vector3(0.35, 0.8, 0),
-      fotosfera: new THREE.Vector3(0.905, 0.4, 0),
-      cromosfera: new THREE.Vector3(0.988, 0.2, 0)
+      fotosfera: new THREE.Vector3(-0.02, 0.98, -0.1),
+      cromosfera: new THREE.Vector3(0.1, 1, 0)
     };
     
     // Posiciones 2D de las etiquetas (porcentajes del canvas)
     const labelPositions = {
-      nucleo: { x: 55, y: 40 },
-      zonaRadiativa: { x: 65, y: 45 },
-      zonaConvectiva: { x: 70, y: 50 },
-      fotosfera: { x: 75, y: 55 },
-      cromosfera: { x: 80, y: 60 }
+      nucleo: { x: 63, y: 71 },
+      zonaRadiativa: { x: 69, y: 55 },
+      zonaConvectiva: { x: 68, y: 40 },
+      fotosfera: { x: 64, y: 24 },
+      cromosfera: { x: 50, y: 10 }
     };
     
     // Referencias a los elementos DOM de las etiquetas
@@ -232,6 +307,152 @@
       }
     }
 
+    // Función para mostrar información de una capa
+    function mostrarInformacionCapa(capaKey: string) {
+      const infoWindow = document.getElementById('info-window');
+      const infoWindowTitle = document.getElementById('info-window-title');
+      const infoWindowBody = document.getElementById('info-window-body');
+      
+      if (!infoWindow || !infoWindowTitle || !infoWindowBody) return;
+      
+      const capaData = capasData[capaKey as keyof typeof capasData];
+      if (!capaData) return;
+      
+      // Llenar el título
+      infoWindowTitle.textContent = capaData.nombre;
+      
+      // Crear el contenido HTML
+      let contenidoHTML = `
+        <div class="info-section">
+          <p class="info-description">${capaData.descripcion}</p>
+        </div>
+      `;
+      
+      // Añadir información específica según la capa
+      if ('extension' in capaData && capaData.extension) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Extensión</h4>
+            <p>${capaData.extension}</p>
+          </div>
+        `;
+      }
+      
+      if ('espesor' in capaData && capaData.espesor) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Espesor</h4>
+            <p>${capaData.espesor}</p>
+          </div>
+        `;
+      }
+      
+      if ('distancia_radio' in capaData && capaData.distancia_radio) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Distancia</h4>
+            <p>${capaData.distancia_radio}</p>
+          </div>
+        `;
+      }
+      
+      if ('temperatura' in capaData && capaData.temperatura) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Temperatura</h4>
+            <p>${capaData.temperatura}</p>
+          </div>
+        `;
+      }
+      
+      if ('densidad' in capaData && capaData.densidad) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Densidad</h4>
+            <p>${capaData.densidad}</p>
+          </div>
+        `;
+      }
+      
+      if (capaData.fenomenos_clave && capaData.fenomenos_clave.length > 0) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Fenómenos Clave</h4>
+            <ul>
+              ${capaData.fenomenos_clave.map(fenomeno => `<li>${fenomeno}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+      
+      if (capaData.porcentaje_radio_solar) {
+        contenidoHTML += `
+          <div class="info-section">
+            <h4>Radio Solar</h4>
+            <p>${capaData.porcentaje_radio_solar}</p>
+          </div>
+        `;
+      }
+      
+      infoWindowBody.innerHTML = contenidoHTML;
+      
+      // Mostrar la ventana
+      infoWindow.style.display = 'flex';
+      
+      // Resetear el scroll al inicio después de mostrar la ventana
+      setTimeout(() => {
+        const infoWindowContent = infoWindow.querySelector('.info-window-content');
+        if (infoWindowContent) {
+          infoWindowContent.scrollTop = 0;
+        }
+      }, 10);
+      
+      // Añadir evento para cerrar con clic fuera
+      setTimeout(() => {
+        infoWindow.addEventListener('click', cerrarVentanaInfo);
+      }, 100);
+    }
+    
+    // Función para cerrar la ventana de información
+    function cerrarVentanaInfo(event: Event) {
+      const infoWindow = document.getElementById('info-window');
+      const infoWindowContent = infoWindow?.querySelector('.info-window-content');
+      
+      if (!infoWindow || !infoWindowContent) return;
+      
+      // Si el clic fue en el fondo (no en el contenido), cerrar
+      if (event.target === infoWindow) {
+        infoWindow.style.display = 'none';
+        infoWindow.removeEventListener('click', cerrarVentanaInfo);
+      }
+    }
+    
+    // Configurar el botón de cerrar
+    const infoWindowClose = document.getElementById('info-window-close');
+    if (infoWindowClose) {
+      infoWindowClose.addEventListener('click', () => {
+        const infoWindow = document.getElementById('info-window');
+        if (infoWindow) {
+          infoWindow.style.display = 'none';
+        }
+      });
+    }
+
+    // Event listener para la tecla ESC
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const infoWindow = document.getElementById('info-window');
+        if (infoWindow && infoWindow.style.display === 'flex') {
+          // Si hay ventana visible, cerrarla
+          infoWindow.style.display = 'none';
+          // Prevenir que el navegador salga de pantalla completa
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        // Si no hay ventana visible, dejar que el navegador maneje ESC normalmente
+      }
+    });
+
     // Función para actualizar posición de las etiquetas
     function actualizarPosicionEtiquetas() {
       if (!modelo || !canvas) return;
@@ -261,21 +482,26 @@
           // Calcular posición en píxeles basada en porcentajes
           const x = (labelPos.x / 100) * canvasWidth;
           const y = (labelPos.y / 100) * canvasHeight;
-          
+
           // Proyectar el hotspot 3D a coordenadas 2D
           const hotspot2D = proyectar3Da2D(hotspot3D);
-          
+
           // Mostrar elementos
           labelElement.style.display = 'block';
           lineElement.style.display = 'block';
-          
+
           // Posicionar etiqueta
           labelElement.style.left = x + 'px';
           labelElement.style.top = y + 'px';
-          
-          // Configurar línea SVG desde la etiqueta hacia el hotspot proyectado
-          lineElement.setAttribute('x1', x.toString());
-          lineElement.setAttribute('y1', y.toString());
+
+          // --- Ajuste para que la línea termine más cerca del centro de la etiqueta ---
+          const etiquetaAncho = labelElement.offsetWidth || 60;
+          const etiquetaAlto = labelElement.offsetHeight || 30;
+          const offsetX = 8;
+          const offsetY = etiquetaAlto / 2; // centro vertical
+
+          lineElement.setAttribute('x1', (x + offsetX).toString());
+          lineElement.setAttribute('y1', (y + offsetY).toString());
           lineElement.setAttribute('x2', hotspot2D.x.toString());
           lineElement.setAttribute('y2', hotspot2D.y.toString());
         } else {
@@ -396,7 +622,7 @@
           if (labelElement) {
             labelElement.addEventListener('click', () => {
               console.log('Clic en etiqueta:', key);
-              // Aquí se añadirá la funcionalidad de mostrar información
+              mostrarInformacionCapa(key);
             });
           }
         });
@@ -536,16 +762,21 @@
     // Minimizar controles
     const btnMinimizar = document.getElementById('btn-minimizar');
     const controlesOpciones = document.getElementById('controles-opciones');
-    let controlesMinimizados = false;
+    let controlesMinimizados = true; // Inicialmente minimizado
     if (btnMinimizar && controlesOpciones) {
+      // Aplicar estado inicial minimizado
+      controlesOpciones.classList.add('minimizado');
+      btnMinimizar.textContent = '+';
+      
       btnMinimizar.addEventListener('click', () => {
         controlesMinimizados = !controlesMinimizados;
         if (controlesMinimizados) {
           controlesOpciones.classList.add('minimizado');
+          btnMinimizar.textContent = '+';
         } else {
           controlesOpciones.classList.remove('minimizado');
+          btnMinimizar.textContent = '_';
         }
-        btnMinimizar.textContent = controlesMinimizados ? '+' : '_';
       });
     }
 
@@ -609,6 +840,13 @@
             if (contenedor.requestFullscreen) {
               await contenedor.requestFullscreen();
               isFullscreen = true;
+              // Cambiar icono
+              const enterIcon = btnFullscreen.querySelector('.fullscreen-icon.enter');
+              const exitIcon = btnFullscreen.querySelector('.fullscreen-icon.exit');
+              if (enterIcon && exitIcon) {
+                (enterIcon as HTMLElement).style.display = 'none';
+                (exitIcon as HTMLElement).style.display = 'block';
+              }
               // Forzar orientación horizontal en móvil
               if (window.screen.orientation && window.innerWidth < 800) {
                 try {
@@ -624,6 +862,13 @@
             if (document.exitFullscreen) {
               await document.exitFullscreen();
               isFullscreen = false;
+              // Cambiar icono
+              const enterIcon = btnFullscreen.querySelector('.fullscreen-icon.enter');
+              const exitIcon = btnFullscreen.querySelector('.fullscreen-icon.exit');
+              if (enterIcon && exitIcon) {
+                (enterIcon as HTMLElement).style.display = 'block';
+                (exitIcon as HTMLElement).style.display = 'none';
+              }
               // Restaurar orientación
               if (window.screen.orientation && orientationLocked) {
                 try {
@@ -639,6 +884,18 @@
       document.addEventListener('fullscreenchange', () => {
         ajustarContenedorPorOrientacion();
         isFullscreen = !!document.fullscreenElement;
+        // Cambiar icono según el estado
+        const enterIcon = btnFullscreen?.querySelector('.fullscreen-icon.enter');
+        const exitIcon = btnFullscreen?.querySelector('.fullscreen-icon.exit');
+        if (enterIcon && exitIcon) {
+          if (isFullscreen) {
+            (enterIcon as HTMLElement).style.display = 'none';
+            (exitIcon as HTMLElement).style.display = 'block';
+          } else {
+            (enterIcon as HTMLElement).style.display = 'block';
+            (exitIcon as HTMLElement).style.display = 'none';
+          }
+        }
         if (!isFullscreen && window.screen.orientation && orientationLocked) {
           try { (window.screen.orientation as any).unlock(); } catch (e) {}
           orientationLocked = false;
@@ -823,6 +1080,20 @@
   }
   .fullscreen-btn:active, .fullscreen-btn:focus {
     background: #e0e0e0;
+  }
+
+  .fullscreen-icon {
+    width: 20px;
+    height: 20px;
+    transition: opacity 0.2s;
+  }
+
+  .fullscreen-icon.enter {
+    display: block;
+  }
+
+  .fullscreen-icon.exit {
+    display: none;
   }
 
   #contenedor-modelo {
@@ -1189,5 +1460,371 @@
   .layer-label[style*="display: none"] {
     opacity: 0 !important;
     visibility: hidden !important;
+  }
+
+  /* Estilos para la ventana de información */
+  .info-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .info-window-content {
+    background: rgba(20, 40, 80, 0.98);
+    border: 2px solid #00eaff;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .info-window-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 15px 20px;
+    border-bottom: 1px solid #00eaff;
+    background: linear-gradient(135deg, #2056a8 0%, #133a6b 100%);
+    border-radius: 13px 13px 0 0;
+  }
+
+  .info-window-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .info-window-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .info-window-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .info-window-close svg {
+    width: 20px;
+    height: 20px;
+    stroke: #ff0000;
+    fill: #ff0000;
+    cilor: #ff0000;
+    stroke-width: 1.3px;
+    scale: 1.6;
+  }
+
+  .info-window-body {
+    padding: 20px;
+    color: #fff;
+    line-height: 1.6;
+  }
+
+  .info-section {
+    margin-bottom: 20px;
+  }
+
+  .info-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-description {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-align: justify;
+  }
+
+  .info-section h4 {
+    color: #00eaff;
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .info-section p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .info-section ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+  }
+
+  .info-section li {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+  }
+
+  /* Scrollbar personalizado para la ventana de información */
+  .info-window-content::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .info-window-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  .info-window-content::-webkit-scrollbar-thumb {
+    background: #00eaff;
+    border-radius: 4px;
+  }
+
+  .info-window-content::-webkit-scrollbar-thumb:hover {
+    background: #00b8cc;
+  }
+
+  /* Firefox */
+  .info-window-content {
+    scrollbar-width: auto;
+    scrollbar-color: #00eaff rgba(255, 255, 255, 0.1);
+  }
+
+  /* Internet Explorer y Edge legacy */
+  .info-window-content {
+    -ms-overflow-style: auto;
+  }
+
+  /* Estilos adicionales para mejorar la apariencia en todos los navegadores */
+  .info-window-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Mejoras específicas para navegadores de escritorio */
+  @media (min-width: 769px) {
+    .info-window-content::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    .info-window-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+    }
+
+    .info-window-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #00eaff 0%, #00b8cc 100%);
+      border-radius: 5px;
+      border: 1px solid rgba(0, 234, 255, 0.3);
+    }
+
+    .info-window-content::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #00b8cc 0%, #0099aa 100%);
+      border-color: rgba(0, 184, 204, 0.5);
+    }
+
+    /* Firefox mejorado para desktop */
+    .info-window-content {
+      scrollbar-width: auto;
+      scrollbar-color: #00eaff rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  /* Estilos específicos para móvil */
+  @media (max-width: 768px) {
+    .info-window-content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .info-window-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    .info-window-content::-webkit-scrollbar-thumb {
+      background: #00eaff;
+      border-radius: 3px;
+    }
+
+    .info-window-content::-webkit-scrollbar-thumb:hover {
+      background: #00b8cc;
+    }
+
+    /* Firefox móvil */
+    .info-window-content {
+      scrollbar-width: thin;
+      scrollbar-color: #00eaff rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Responsive para la ventana de información */
+  @media (max-width: 768px) {
+    .info-window {
+      padding: 10px;
+    }
+    
+    .info-window-content {
+      max-width: 100%;
+      max-height: 90vh;
+    }
+    
+    .info-window-header {
+      padding: 15px 15px 10px 15px;
+    }
+    
+    .info-window-header h3 {
+      font-size: 1.3rem;
+    }
+    
+    .info-window-body {
+      padding: 15px;
+    }
+    
+    .info-description {
+      font-size: 0.95rem;
+    }
+    
+    .info-section h4 {
+      font-size: 1rem;
+    }
+    
+    .info-section p,
+    .info-section li {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Estilos específicos para móvil en orientación vertical */
+  @media (max-width: 768px) and (orientation: portrait) {
+    .info-window {
+      padding: 5px;
+      align-items: flex-start;
+      padding-top: 10px;
+    }
+    
+    .info-window-content {
+      max-width: 95%;
+      max-height: 85vh;
+      margin: 0 auto;
+    }
+    
+    .info-window-header {
+      padding: 12px 15px 8px 15px;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #2056a8 0%, #133a6b 100%);
+      z-index: 10;
+    }
+    
+    .info-window-header h3 {
+      font-size: 1.1rem;
+      margin-right: 30px; /* Espacio para el botón de cerrar */
+    }
+    
+    .info-window-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 0, 0, 0.8);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 11;
+    }
+    
+    .info-window-close:hover {
+      background: rgba(255, 0, 0, 1);
+    }
+    
+    .info-window-close svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      fill: #ffffff;
+      stroke-width: 2px;
+    }
+    
+    .info-window-body {
+      padding: 12px 15px;
+      max-height: calc(85vh - 60px); /* Restar altura del header */
+    }
+    
+    .info-description {
+      font-size: 0.9rem;
+    }
+    
+    .info-section h4 {
+      font-size: 0.95rem;
+    }
+    
+    .info-section p,
+    .info-section li {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Estilos para pantallas muy pequeñas */
+  @media (max-width: 480px) and (orientation: portrait) {
+    .info-window {
+      align-items: flex-start;
+      padding-top: 5px;
+    }
+    
+    .info-window-content {
+      max-width: 98%;
+      max-height: 80vh;
+    }
+    
+    .info-window-header {
+      padding: 10px 12px 6px 12px;
+    }
+    
+    .info-window-header h3 {
+      font-size: 1rem;
+    }
+    
+    .info-window-close {
+      width: 28px;
+      height: 28px;
+      top: 6px;
+      right: 6px;
+    }
+    
+    .info-window-close svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .info-window-body {
+      padding: 10px 12px;
+    }
+    
+    .info-description {
+      font-size: 0.85rem;
+    }
+    
+    .info-section h4 {
+      font-size: 0.9rem;
+    }
+    
+    .info-section p,
+    .info-section li {
+      font-size: 0.8rem;
+    }
   }
 </style>
