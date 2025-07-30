@@ -14,7 +14,7 @@
     </div>
     <div class="controles-checkbox floating" id="controles-checkbox">
       <div class="controles-header" id="controles-header">
-        <span>Controles</span>
+        <span> Controles </span>
         <button id="btn-minimizar" aria-label="Minimizar">_</button>
       </div>
       <div class="controles-opciones" id="controles-opciones">
@@ -23,7 +23,6 @@
         <label><input type="checkbox" id="chk-labels" checked> Mostrar etiquetas</label>
         <button id="btn-reset" class="control-btn">Resetear Vista</button>
         <button id="btn-rotar" class="control-btn">Rotar Modelo</button>
-        <button id="btn-textura-cromosfera" class="control-btn">Cambiar textura</button>
       </div>
     </div>
     
@@ -65,6 +64,20 @@
         <span class="label-text">Cromosfera</span>
       </div>
       
+      <div id="label-corona" class="layer-label" data-layer="corona">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Corona</span>
+      </div>
+      
+      <div id="label-arcosSolares" class="layer-label" data-layer="arcosSolares">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2056a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Arcos Solares</span>
+      </div>
+      
       <!-- SVG para las líneas -->
       <svg id="label-lines" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="lines-container">
         <line class="label-line" data-layer="nucleo"></line>
@@ -72,6 +85,8 @@
         <line class="label-line" data-layer="zonaConvectiva"></line>
         <line class="label-line" data-layer="fotosfera"></line>
         <line class="label-line" data-layer="cromosfera"></line>
+        <line class="label-line" data-layer="corona"></line>
+        <line class="label-line" data-layer="arcosSolares"></line>
       </svg>
     </div>
 
@@ -158,10 +173,10 @@
     // controles.minAzimuthAngle = controles.maxAzimuthAngle = undefined; // (Opcional: limitar ángulos)
 
     // Iluminación
-    const luzAmbiente = new THREE.AmbientLight(0xffffff, 1.0);
+    const luzAmbiente = new THREE.AmbientLight(0xffffff, 2.5);
     escena.add(luzAmbiente);
 
-    const luzDireccional = new THREE.DirectionalLight(0xffffff, 1.0);
+    const luzDireccional = new THREE.DirectionalLight(0xffffff, 1.5);
     luzDireccional.position.set(10, 10, 5);
     escena.add(luzDireccional);
 
@@ -179,8 +194,12 @@
       fotosferaCorteT: undefined,
       fotosferaCorte: undefined,
       cromosferaCorteT: undefined,
-      cromosferaCorte: undefined
+      cromosferaCorte: undefined,
+      arcosSolares: undefined
     };
+    
+    // Variables para la corona
+    let corona: THREE.Mesh | null = null;
     let corteActivo = true;
     let cromosferaActiva = true;
     let labelsActivos = true;
@@ -237,6 +256,24 @@
         temperatura: "De 5,500 °C a 20,000 °C",
         fenomenos_clave: ["Tono rosado (emisión de hidrógeno)", "Espículas"],
         porcentaje_radio_solar: "Ligeramente por encima del 100%"
+      },
+      corona: {
+        nombre: "Corona",
+        descripcion: "La atmósfera exterior del Sol, visible durante los eclipses totales como un halo blanco brillante. Es mucho más caliente que la superficie del Sol y se extiende millones de kilómetros hacia el espacio.",
+        distancia_radio: "Por encima de la cromosfera",
+        espesor: "Millones de kilómetros",
+        temperatura: "1-3 millones °C",
+        fenomenos_clave: ["Viento solar", "Eyecciones de masa coronal", "Brillo durante eclipses"],
+        porcentaje_radio_solar: "Mucho más allá del 100%"
+      },
+      arcosSolares: {
+        nombre: "Arcos Solares",
+        descripcion: "Estructuras magnéticas en forma de arco que se forman en la corona solar. Son regiones donde el plasma solar sigue las líneas del campo magnético, creando espectaculares formaciones visibles en longitudes de onda específicas.",
+        distancia_radio: "En la corona solar",
+        espesor: "Variable",
+        temperatura: "1-3 millones °C",
+        fenomenos_clave: ["Estructuras magnéticas", "Plasma confinado", "Actividad solar"],
+        porcentaje_radio_solar: "En la corona"
       }
     };
     
@@ -246,7 +283,9 @@
       zonaRadiativa: new THREE.Vector3(0.25, 0.4, 0),
       zonaConvectiva: new THREE.Vector3(0.35, 0.8, 0),
       fotosfera: new THREE.Vector3(-0.02, 0.98, -0.1),
-      cromosfera: new THREE.Vector3(0.1, 1, 0)
+      cromosfera: new THREE.Vector3(0.1, 1, 0),
+      corona: new THREE.Vector3(0.8, 0.8, 0.3),
+      arcosSolares: new THREE.Vector3(0.5, -0.2, -1.1)
     };
     
     // Posiciones 2D de las etiquetas (porcentajes del canvas)
@@ -255,7 +294,9 @@
       zonaRadiativa: { x: 69, y: 55 },
       zonaConvectiva: { x: 68, y: 40 },
       fotosfera: { x: 64, y: 24 },
-      cromosfera: { x: 50, y: 10 }
+      cromosfera: { x: 50, y: 10 },
+      corona: { x: 34, y: 8 },
+      arcosSolares: { x: 50, y: 85 }
     };
     
     // Referencias a los elementos DOM de las etiquetas
@@ -264,7 +305,9 @@
       zonaRadiativa: document.getElementById('label-zonaRadiativa'),
       zonaConvectiva: document.getElementById('label-zonaConvectiva'),
       fotosfera: document.getElementById('label-fotosfera'),
-      cromosfera: document.getElementById('label-cromosfera')
+      cromosfera: document.getElementById('label-cromosfera'),
+      corona: document.getElementById('label-corona'),
+      arcosSolares: document.getElementById('label-arcosSolares')
     };
     
     // Referencias a las líneas SVG
@@ -273,7 +316,9 @@
       zonaRadiativa: labelLines?.querySelector('[data-layer="zonaRadiativa"]') as SVGLineElement,
       zonaConvectiva: labelLines?.querySelector('[data-layer="zonaConvectiva"]') as SVGLineElement,
       fotosfera: labelLines?.querySelector('[data-layer="fotosfera"]') as SVGLineElement,
-      cromosfera: labelLines?.querySelector('[data-layer="cromosfera"]') as SVGLineElement
+      cromosfera: labelLines?.querySelector('[data-layer="cromosfera"]') as SVGLineElement,
+      corona: labelLines?.querySelector('[data-layer="corona"]') as SVGLineElement,
+      arcosSolares: labelLines?.querySelector('[data-layer="arcosSolares"]') as SVGLineElement
     };
 
     // Función para proyectar coordenadas 3D a 2D
@@ -478,6 +523,11 @@
           mostrar = false;
         }
         
+        // Mostrar etiquetas de corona y arcos solares siempre que las etiquetas estén activas
+        if (mostrar && (key === 'corona' || key === 'arcosSolares')) {
+          mostrar = true;
+        }
+        
         if (mostrar) {
           // Calcular posición en píxeles basada en porcentajes
           const x = (labelPos.x / 100) * canvasWidth;
@@ -523,6 +573,7 @@
         if (meshes.fotosferaCorte) (meshes.fotosferaCorte as any).visible = true;
         if (meshes.cromosferaCorteT) (meshes.cromosferaCorteT as any).visible = cromosferaActiva;
         if (meshes.cromosferaCorte) (meshes.cromosferaCorte as any).visible = cromosferaActiva;
+        if (meshes.arcosSolares) (meshes.arcosSolares as any).visible = true;
         // Ocultar sol completo
         if (meshes.fotosferaExterior) (meshes.fotosferaExterior as any).visible = false;
         if (meshes.cromosferaExterior) (meshes.cromosferaExterior as any).visible = false;
@@ -535,6 +586,7 @@
         // Mostrar solo el sol completo
         if (meshes.fotosferaExterior) (meshes.fotosferaExterior as any).visible = true;
         if (meshes.cromosferaExterior) (meshes.cromosferaExterior as any).visible = cromosferaActiva;
+        if (meshes.arcosSolares) (meshes.arcosSolares as any).visible = true;
         // Ocultar sol cortado
         if (meshes.nucleo) (meshes.nucleo as any).visible = false;
         if (meshes.zonaRadiativaCorte) (meshes.zonaRadiativaCorte as any).visible = false;
@@ -546,9 +598,9 @@
       }
     }
 
-    console.log('Intentando cargar modelo desde: /models/capas_test8.glb');
+    console.log('Intentando cargar modelo desde: /models/capasSolares.glb');
 
-    loader.load('/models/capas_test8.glb', 
+    loader.load('/models/capasSolares.glb', 
       (gltf) => {
         console.log('Modelo cargado exitosamente:', gltf);
         modelo = gltf.scene;
@@ -610,9 +662,48 @@
               case 'Cromosfera_Corte':
                 meshes.cromosferaCorte = mesh;
                 break;
+              case 'Arcos_Solares':
+                meshes.arcosSolares = mesh;
+                break;
             }
           }
         });
+        
+        // Crear la corona con shaders
+        const vertexShader = `
+          varying vec3 vNormal;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `;
+
+        const fragmentShader = `
+          varying vec3 vNormal;
+          void main() {
+            float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+            gl_FragColor = vec4(1.0, 0.9, 0.8, 1.0) * intensity;
+          }
+        `;
+
+        const coronaMaterial = new THREE.ShaderMaterial({
+          uniforms: {},
+          vertexShader,
+          fragmentShader,
+          side: THREE.BackSide,
+          blending: THREE.AdditiveBlending,
+          transparent: true
+        });
+
+        const coronaGeometry = new THREE.SphereGeometry(1.0, 32, 32);
+        coronaGeometry.scale(1.3, 1.3, 1.3);
+        
+        corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
+        // Posicionar la corona en la misma posición que el modelo
+        corona.position.copy(modelo.position);
+        // Aplicar la misma rotación inicial que el modelo
+        corona.rotation.copy(modelo.rotation);
+        escena.add(corona);
         // Inicializar visibilidad
         actualizarVisibilidad();
 
@@ -665,6 +756,17 @@
         modelo.rotation.y += 0.01;
       }
       
+      // Rotación de la corona
+      if (corona) {
+        if (rotacionAutomatica) {
+          // Si la rotación automática está activa, la corona sigue al modelo
+          corona.rotation.copy(modelo.rotation);
+        } else {
+          // Si no, solo una rotación suave independiente
+          corona.rotation.y += 0.0001;
+        }
+      }
+      
       controles.update();
       renderizador.render(escena, camara);
       
@@ -698,6 +800,10 @@
       btnReset.addEventListener('click', () => {
         if (modelo) {
           modelo.rotation.set(0, -Math.PI/2, 0);
+        }
+        // Resetear también la corona
+        if (corona) {
+          corona.rotation.copy(modelo.rotation);
         }
         // Ajustar la cámara para que el modelo se vea más grande
         const box = new THREE.Box3().setFromObject(modelo as any);
@@ -959,7 +1065,9 @@
         zonaRadiativa: { x: 65, y: 45 },
         zonaConvectiva: { x: 70, y: 50 },
         fotosfera: { x: 75, y: 55 },
-        cromosfera: { x: 80, y: 60 }
+        cromosfera: { x: 80, y: 60 },
+        corona: { x: 85, y: 65 },
+        arcosSolares: { x: 90, y: 70 }
       };
       
       Object.keys(posiciones).forEach(capa => {
@@ -983,57 +1091,7 @@
     console.log('- posicionarTodasEtiquetasPorcentaje()');
     console.log('- labelPositions (objeto con todas las posiciones en porcentajes)');
  
-    // --- Cambiar textura de la cromosfera ---
-    const btnTexturaCromosfera = document.getElementById('btn-textura-cromosfera');
-    let texturaAlternativaCargada = false;
-    let texturaOriginalCromosfera: THREE.Texture | null = null;
-    let texturaOriginalCromosferaCorte: THREE.Texture | null = null;
-    let texturaOriginalCromosferaCorteT: THREE.Texture | null = null;
-    let texturaAlternativa: THREE.Texture | null = null;
-    if (btnTexturaCromosfera) {
-      btnTexturaCromosfera.addEventListener('click', () => {
-        if (!meshes.cromosferaExterior && !meshes.cromosferaCorte && !meshes.cromosferaCorteT) return;
-        // Cargar textura alternativa si no está cargada
-        if (!texturaAlternativa) {
-          const loader = new THREE.TextureLoader();
-          loader.load('/2k_sun.jpg', (tex) => {
-            texturaAlternativa = tex;
-            aplicarTexturaCromosfera();
-          });
-        } else {
-          aplicarTexturaCromosfera();
-        }
-      });
-    }
-    function aplicarTexturaCromosfera() {
-      // Guardar texturas originales la primera vez
-      if (!texturaOriginalCromosfera && meshes.cromosferaExterior) {
-        texturaOriginalCromosfera = ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
-      }
-      if (!texturaOriginalCromosferaCorte && meshes.cromosferaCorte) {
-        texturaOriginalCromosferaCorte = ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
-      }
-      if (!texturaOriginalCromosferaCorteT && meshes.cromosferaCorteT) {
-        texturaOriginalCromosferaCorteT = ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).map;
-      }
-      // Alternar textura
-      texturaAlternativaCargada = !texturaAlternativaCargada;
-      if (meshes.cromosferaExterior) {
-        ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosfera;
-        ((meshes.cromosferaExterior as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
-      }
-      if (meshes.cromosferaCorte) {
-        ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosferaCorte;
-        ((meshes.cromosferaCorte as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
-      }
-      if (meshes.cromosferaCorteT) {
-        ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).map = texturaAlternativaCargada ? texturaAlternativa : texturaOriginalCromosferaCorteT;
-        ((meshes.cromosferaCorteT as THREE.Mesh).material as THREE.MeshStandardMaterial).needsUpdate = true;
-      }
-      if (btnTexturaCromosfera) {
-        btnTexturaCromosfera.textContent = texturaAlternativaCargada ? 'Restaurar textura' : 'Cambiar textura';
-      }
-    }
+
   });
 </script>
 
@@ -1434,11 +1492,11 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
   
-  /* Cambiar la línea SVG a continua y color cyan brillante */
+  /* Cambiar la línea SVG a punteada y color cyan brillante */
   .label-line {
     stroke: #00eaff;
     stroke-width: 3;
-    stroke-dasharray: none;
+    stroke-dasharray: 8, 4;
     opacity: 1;
     filter: drop-shadow(0 1px 2px rgba(0, 234, 255, 0.3));
   }
