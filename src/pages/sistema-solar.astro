@@ -1,0 +1,223 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SistemaSolarComponent from '../components/SistemaSolar.astro';
+---
+
+<Layout title="Sistema Solar 3D - Visualización Interactiva">
+  <main>
+    <header class="page-header">
+      <h1>🪐 Sistema Solar 3D</h1>
+      <p>Explora nuestro sistema solar en 3D. Cambia entre escalas visual y real, observa las órbitas y descubre información sobre cada planeta.</p>
+      <div class="controles-escala">
+        <span class="escala-info">
+          <strong>Escala Visual:</strong> Tamaños y distancias optimizados para visualización
+        </span>
+        <span class="escala-info">
+          <strong>Escala Real:</strong> Proporciones astronómicas reales (¡prepárate para las distancias!)
+        </span>
+      </div>
+    </header>
+    
+    <SistemaSolarComponent />
+    
+    <section class="info-section">
+      <div class="info-cards">
+        <div class="info-card">
+          <h3>🎮 Controles</h3>
+          <ul>
+            <li><strong>Ratón:</strong> Rotar vista (clic y arrastrar)</li>
+            <li><strong>Rueda:</strong> Zoom in/out</li>
+            <li><strong>Clic derecho:</strong> Mover vista</li>
+            <li><strong>Etiquetas:</strong> Clic para centrar cámara</li>
+            <li><strong>🔍 Información:</strong> Clic en icono para detalles</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <h3>📊 Escalas</h3>
+          <ul>
+            <li><strong>Visual:</strong> Permite ver todos los planetas cómodamente</li>
+            <li><strong>Real:</strong> Muestra las distancias astronómicas reales</li>
+            <li>Los tamaños están escalados para mantener visibilidad</li>
+            <li>Las órbitas respetan las proporciones relativas</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <h3>🌍 Cuerpos Celestes</h3>
+          <ul>
+            <li><strong>Planetas:</strong> Sol, Mercurio, Venus, Tierra, Marte, Júpiter, Saturno, Urano</li>
+            <li><strong>Satélites:</strong> La Luna orbita la Tierra</li>
+            <li>Texturas reales de alta calidad</li>
+            <li>Velocidades de rotación y traslación realistas</li>
+            <li>Saturno incluye su sistema de anillos</li>
+            <li>Sol brillante con emisión de luz realista</li>
+            <li>Iluminación mejorada para mejor visibilidad</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <footer class="page-footer">
+      <div class="nav-links">
+        <a href="/about" class="nav-link">ℹ️ Acerca del Proyecto</a>
+        <a href="/" class="nav-link">🌞 Capas Solares</a>
+        <a href="/" class="nav-link">🏠 Inicio</a>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .page-header p {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .controles-escala {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .escala-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .info-section {
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    margin-top: 2rem;
+  }
+
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .info-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .info-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .info-card h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .info-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-card li {
+    padding: 0.5rem 0;
+    color: #666;
+    border-bottom: 1px solid #eee;
+  }
+
+  .info-card li:last-child {
+    border-bottom: none;
+  }
+
+  .info-card strong {
+    color: #333;
+  }
+
+  .page-footer {
+    margin-top: auto;
+    padding: 2rem 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+  }
+
+  .nav-link:hover {
+    color: #495057;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 768px) {
+    .page-header h1 {
+      font-size: 2rem;
+    }
+    
+    .controles-escala {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .info-cards {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .info-card {
+      padding: 1.5rem;
+    }
+    
+    .nav-links {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+</style>

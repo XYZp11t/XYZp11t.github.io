@@ -122,6 +122,7 @@
 <script>
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -147,7 +148,7 @@
 
     // Fondo equirectangular
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load('/2k_stars_milky_way.jpg', (texture) => {
+    textureLoader.load('/texturas/2k_stars_milky_way.jpg', (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       escena.background = texture;
     });
@@ -180,8 +181,14 @@
     luzDireccional.position.set(10, 10, 5);
     escena.add(luzDireccional);
 
+    // Configurar DRACOLoader para modelos comprimidos
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    dracoLoader.setDecoderConfig({ type: 'js' });
+    
     // Cargar el modelo GLB
     const loader = new GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
     let modelo: any = null;
     let rotacionAutomatica = false;
     /** @type {Record<string, THREE.Mesh | undefined>} */
@@ -1081,6 +1088,13 @@
     (window as any).posicionarEtiquetaPorcentaje = posicionarEtiquetaPorcentaje;
     (window as any).posicionarTodasEtiquetasPorcentaje = posicionarTodasEtiquetasPorcentaje;
     (window as any).labelPositions = labelPositions;
+    
+    // Limpieza de recursos cuando sea necesario
+    window.addEventListener('beforeunload', () => {
+      if (dracoLoader) {
+        dracoLoader.dispose();
+      }
+    });
     
     console.log('Funciones de debugging disponibles:');
     console.log('- ajustarHotspot3D(capa, x, y, z)');

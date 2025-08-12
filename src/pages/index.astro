@@ -6,14 +6,18 @@ import ModeloGLB from '../components/CapasSolares.astro';
 <Layout title="Visualización de Modelo 3D - Capas Solares">
   <main>
     <header class="page-header">
-      <h1>🌞 Visualización de Modelo 3D - Capas Solares</h1>
-      <p>Explora el modelo 3D de las capas solares. Puedes rotar, hacer zoom y navegar por el modelo.</p>
+      <h1>🌞 Capas Solares 3D</h1>
+      <p>Explora el modelo 3D de las capas internas del Sol. Puedes rotar, hacer zoom y navegar por el modelo para entender su estructura.</p>
+      <div class="header-nav">
+        <a href="/sistema-solar" class="header-nav-link">🪐 Ver Sistema Solar Completo</a>
+      </div>
     </header>
     
     <ModeloGLB />
     
     <footer class="page-footer">
       <div class="nav-links">
+        <a href="/sistema-solar" class="nav-link">🪐 Sistema Solar</a>
         <a href="/about" class="nav-link">ℹ️ Acerca del Proyecto</a>
         <a href="/" class="nav-link">🏠 Inicio</a>
       </div>
@@ -43,9 +47,32 @@ import ModeloGLB from '../components/CapasSolares.astro';
   }
 
   .page-header p {
-    margin: 0;
+    margin: 0 0 1.5rem 0;
     font-size: 1.1rem;
     opacity: 0.9;
+  }
+
+  .header-nav {
+    margin-top: 1rem;
+  }
+
+  .header-nav-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: inline-block;
+  }
+
+  .header-nav-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .page-footer {
