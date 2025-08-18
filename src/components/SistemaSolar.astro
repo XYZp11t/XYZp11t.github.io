@@ -20,10 +20,29 @@
       <div class="controles-opciones" id="controles-opciones">
         <label><input type="checkbox" id="chk-orbitas" checked> Mostrar órbitas</label>
         <label><input type="checkbox" id="chk-labels" checked> Mostrar etiquetas</label>
-        <label><input type="checkbox" id="chk-rotacion" checked> Rotación planetaria</label>
-        <label><input type="checkbox" id="chk-orbitar" checked> Movimiento orbital</label>
-        <button id="btn-escala-visual" class="control-btn active">Escala Visual</button>
-        <button id="btn-escala-real" class="control-btn">Escala Real</button>
+        
+        <!-- Control de tiempo -->
+        <div class="tiempo-controles">
+          <button id="btn-play-pause" class="control-btn play-btn">
+            <span class="play-icon">▶</span>
+            <span class="pause-icon" style="display: none;">⏸</span>
+            <span class="btn-text">Play</span>
+          </button>
+          
+          <div class="fecha-slider-container">
+            <label for="fecha-slider"><strong>Fecha:</strong></label>
+            <input type="range" id="fecha-slider" min="-20" max="20" value="0" step="0.1">
+            <div class="slider-labels">
+              <span>-20 años</span>
+              <span>Hoy</span>
+              <span>+20 años</span>
+            </div>
+            <div class="fecha-actual">
+              <span id="fecha-simulacion"></span>
+            </div>
+          </div>
+        </div>
+        
         <button id="btn-reset" class="control-btn">Resetear Vista</button>
       </div>
     </div>
@@ -87,6 +106,13 @@
         <span class="label-text">Urano</span>
       </div>
       
+      <div id="label-neptuno" class="planet-label" data-planet="neptuno">
+        <span class="info-icon" aria-label="info">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b70dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+        </span>
+        <span class="label-text">Neptuno</span>
+      </div>
+      
       <div id="label-luna" class="planet-label satellite-label" data-planet="luna">
         <span class="info-icon" aria-label="info">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c0c0c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
@@ -104,6 +130,7 @@
         <line class="label-line" data-planet="jupiter"></line>
         <line class="label-line" data-planet="saturno"></line>
         <line class="label-line" data-planet="urano"></line>
+        <line class="label-line" data-planet="neptuno"></line>
         <line class="label-line" data-planet="luna"></line>
       </svg>
     </div>
@@ -193,36 +220,47 @@
     controles.maxDistance = 10000; // Aumentar distancia máxima
 
     // Variables del sistema
-    let escalaActual: 'visual' | 'real' = 'visual';
     let mostrarOrbitas = true;
     let mostrarLabels = true;
-    let rotacionPlanetaria = true;
-    let movimientoOrbital = true;
+    let animacionActiva = false; // Control de play/pause
     let planetas: Record<string, THREE.Mesh | THREE.Group> = {};
-    let orbitas: Record<number, THREE.Line> = {};
+    let orbitas: Record<string, THREE.Line> = {};
     let etiquetasActivas: any[] = [];
     let animacionCamara: any = null;
     let modeloSolCargado = false;
+    
+    // Sistema de tiempo J2000
+    const J2000_JD = 2451545.0; // Época J2000.0 = JD 2451545.0 = 2000-01-01 12:00 UT
+    let fechaBaseActual = new Date(); // Fecha real actual (hoy)
+    let tiempoSimuladoAnios = 0; // Años desde la fecha base (puede ser negativo, rango ±20)
+    let tiempoActual = 0; // Días desde J2000 para cálculos orbitales
+    let factorAnimacionAnios = 0.00138; // Factor de velocidad de animación (0.5 días por frame ≈ 0.00137 años por frame)
 
-    // Datos de los planetas (distancias en UA, tamaños en km, periodos en días terrestres)
+    // Datos de los planetas basados en elementos orbitales J2000.0
     const datosPlanetas = {
       sol: {
         nombre: 'Sol',
         radio: 696340, // km
-        distancia: 0,
-        periodo: 25.4, // días (rotación)
-        periodoOrbital: 0,
+        rot_period_hours: 609.12, // 25.38 días * 24 horas (período sinódico)
         textura: '/texturas/2k_sun.jpg',
         color: 0xfdb813,
         emissive: 0x444400,
+        obliquity_deg: 7.25, // inclinación del eje solar
         info: 'El Sol es una estrella de tipo G que contiene el 99.86% de la masa del sistema solar.'
       },
       mercurio: {
         nombre: 'Mercurio',
         radio: 2439, // km
-        distancia: 0.39, // UA
-        periodo: 58.6, // días terrestres
-        periodoOrbital: 88, // días terrestres
+        a_AU: 0.38709893,
+        e: 0.20563069,
+        i_deg: 7.00487,
+        Omega_deg: 48.33167,
+        varpi_deg: 77.45645,
+        L_deg: 252.25084,
+        M0_deg: 174.79439,
+        n_deg_per_day: 4.09235071,
+        rot_period_hours: 1407.6,
+        obliquity_deg: 0.034,
         textura: '/texturas/2k_mercury.jpg',
         color: 0x8c7853,
         info: 'Mercurio es el planeta más cercano al Sol y el más pequeño del sistema solar.'
@@ -230,9 +268,16 @@
       venus: {
         nombre: 'Venus',
         radio: 6051, // km
-        distancia: 0.72, // UA
-        periodo: -243, // días terrestres (rotación retrógrada)
-        periodoOrbital: 225, // días terrestres
+        a_AU: 0.72333199,
+        e: 0.00677323,
+        i_deg: 3.39471,
+        Omega_deg: 76.68069,
+        varpi_deg: 131.53298,
+        L_deg: 181.97973,
+        M0_deg: 50.44675,
+        n_deg_per_day: 1.60212905,
+        rot_period_hours: -5832.6, // retrógrado
+        obliquity_deg: 177.36,
         textura: '/texturas/2k_venus_atmosphere.jpg',
         color: 0xffc649,
         info: 'Venus es el planeta más caliente del sistema solar debido a su atmósfera densa de CO2.'
@@ -240,9 +285,16 @@
       tierra: {
         nombre: 'Tierra',
         radio: 6371, // km
-        distancia: 1.0, // UA
-        periodo: 1, // día terrestre
-        periodoOrbital: 365.25, // días terrestres
+        a_AU: 1.00000011,
+        e: 0.01671022,
+        i_deg: 0.00005,
+        Omega_deg: -11.26064,
+        varpi_deg: 102.94719,
+        L_deg: 100.46435,
+        M0_deg: 357.51716,
+        n_deg_per_day: 0.98561009,
+        rot_period_hours: 23.9345,
+        obliquity_deg: 23.44,
         textura: '/texturas/2k_earth_daymap.jpg',
         color: 0x6b93d6,
         info: 'La Tierra es el único planeta conocido que alberga vida, con océanos líquidos y atmósfera protectora.'
@@ -250,9 +302,16 @@
       marte: {
         nombre: 'Marte',
         radio: 3389, // km
-        distancia: 1.52, // UA
-        periodo: 1.03, // días terrestres
-        periodoOrbital: 687, // días terrestres
+        a_AU: 1.52366231,
+        e: 0.09341233,
+        i_deg: 1.85061,
+        Omega_deg: 49.57854,
+        varpi_deg: 336.04084,
+        L_deg: 355.45332,
+        M0_deg: 19.41248,
+        n_deg_per_day: 0.52403272,
+        rot_period_hours: 24.6229,
+        obliquity_deg: 25.19,
         textura: '/texturas/2k_mars.jpg',
         color: 0xcd5c5c,
         info: 'Marte, el planeta rojo, tiene la montaña más alta del sistema solar: Olympus Mons.'
@@ -260,9 +319,16 @@
       jupiter: {
         nombre: 'Júpiter',
         radio: 69911, // km
-        distancia: 5.2, // UA
-        periodo: 0.41, // días terrestres
-        periodoOrbital: 4333, // días terrestres
+        a_AU: 5.20336301,
+        e: 0.04839266,
+        i_deg: 1.30530,
+        Omega_deg: 100.55615,
+        varpi_deg: 14.75385,
+        L_deg: 34.40438,
+        M0_deg: 19.65053,
+        n_deg_per_day: 0.08309120,
+        rot_period_hours: 9.9250,
+        obliquity_deg: 3.13,
         textura: '/texturas/2k_jupiter.jpg',
         color: 0xd8ca9d,
         info: 'Júpiter es el planeta más grande del sistema solar, con más de 80 lunas conocidas.'
@@ -270,50 +336,80 @@
       saturno: {
         nombre: 'Saturno',
         radio: 58232, // km
-        distancia: 9.5, // UA
-        periodo: 0.45, // días terrestres
-        periodoOrbital: 10759, // días terrestres
+        a_AU: 9.53707032,
+        e: 0.05415060,
+        i_deg: 2.48446,
+        Omega_deg: 113.71504,
+        varpi_deg: 92.43194,
+        L_deg: 49.94432,
+        M0_deg: 317.51238,
+        n_deg_per_day: 0.03347063,
+        rot_period_hours: 10.656,
+        obliquity_deg: 26.73,
+        anillos: true,
         textura: '/texturas/2k_saturn.jpg',
         color: 0xfab27b,
-        anillos: true,
         info: 'Saturno es famoso por su sistema de anillos, compuesto principalmente de hielo y roca.'
       },
       urano: {
         nombre: 'Urano',
         radio: 25362, // km
-        distancia: 19.2, // UA
-        periodo: -0.72, // días terrestres (rotación retrógrada)
-        periodoOrbital: 30687, // días terrestres
+        a_AU: 19.19126393,
+        e: 0.04716771,
+        i_deg: 0.76986,
+        Omega_deg: 74.22988,
+        varpi_deg: 170.96424,
+        L_deg: 313.23218,
+        M0_deg: 142.26794,
+        n_deg_per_day: 0.01173196,
+        rot_period_hours: -17.24, // retrógrado
+        obliquity_deg: 97.77,
         textura: '/texturas/2k_uranus.jpg',
         color: 0x4fd0e7,
         info: 'Urano rota de lado, con un eje de rotación inclinado 98 grados.'
       },
+      neptuno: {
+        nombre: 'Neptuno',
+        radio: 24622, // km
+        a_AU: 30.06896348,
+        e: 0.00858587,
+        i_deg: 1.76917,
+        Omega_deg: 131.72169,
+        varpi_deg: 44.97135,
+        L_deg: 304.88003,
+        M0_deg: 259.90868,
+        n_deg_per_day: 0.00598116,
+        rot_period_hours: 16.11,
+        obliquity_deg: 28.32,
+        textura: '/texturas/2k_neptune.jpg',
+        color: 0x4b70dd,
+        info: 'Neptuno es el planeta más lejano del sistema solar, con vientos que alcanzan 2,100 km/h.'
+      },
       luna: {
         nombre: 'Luna',
         radio: 1737, // km
-        distancia: 0.00257, // UA desde la Tierra (384,400 km)
-        periodo: 27.3, // días terrestres
-        periodoOrbital: 27.3, // días terrestres
+        distancia_terra_km: 384400, // km desde la Tierra
+        rot_period_hours: 655.7, // 27.32 días (acoplamiento de marea)
+        orbital_period_hours: 655.7, // sincronizado con rotación
+        orbital_period_days: 27.321661, // Período sidéreo en días
+        obliquity_deg: 6.7, // inclinación respecto a su órbita
+        // Elementos orbitales simplificados para la Luna (geocéntricos)
+        a_km: 384400, // Semieje mayor en km
+        e_luna: 0.0549, // Excentricidad orbital de la Luna
+        i_luna_deg: 5.145, // Inclinación orbital respecto a la eclíptica
         textura: '/texturas/2k_moon.jpg',
         color: 0xc0c0c0,
         esSatelite: true,
         planetaPadre: 'tierra',
-        info: 'La Luna es el único satélite natural de la Tierra y el quinto satélite más grande del Sistema Solar.'
+        info: 'La Luna es el único satélite natural de la Tierra y el quinto satélite más grande del Sistema Solar. Debido al acoplamiento de marea, siempre muestra la misma cara a la Tierra.'
       }
     };
 
-    // Escalas
-    const escalas = {
-      visual: {
-        distancia: 20, // Factor para distancias
-        tamano: 0.3, // Factor para tamaños
-        sol: 4 // Tamaño especial para el Sol
-      },
-      real: {
-        distancia: 100, // Factor para distancias reales
-        tamano: 0.00005, // Factor más realista para tamaños
-        sol: 1 // Tamaño proporcional para el Sol
-      }
+    // Escala visual fija (eliminamos el sistema de escalas múltiples)
+    const escalaConfig = {
+      distancia: 20, // Factor para distancias
+      tamano: 0.3, // Factor para tamaños
+      sol: 4 // Tamaño especial para el Sol
     };
 
     // Función para crear el Sol con modelo GLB
@@ -332,12 +428,16 @@
           const modelo = gltf.scene;
           
           // Escalar el modelo
-          const escalaConfig = escalas[escalaActual];
           const escala = escalaConfig.sol * 0.5; // Ajustar escala para que se vea bien
           modelo.scale.setScalar(escala);
           
           // Posicionar en el centro
           modelo.position.set(0, 0, 0);
+          
+                  // Aplicar inclinación del eje del Sol
+        if (datosPlanetas.sol.obliquity_deg) {
+          modelo.rotation.z = (datosPlanetas.sol.obliquity_deg * Math.PI) / 180;
+        }
           
           // Hacer todos los materiales más brillantes y emisivos
           modelo.traverse((child) => {
@@ -357,13 +457,7 @@
             }
           });
           
-          // Añadir luz central del Sol
-          const luzSolar = new THREE.PointLight(0xffaa00, 4, 3000);
-          modelo.add(luzSolar);
-          
-          // Añadir luz ambiental adicional desde el Sol
-          const luzAmbientalSol = new THREE.AmbientLight(0xffaa44, 0.4);
-          modelo.add(luzAmbientalSol);
+          // La iluminación ahora se maneja desde el generador de luz solar centralizado
           
           // Propiedades para animación
           modelo.userData = {
@@ -371,8 +465,9 @@
             datos: datosPlanetas.sol,
             distanciaOrbital: 0,
             anguloOrbital: 0,
-            velocidadRotacion: (2 * Math.PI) / (datosPlanetas.sol.periodo || 25),
-            velocidadOrbital: 0
+            velocidadRotacionHoras: datosPlanetas.sol.rot_period_hours ? (2 * Math.PI) / Math.abs(datosPlanetas.sol.rot_period_hours) : 0,
+            velocidadOrbitalDias: 0,
+            planetaMesh: modelo
           };
           
           escena.add(modelo);
@@ -387,14 +482,100 @@
       });
     }
 
+    // Función para crear material de la Tierra con texturas de día y noche
+    function crearMaterialTierra(): THREE.ShaderMaterial {
+      // Shader personalizado para mezclar texturas de día y noche
+      const vertexShader = `
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        
+        void main() {
+          vUv = uv;
+          // Usar normal en espacio local (sin transformación de cámara)
+          vNormal = normalize(normal);
+          // Posición en espacio local
+          vPosition = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+      
+      const fragmentShader = `
+        uniform sampler2D dayTexture;
+        uniform sampler2D nightTexture;
+        uniform vec3 sunDirectionLocal;
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        
+        void main() {
+          // Calcular iluminación basándose en la dirección del Sol en coordenadas locales
+          // El Sol está en la dirección opuesta a la posición orbital de la Tierra
+          vec3 sunDir = normalize(sunDirectionLocal);
+          
+          // Producto punto entre la normal de la superficie y la dirección del Sol
+          float sunDot = dot(vNormal, sunDir);
+          
+          // Crear factor de mezcla suave entre día y noche
+          // sunDot > 0 = día (superficie orientada hacia el Sol)
+          // sunDot < 0 = noche (superficie orientada lejos del Sol)
+          float mixFactor = smoothstep(-0.1, 0.1, sunDot);
+          
+          // Cargar texturas
+          vec4 dayColor = texture2D(dayTexture, vUv);
+          vec4 nightColor = texture2D(nightTexture, vUv);
+          
+          // Mezclar las texturas basándose en la iluminación
+          vec4 finalColor = mix(nightColor, dayColor, mixFactor);
+          
+          // Añadir brillo sutil a las luces nocturnas cuando es de noche
+          if (mixFactor < 0.5) {
+            // Intensificar ligeramente las luces nocturnas
+            finalColor.rgb += nightColor.rgb * (1.0 - mixFactor) * 0.2;
+          }
+          
+          gl_FragColor = finalColor;
+        }
+      `;
+      
+      // Crear material con shader personalizado
+      const material = new THREE.ShaderMaterial({
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader,
+        uniforms: {
+          dayTexture: { value: null },
+          nightTexture: { value: null },
+          sunDirectionLocal: { value: new THREE.Vector3(1, 0, 0) } // Dirección inicial hacia el Sol
+        }
+      });
+      
+      // Cargar texturas de día y noche
+      textureLoader.load('/texturas/2k_earth_daymap.jpg', (texture) => {
+        material.uniforms.dayTexture.value = texture;
+        material.needsUpdate = true;
+      });
+      
+      textureLoader.load('/texturas/2k_earth_nightmap.jpg', (texture) => {
+        material.uniforms.nightTexture.value = texture;
+        material.needsUpdate = true;
+      });
+      
+      return material;
+    }
+
     // Función para crear un planeta
     function crearPlaneta(nombre: string, datos: any) {
-      const escalaConfig = escalas[escalaActual];
       
       // Si es el Sol, usar modelo GLB
       if (nombre === 'sol') {
         crearSolGLB();
         return;
+      }
+      
+      // Evitar crear la Luna si ya existe
+      if (nombre === 'luna' && planetas['luna']) {
+        console.log('La Luna ya existe, saltando creación duplicada');
+        return planetas['luna'];
       }
       
       // Calcular tamaño
@@ -410,24 +591,26 @@
       // Crear geometría y material
       const geometria = new THREE.SphereGeometry(radio, 32, 32);
       
-      // Cargar textura
-      const material = new THREE.MeshPhongMaterial();
-      textureLoader.load(datos.textura, (texture) => {
-        material.map = texture;
-        material.needsUpdate = true;
-      });
+      let material: THREE.Material;
+      
+      // Material especial para la Tierra con texturas de día y noche
+      if (nombre === 'tierra') {
+        material = crearMaterialTierra();
+      } else {
+        // Material normal para otros planetas
+        material = new THREE.MeshPhongMaterial();
+        textureLoader.load(datos.textura, (texture) => {
+          (material as THREE.MeshPhongMaterial).map = texture;
+          material.needsUpdate = true;
+        });
+      }
 
       const planeta = new THREE.Mesh(geometria, material);
       
-      // Añadir luz individual a cada planeta para mejor iluminación
-      const luzPlanetaria = new THREE.PointLight(0xffffff, 2.0, radio * 100);
-      luzPlanetaria.position.set(0, 0, radio * 2); // Posicionar la luz cerca del planeta
-      planeta.add(luzPlanetaria);
+      // Los planetas ahora se iluminan desde el generador de luz solar centralizado
       
-      // Añadir una segunda luz para iluminación más uniforme
-      const luzSecundaria = new THREE.PointLight(0xffffff, 1.0, radio * 80);
-      luzSecundaria.position.set(radio * 2, radio, 0);
-      planeta.add(luzSecundaria);
+      // Crear un grupo para aplicar inclinación orbital
+      const grupoPlaneta = new THREE.Group();
       
       // Posición inicial
       let distancia, planetaPadre = null;
@@ -435,67 +618,237 @@
       if (datos.esSatelite && datos.planetaPadre) {
         // Es un satélite, orbita alrededor de su planeta padre
         planetaPadre = planetas[datos.planetaPadre];
-        distancia = datos.distancia * escalaConfig.distancia * 100; // Escala para satélites
+        // Para la Luna, usar distancia en km convertida a unidades de escena con escala reducida
+        distancia = (datos.distancia_terra_km / 149597870.7) * escalaConfig.distancia * 15; // km -> UA -> escala (reducido de 100 a 15)
         if (planetaPadre) {
+          // Para satélites, no usar grupo - añadir directamente al planeta padre
           planeta.position.set(distancia, 0, 0);
-          planetaPadre.add(planeta); // Añadir como hijo del planeta padre
+          
+          // Aplicar obliquidad respecto al plano orbital del satélite
+          if (datos.obliquity_deg !== undefined) {
+            const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
+            planeta.rotation.z = obliquidad;
+          }
+          
+          // Obtener el mesh del planeta padre (no el grupo)
+          let meshPlanetaPadre;
+          if (planetaPadre.userData.planetaMesh) {
+            meshPlanetaPadre = planetaPadre.userData.planetaMesh;
+          } else {
+            meshPlanetaPadre = planetaPadre;
+          }
+          meshPlanetaPadre.add(planeta);
         }
       } else {
         // Es un planeta, orbita alrededor del Sol
-        distancia = datos.distancia * escalaConfig.distancia;
-        planeta.position.set(distancia, 0, 0);
-        escena.add(planeta);
+        // Calcular posición inicial basada en la fecha actual
+        const posicionInicial = calcularPosicionOrbital(datos, tiempoActual);
+        planeta.position.set(
+          posicionInicial.x * escalaConfig.distancia,
+          posicionInicial.z * escalaConfig.distancia, // z se mapea a y
+          posicionInicial.y * escalaConfig.distancia  // y se mapea a z
+        );
+        
+        // Aplicar obliquidad respecto al plano orbital del planeta
+        if (datos.obliquity_deg !== undefined) {
+          const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
+          planeta.rotation.z = obliquidad;
+        }
+        
+        grupoPlaneta.add(planeta);
+        escena.add(grupoPlaneta);
         
         // Crear órbita solo para planetas
-        crearOrbita(distancia);
+        crearOrbita(datos, nombre);
       }
       
-      // Propiedades para animación
-      planeta.userData = {
+      // Propiedades para animación con datos J2000
+      const objetoFinal = datos.esSatelite ? planeta : grupoPlaneta;
+      objetoFinal.userData = {
         nombre: nombre,
         datos: datos,
         distanciaOrbital: distancia,
-        anguloOrbital: Math.random() * Math.PI * 2,
-        velocidadRotacion: (2 * Math.PI) / (datos.periodo || 1),
-        velocidadOrbital: (2 * Math.PI) / (datos.periodoOrbital || 365),
+        // Para órbitas, usar anomalía media inicial M0 convertida a radianes
+        anguloOrbital: datos.M0_deg ? (datos.M0_deg * Math.PI) / 180 : Math.random() * Math.PI * 2,
+        // Velocidad de rotación basada en rot_period_hours
+        velocidadRotacionHoras: datos.rot_period_hours ? (2 * Math.PI) / Math.abs(datos.rot_period_hours) : 0,
+        // Velocidad orbital basada en n_deg_per_day (movimiento medio)
+        velocidadOrbitalDias: datos.n_deg_per_day ? (datos.n_deg_per_day * Math.PI) / 180 : 0,
         esSatelite: datos.esSatelite || false,
-        planetaPadre: planetaPadre
+        planetaPadre: planetaPadre,
+        planetaMesh: planeta, // Referencia al mesh del planeta para rotación
+        grupo: datos.esSatelite ? null : grupoPlaneta, // Referencia al grupo para órbitas
+        // Para satélites como la Luna
+        velocidadRotacionSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0,
+        velocidadOrbitalSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0
       };
 
-      planetas[nombre] = planeta;
+      planetas[nombre] = objetoFinal;
 
       // Anillos de Saturno
       if (datos.anillos) {
         crearAnillosSaturno(planeta, radio);
       }
 
-      return planeta;
+      // Órbita de la Luna (cuando se crea la Tierra)
+      if (nombre === 'tierra') {
+        // Crear órbita de la Luna después de que se haya creado la Luna
+        setTimeout(() => {
+          const planetaTierra = planetas['tierra'];
+          if (planetaTierra && !orbitas['luna']) {
+            crearOrbitaLuna(planetaTierra);
+          }
+        }, 100);
+      }
+
+      return objetoFinal;
     }
 
-    // Función para crear órbitas
-    function crearOrbita(radio: number) {
+    // Función para calcular posición orbital usando elementos Keplerianos
+    function calcularPosicionOrbital(datos: any, tiempo: number): { x: number, y: number, z: number } {
+      if (!datos.a_AU || !datos.e || datos.n_deg_per_day === undefined) {
+        return { x: 0, y: 0, z: 0 };
+      }
+
+      // Elementos orbitales
+      const a = datos.a_AU; // Semieje mayor en UA
+      const e = datos.e; // Excentricidad
+      const i = (datos.i_deg || 0) * Math.PI / 180; // Inclinación
+      const Omega = (datos.Omega_deg || 0) * Math.PI / 180; // Longitud del nodo ascendente
+      const omega = ((datos.varpi_deg || 0) - (datos.Omega_deg || 0)) * Math.PI / 180; // Argumento del periapsis
+      const M0 = (datos.M0_deg || 0) * Math.PI / 180; // Anomalía media en época
+      const n = datos.n_deg_per_day * Math.PI / 180; // Movimiento medio en rad/día
+
+      // Anomalía media en tiempo t
+      const M = M0 + n * tiempo;
+
+      // Resolver la ecuación de Kepler para la anomalía excéntrica E
+      let E = M;
+      for (let j = 0; j < 10; j++) {
+        E = M + e * Math.sin(E);
+      }
+
+      // Anomalía verdadera
+      const nu = 2 * Math.atan2(
+        Math.sqrt(1 + e) * Math.sin(E / 2),
+        Math.sqrt(1 - e) * Math.cos(E / 2)
+      );
+
+      // Distancia heliocéntrica
+      const r = a * (1 - e * Math.cos(E));
+
+      // Posición en el plano orbital
+      const x_orb = r * Math.cos(nu);
+      const y_orb = r * Math.sin(nu);
+      const z_orb = 0;
+
+      // Rotaciones para orientar la órbita en el espacio
+      const cos_Omega = Math.cos(Omega);
+      const sin_Omega = Math.sin(Omega);
+      const cos_omega = Math.cos(omega);
+      const sin_omega = Math.sin(omega);
+      const cos_i = Math.cos(i);
+      const sin_i = Math.sin(i);
+
+      // Matriz de rotación del plano orbital al eclíptico
+      const x = (cos_Omega * cos_omega - sin_Omega * sin_omega * cos_i) * x_orb +
+                (-cos_Omega * sin_omega - sin_Omega * cos_omega * cos_i) * y_orb;
+      
+      const y = (sin_Omega * cos_omega + cos_Omega * sin_omega * cos_i) * x_orb +
+                (-sin_Omega * sin_omega + cos_Omega * cos_omega * cos_i) * y_orb;
+      
+      const z = (sin_omega * sin_i) * x_orb + (cos_omega * sin_i) * y_orb;
+
+      return { x, y, z };
+    }
+
+    // Colores únicos para cada órbita
+    const coloresOrbitas: Record<string, number> = {
+      mercurio: 0x8c7853, // Marrón
+      venus: 0xffc649,    // Amarillo dorado
+      tierra: 0x6b93d6,   // Azul tierra
+      marte: 0xcd5c5c,    // Rojo marte
+      jupiter: 0xd8ca9d,  // Beige jupiter
+      saturno: 0xfab27b,  // Naranja saturno
+      urano: 0x4fd0e7,    // Cyan urano
+      neptuno: 0x4b70dd,  // Azul neptuno
+      luna: 0xc0c0c0      // Plateado luna
+    };
+
+    // Función para crear órbitas con trayectorias precisas
+    function crearOrbita(datos: any, nombre: string) {
+      if (!datos.a_AU || !datos.e || datos.n_deg_per_day === undefined) {
+        return;
+      }
+
+      const puntos = [];
+      const segmentos = 128; // Más puntos para órbitas más suaves
+      
+      // Generar puntos de la órbita completa
+      for (let i = 0; i <= segmentos; i++) {
+        const fraccion = i / segmentos;
+        const tiempoOrbital = fraccion * (360 / datos.n_deg_per_day); // Tiempo para órbita completa
+        const pos = calcularPosicionOrbital(datos, tiempoOrbital);
+        
+        puntos.push(new THREE.Vector3(
+          pos.x * escalaConfig.distancia,
+          pos.z * escalaConfig.distancia, // z se mapea a y en Three.js
+          pos.y * escalaConfig.distancia  // y se mapea a z en Three.js
+        ));
+      }
+
+      const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
+      const color = coloresOrbitas[nombre] || 0x4488ff;
+      const material = new THREE.LineBasicMaterial({ 
+        color: color, 
+        transparent: true, 
+        opacity: 0.6 
+      });
+      
+      const orbita = new THREE.Line(geometria, material);
+      escena.add(orbita);
+      orbitas[nombre] = orbita;
+    }
+
+    // Función para crear órbita de la Luna
+    function crearOrbitaLuna(planetaTierra: THREE.Mesh | THREE.Group) {
+      // Evitar crear la órbita de la Luna si ya existe
+      if (orbitas['luna']) {
+        console.log('La órbita de la Luna ya existe, saltando creación duplicada');
+        return;
+      }
+      
       const puntos = [];
       const segmentos = 64;
+      const distanciaLuna = (384400 / 149597870.7) * escalaConfig.distancia * 15; // km -> UA -> escala (mismo factor que la posición)
       
+      // Crear órbita circular simple para la Luna
       for (let i = 0; i <= segmentos; i++) {
         const angulo = (i / segmentos) * Math.PI * 2;
         puntos.push(new THREE.Vector3(
-          Math.cos(angulo) * radio,
+          Math.cos(angulo) * distanciaLuna,
           0,
-          Math.sin(angulo) * radio
+          Math.sin(angulo) * distanciaLuna
         ));
       }
 
       const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
       const material = new THREE.LineBasicMaterial({ 
-        color: 0x666666, 
+        color: coloresOrbitas.luna, 
         transparent: true, 
-        opacity: 0.3 
+        opacity: 0.5 
       });
       
-      const orbita = new THREE.Line(geometria, material);
-      escena.add(orbita);
-      orbitas[radio] = orbita;
+      const orbitaLuna = new THREE.Line(geometria, material);
+      
+      // Añadir la órbita como hijo del planeta Tierra
+      if (planetaTierra.userData.planetaMesh) {
+        planetaTierra.userData.planetaMesh.add(orbitaLuna);
+      } else {
+        planetaTierra.add(orbitaLuna);
+      }
+      
+      orbitas['luna'] = orbitaLuna;
     }
 
     // Función para crear anillos de Saturno
@@ -517,32 +870,72 @@
       });
     }
 
-    // Iluminación mejorada
-    const luzAmbiente = new THREE.AmbientLight(0x606060, 0.8); // Más luz ambiental
+    // Sistema de iluminación simple y efectivo
+    // Luz ambiente para iluminación general
+    const luzAmbiente = new THREE.AmbientLight(0x404040, 13);
     escena.add(luzAmbiente);
 
-    // Luz hemisférica para iluminación más natural
-    const luzHemisferica = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
-    escena.add(luzHemisferica);
-
-    // Luz direccional adicional para mejor visibilidad
-    const luzDireccional = new THREE.DirectionalLight(0xffffff, 1.0);
-    luzDireccional.position.set(10, 10, 10);
-    luzDireccional.castShadow = true;
-    luzDireccional.shadow.mapSize.width = 2048;
-    luzDireccional.shadow.mapSize.height = 2048;
-    escena.add(luzDireccional);
-
-    // Luz central del Sol (se reemplazará por la luz del Sol)
-    const luzSol = new THREE.PointLight(0xffaa00, 3.0, 3000);
+    // Luz principal del Sol que ilumina todos los objetos
+    const luzSol = new THREE.PointLight(0xffffff, 5000, 5000);
     luzSol.position.set(0, 0, 0);
     luzSol.castShadow = true;
     luzSol.shadow.mapSize.width = 2048;
     luzSol.shadow.mapSize.height = 2048;
     escena.add(luzSol);
 
+    // Calcular tiempo J2000 para una fecha dada
+    function calcularTiempoJ2000(fecha: Date): number {
+      const fechaJ2000 = new Date(2000, 0, 1, 12, 0, 0); // 1 enero 2000, 12:00 UT
+      return (fecha.getTime() - fechaJ2000.getTime()) / 86400000; // ms a días
+    }
+
+    // Inicializar tiempo desde J2000
+    function inicializarTiempo() {
+      fechaBaseActual = new Date();
+      tiempoSimuladoAnios = 0; // Comenzar en la fecha actual
+      tiempoActual = calcularTiempoJ2000(fechaBaseActual);
+      
+      console.log(`Fecha base: ${fechaBaseActual.toLocaleDateString()}`);
+      console.log(`Tiempo desde J2000: ${tiempoActual.toFixed(2)} días`);
+      
+      actualizarIndicadorFecha();
+    }
+
+    // Actualizar el indicador de fecha en la interfaz
+    function actualizarIndicadorFecha() {
+      // Convertir años a días (365.25 días por año para incluir años bisiestos)
+      const diasSimulados = tiempoSimuladoAnios * 365.25;
+      const fechaSimulada = new Date(fechaBaseActual.getTime() + diasSimulados * 86400000);
+      const fechaElement = document.getElementById('fecha-simulacion');
+      if (fechaElement) {
+        fechaElement.textContent = fechaSimulada.toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+    }
+
+    // Actualizar tiempo basado en el slider (en años)
+    function actualizarTiempoSimulado(anios: number) {
+      tiempoSimuladoAnios = anios;
+      // Convertir años a días para cálculos orbitales
+      const diasSimulados = tiempoSimuladoAnios * 365.25;
+      tiempoActual = calcularTiempoJ2000(fechaBaseActual) + diasSimulados;
+      actualizarIndicadorFecha();
+      actualizarPosicionesPlanetas();
+    }
+
     // Crear todos los planetas
     async function inicializarSistema() {
+      // Evitar reinicializar si ya está funcionando
+      if (Object.keys(planetas).length > 0 && !modeloSolCargado) {
+        console.log('El sistema ya está inicializado, saltando reinicialización');
+        return;
+      }
+      
+      // Inicializar el sistema de tiempo
+      inicializarTiempo();
       // Limpiar sistema anterior
       Object.values(planetas).forEach(planeta => {
         escena.remove(planeta);
@@ -578,37 +971,162 @@
       }
     }
 
+    // Función para actualizar posiciones de planetas
+    function actualizarPosicionesPlanetas() {
+      Object.values(planetas).forEach(planeta => {
+        if (planeta.userData && planeta.userData.nombre !== 'sol') {
+          
+          if (!planeta.userData.esSatelite) {
+            // Actualizar posición orbital de planetas
+            if (planeta.userData.datos.n_deg_per_day) {
+              const posicion = calcularPosicionOrbital(planeta.userData.datos, tiempoActual);
+              
+              // Aplicar posición precisa al mesh del planeta dentro del grupo
+              if (planeta.userData.planetaMesh) {
+                planeta.userData.planetaMesh.position.set(
+                  posicion.x * escalaConfig.distancia,
+                  posicion.z * escalaConfig.distancia, // z se mapea a y
+                  posicion.y * escalaConfig.distancia  // y se mapea a z
+                );
+              }
+            }
+          } else {
+            // Actualizar posición orbital de satélites (Luna)
+            if (planeta.userData.datos.orbital_period_days) {
+              const anguloOrbital = (2 * Math.PI * tiempoActual) / planeta.userData.datos.orbital_period_days;
+              
+              // Aplicar excentricidad básica para la Luna
+              const e = planeta.userData.datos.e_luna || 0.0549;
+              const a = planeta.userData.distanciaOrbital;
+              
+              // Anomalía media simple para la Luna
+              const M = anguloOrbital;
+              let E = M;
+              // Iteración simple para anomalía excéntrica
+              for (let i = 0; i < 3; i++) {
+                E = M + e * Math.sin(E);
+              }
+              
+              // Posición con excentricidad
+              const r = a * (1 - e * Math.cos(E));
+              const nu = 2 * Math.atan2(
+                Math.sqrt(1 + e) * Math.sin(E / 2),
+                Math.sqrt(1 - e) * Math.cos(E / 2)
+              );
+              
+              planeta.position.x = r * Math.cos(nu);
+              planeta.position.z = r * Math.sin(nu);
+              
+              // Acoplamiento de marea para la Luna
+              planeta.rotation.y = -nu; // Siempre muestra la misma cara
+            }
+          }
+        }
+      });
+    }
+
+    // Función para actualizar rotaciones de planetas
+    function actualizarRotacionesPlanetas() {
+      Object.values(planetas).forEach(planeta => {
+        if (planeta.userData && planeta.userData.velocidadRotacionHoras) {
+          // Determinar dirección de rotación basada en rot_period_hours
+          let direccion = 1; // Antihorario (normal)
+          if (planeta.userData.datos.rot_period_hours < 0) {
+            direccion = -1; // Horario (retrógrado)
+          }
+          
+          // Calcular ángulo de spin basado en tiempo transcurrido
+          const tiempoHoras = tiempoActual * 24; // días a horas
+          const spinAngle = (2 * Math.PI * tiempoHoras / Math.abs(planeta.userData.datos.rot_period_hours)) * direccion;
+          
+          // Aplicar rotación al mesh del planeta
+          if (planeta.userData.planetaMesh) {
+            planeta.userData.planetaMesh.rotation.y = spinAngle;
+          } else if (planeta.userData.nombre !== 'sol') {
+            planeta.rotation.y = spinAngle;
+          }
+        }
+      });
+    }
+
+    // Función para actualizar el shader de la Tierra con la dirección del Sol
+    function actualizarShaderTierra() {
+      const tierraObj = planetas['tierra'];
+      
+      if (tierraObj && tierraObj.userData.planetaMesh) {
+        const material = tierraObj.userData.planetaMesh.material;
+        
+        // Verificar si es el material de shader personalizado
+        if (material instanceof THREE.ShaderMaterial && material.uniforms.sunDirectionLocal) {
+          // Calcular la dirección del Sol basándose en la posición orbital de la Tierra
+          // La Tierra orbita alrededor del Sol, así que la dirección hacia el Sol
+          // es siempre opuesta a la posición orbital de la Tierra
+          
+          // Obtener la posición mundial de la Tierra
+          const earthWorldPosition = new THREE.Vector3();
+          if (tierraObj.userData.planetaMesh) {
+            tierraObj.userData.planetaMesh.getWorldPosition(earthWorldPosition);
+          } else {
+            tierraObj.getWorldPosition(earthWorldPosition);
+          }
+          
+          // El Sol está en el origen (0,0,0), así que la dirección hacia el Sol
+          // es la dirección opuesta a la posición de la Tierra
+          const sunDirectionWorld = new THREE.Vector3().copy(earthWorldPosition).negate().normalize();
+          
+          // Convertir la dirección del Sol a coordenadas locales de la Tierra
+          // Primero necesitamos la matriz inversa del mundo de la Tierra
+          const earthMatrix = new THREE.Matrix4();
+          if (tierraObj.userData.planetaMesh) {
+            earthMatrix.copy(tierraObj.userData.planetaMesh.matrixWorld);
+          } else {
+            earthMatrix.copy(tierraObj.matrixWorld);
+          }
+          
+          // Extraer solo la rotación (sin traslación ni escala) 
+          const rotationMatrix = new THREE.Matrix3().setFromMatrix4(earthMatrix);
+          const sunDirectionLocal = new THREE.Vector3().copy(sunDirectionWorld);
+          sunDirectionLocal.applyMatrix3(rotationMatrix.invert());
+          
+          // Actualizar la dirección del Sol en el shader
+          material.uniforms.sunDirectionLocal.value.copy(sunDirectionLocal);
+        }
+      }
+    }
+
     // Función de animación
     function animar() {
       requestAnimationFrame(animar);
-
-      if (rotacionPlanetaria) {
-        Object.values(planetas).forEach(planeta => {
-          if (planeta.userData && planeta.userData.velocidadRotacion) {
-            planeta.rotation.y += planeta.userData.velocidadRotacion * 0.01;
+      
+      // Si la animación está activa, avanzar el tiempo
+      if (animacionActiva) {
+        tiempoSimuladoAnios += factorAnimacionAnios;
+        
+        // Actualizar slider sin disparar eventos
+        const slider = document.getElementById('fecha-slider') as HTMLInputElement;
+        if (slider) {
+          // Mantener el slider en el rango [-20, 20] años
+          if (tiempoSimuladoAnios > 20) {
+            // Reiniciar desde -20 cuando llegue al final
+            tiempoSimuladoAnios = -20;
+            console.log('Reiniciando simulación temporal desde -20 años');
+          } else if (tiempoSimuladoAnios < -20) {
+            tiempoSimuladoAnios = -20;
           }
-        });
+          slider.value = tiempoSimuladoAnios.toString();
+        }
+        
+        // Convertir años a días para cálculos orbitales
+        const diasSimulados = tiempoSimuladoAnios * 365.25;
+        tiempoActual = calcularTiempoJ2000(fechaBaseActual) + diasSimulados;
+        
+        actualizarIndicadorFecha();
+        actualizarPosicionesPlanetas();
+        actualizarRotacionesPlanetas();
       }
 
-      if (movimientoOrbital) {
-        Object.values(planetas).forEach(planeta => {
-          if (planeta.userData && planeta.userData.nombre !== 'sol') {
-            planeta.userData.anguloOrbital += planeta.userData.velocidadOrbital * 0.001;
-            
-            if (!planeta.userData.esSatelite) {
-              // Movimiento orbital de planetas alrededor del Sol
-              const distancia = planeta.userData.distanciaOrbital;
-              planeta.position.x = Math.cos(planeta.userData.anguloOrbital) * distancia;
-              planeta.position.z = Math.sin(planeta.userData.anguloOrbital) * distancia;
-            } else {
-              // Movimiento orbital de satélites alrededor de su planeta padre
-              const distancia = planeta.userData.distanciaOrbital;
-              planeta.position.x = Math.cos(planeta.userData.anguloOrbital) * distancia;
-              planeta.position.z = Math.sin(planeta.userData.anguloOrbital) * distancia;
-            }
-          }
-        });
-      }
+      // Actualizar posición del Sol para el shader de la Tierra
+      actualizarShaderTierra();
 
       // Actualizar animación de cámara si existe
       if (animacionCamara) {
@@ -627,31 +1145,59 @@
     // Función para actualizar etiquetas
     function actualizarEtiquetas() {
       Object.keys(planetas).forEach(nombre => {
-        const planeta = planetas[nombre];
+        const objetoPlaneta = planetas[nombre];
         const label = document.getElementById(`label-${nombre}`);
+        const line = document.querySelector(`[data-planet="${nombre}"]`) as SVGLineElement;
         
-        if (label && planeta) {
-          // Para satélites, obtener posición mundial
-          const posicionMundial = new THREE.Vector3();
-          planeta.getWorldPosition(posicionMundial);
+        if (label && objetoPlaneta) {
+          // Obtener la posición mundial del mesh del planeta
+          let posicionMundial = new THREE.Vector3();
           
+          if (objetoPlaneta.userData.planetaMesh) {
+            // Si es un grupo con mesh, obtener posición del mesh
+            objetoPlaneta.userData.planetaMesh.getWorldPosition(posicionMundial);
+          } else {
+            // Si es un mesh directo (satélite u otro), obtener su posición
+            objetoPlaneta.getWorldPosition(posicionMundial);
+          }
+          
+          // Proyectar a coordenadas de pantalla
           const vector = posicionMundial.clone();
           vector.project(camara);
 
-          const x = (vector.x * 0.5 + 0.5) * (canvas?.clientWidth || 0);
-          const y = (vector.y * -0.5 + 0.5) * (canvas?.clientHeight || 0);
+          const planetaX = (vector.x * 0.5 + 0.5) * (canvas?.clientWidth || 0);
+          const planetaY = (vector.y * -0.5 + 0.5) * (canvas?.clientHeight || 0);
 
-          label.style.left = `${x}px`;
-          label.style.top = `${y}px`;
+          // Calcular posición de la etiqueta con offset orbital
+          const offset = 80; // Distancia de la etiqueta desde el planeta
+          const anguloEtiqueta = objetoPlaneta.userData.anguloOrbital + Math.PI / 4; // Offset angular para que no esté encima
+          
+          const etiquetaX = planetaX + Math.cos(anguloEtiqueta) * offset;
+          const etiquetaY = planetaY + Math.sin(anguloEtiqueta) * offset;
+
+          // Actualizar posición de la etiqueta
+          label.style.left = `${etiquetaX}px`;
+          label.style.top = `${etiquetaY}px`;
           label.style.display = vector.z < 1 ? 'block' : 'none';
+          
+          // Actualizar línea conectora
+          if (line && vector.z < 1) {
+            line.setAttribute('x1', etiquetaX.toString());
+            line.setAttribute('y1', etiquetaY.toString());
+            line.setAttribute('x2', planetaX.toString());
+            line.setAttribute('y2', planetaY.toString());
+            line.style.display = 'block';
+          } else if (line) {
+            line.style.display = 'none';
+          }
         }
       });
     }
 
     // Función para centrar la cámara en un planeta
     function centrarCamaraEnPlaneta(nombrePlaneta: string) {
-      const planeta = planetas[nombrePlaneta];
-      if (!planeta) return;
+      const objetoPlaneta = planetas[nombrePlaneta];
+      if (!objetoPlaneta) return;
 
       // Detener animación anterior
       if (animacionCamara) {
@@ -660,22 +1206,24 @@
 
       // Obtener posición mundial del planeta
       const posicionMundial = new THREE.Vector3();
-      planeta.getWorldPosition(posicionMundial);
+      if (objetoPlaneta.userData.planetaMesh) {
+        objetoPlaneta.userData.planetaMesh.getWorldPosition(posicionMundial);
+      } else {
+        objetoPlaneta.getWorldPosition(posicionMundial);
+      }
 
       // Calcular distancia apropiada basada en el tamaño del planeta
-      const datos = planeta.userData.datos;
+      const datos = objetoPlaneta.userData.datos;
       let distanciaObjetivo = 10;
       
       if (nombrePlaneta === 'sol') {
         distanciaObjetivo = 15; // Más cerca para ver el modelo GLB
       } else if (datos && datos.esSatelite) {
-        distanciaObjetivo = 2; // Muy cerca para ver la Luna
+        distanciaObjetivo = 3; // Distancia apropiada para ver satélites como la Luna
       } else if (['jupiter', 'saturno'].includes(nombrePlaneta)) {
         distanciaObjetivo = 20;
       } else if (['mercurio', 'venus', 'marte'].includes(nombrePlaneta)) {
         distanciaObjetivo = 8;
-      } else if (nombrePlaneta === 'luna') {
-        distanciaObjetivo = 1; // Extra cerca para la Luna
       }
 
       // Posición objetivo de la cámara
@@ -735,39 +1283,68 @@
       }
     });
 
-    document.getElementById('chk-rotacion')?.addEventListener('change', (e) => {
-      rotacionPlanetaria = (e.target as HTMLInputElement).checked;
-    });
-
-    document.getElementById('chk-orbitar')?.addEventListener('change', (e) => {
-      movimientoOrbital = (e.target as HTMLInputElement).checked;
-    });
-
-    document.getElementById('btn-escala-visual')?.addEventListener('click', () => {
-      if (escalaActual !== 'visual') {
-        escalaActual = 'visual';
-        const btnVisual = document.getElementById('btn-escala-visual');
-        const btnReal = document.getElementById('btn-escala-real');
-        if (btnVisual) btnVisual.classList.add('active');
-        if (btnReal) btnReal.classList.remove('active');
-        inicializarSistema();
+    // Control Play/Pause
+    document.getElementById('btn-play-pause')?.addEventListener('click', () => {
+      animacionActiva = !animacionActiva;
+      const btn = document.getElementById('btn-play-pause');
+      const playIcon = btn?.querySelector('.play-icon') as HTMLElement;
+      const pauseIcon = btn?.querySelector('.pause-icon') as HTMLElement;
+      const btnText = btn?.querySelector('.btn-text') as HTMLElement;
+      const chkLabels = document.getElementById('chk-labels') as HTMLInputElement;
+      
+      if (animacionActiva) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'inline';
+        btnText.textContent = 'Pause';
+        btn?.classList.add('active');
+        
+        // Desmarcar la casilla "Mostrar etiquetas" cuando se activa la animación
+        if (chkLabels) {
+          chkLabels.checked = false;
+          mostrarLabels = false;
+          const labelsContainer = document.getElementById('labels-container');
+          if (labelsContainer) {
+            labelsContainer.style.display = 'none';
+          }
+        }
+      } else {
+        playIcon.style.display = 'inline';
+        pauseIcon.style.display = 'none';
+        btnText.textContent = 'Play';
+        btn?.classList.remove('active');
+        
+        // Volver a marcar la casilla "Mostrar etiquetas" cuando se pausa la animación
+        if (chkLabels) {
+          chkLabels.checked = true;
+          mostrarLabels = true;
+          const labelsContainer = document.getElementById('labels-container');
+          if (labelsContainer) {
+            labelsContainer.style.display = 'block';
+          }
+        }
       }
     });
 
-    document.getElementById('btn-escala-real')?.addEventListener('click', () => {
-      if (escalaActual !== 'real') {
-        escalaActual = 'real';
-        const btnReal = document.getElementById('btn-escala-real');
-        const btnVisual = document.getElementById('btn-escala-visual');
-        if (btnReal) btnReal.classList.add('active');
-        if (btnVisual) btnVisual.classList.remove('active');
-        inicializarSistema();
-      }
+    // Control del slider de fecha
+    document.getElementById('fecha-slider')?.addEventListener('input', (e) => {
+      const valor = parseFloat((e.target as HTMLInputElement).value);
+      actualizarTiempoSimulado(valor);
     });
 
     document.getElementById('btn-reset')?.addEventListener('click', () => {
+      // Resetear posición de cámara
       camara.position.set(0, 50, 100);
       controles.reset();
+      
+      // Resetear fecha al presente
+      tiempoSimuladoAnios = 0;
+      const slider = document.getElementById('fecha-slider') as HTMLInputElement;
+      if (slider) {
+        slider.value = '0';
+      }
+      
+      // Actualizar posiciones planetarias a la fecha actual
+      actualizarTiempoSimulado(0);
     });
 
     // Información de planetas y centrado de cámara
@@ -800,14 +1377,49 @@
             
             if (titleElement && bodyElement && windowElement) {
               titleElement.textContent = planetData.nombre;
-              bodyElement.innerHTML = `
-                <p><strong>Información:</strong> ${planetData.info}</p>
-                <p><strong>Radio:</strong> ${planetData.radio.toLocaleString()} km</p>
-                <p><strong>Distancia ${'esSatelite' in planetData && planetData.esSatelite ? 'a su planeta' : 'al Sol'}:</strong> ${planetData.distancia} ${'esSatelite' in planetData && planetData.esSatelite ? 'UA (escalado)' : 'UA'}</p>
-                <p><strong>Período de rotación:</strong> ${Math.abs(planetData.periodo)} días</p>
-                ${planetData.periodoOrbital ? `<p><strong>Período orbital:</strong> ${planetData.periodoOrbital} días</p>` : ''}
-                ${'esSatelite' in planetData && planetData.esSatelite ? `<p><strong>Tipo:</strong> Satélite natural de ${'planetaPadre' in planetData ? planetData.planetaPadre : 'desconocido'}</p>` : ''}
-              `;
+              // Construir HTML dinámicamente basado en los datos disponibles
+              let infoHTML = `<p><strong>Información:</strong> ${planetData.info}</p>`;
+              infoHTML += `<p><strong>Radio:</strong> ${planetData.radio.toLocaleString()} km</p>`;
+              
+              // Distancia (usar acceso seguro de propiedades)
+              if ('esSatelite' in planetData && planetData.esSatelite) {
+                if ('distancia_terra_km' in planetData) {
+                  infoHTML += `<p><strong>Distancia a la Tierra:</strong> ${(planetData as any).distancia_terra_km.toLocaleString()} km</p>`;
+                }
+              } else {
+                if ('a_AU' in planetData) {
+                  infoHTML += `<p><strong>Distancia al Sol:</strong> ${(planetData as any).a_AU.toFixed(3)} UA</p>`;
+                }
+              }
+              
+              // Período de rotación
+              if ('rot_period_hours' in planetData && planetData.rot_period_hours) {
+                const dias = Math.abs(planetData.rot_period_hours) / 24;
+                const retrogrado = planetData.rot_period_hours < 0 ? ' (retrógrado)' : '';
+                infoHTML += `<p><strong>Período de rotación:</strong> ${dias.toFixed(2)} días${retrogrado}</p>`;
+              }
+              
+              // Período orbital
+              if ('n_deg_per_day' in planetData) {
+                const diasOrbitales = 360 / (planetData as any).n_deg_per_day;
+                infoHTML += `<p><strong>Período orbital:</strong> ${diasOrbitales.toFixed(1)} días</p>`;
+              } else if ('orbital_period_hours' in planetData) {
+                const diasOrbitales = (planetData as any).orbital_period_hours / 24;
+                infoHTML += `<p><strong>Período orbital:</strong> ${diasOrbitales.toFixed(2)} días</p>`;
+              }
+              
+              // Obliquidad
+              if ('obliquity_deg' in planetData && planetData.obliquity_deg !== undefined) {
+                infoHTML += `<p><strong>Obliquidad:</strong> ${planetData.obliquity_deg.toFixed(1)}°</p>`;
+              }
+              
+              // Tipo para satélites
+              if ('esSatelite' in planetData && planetData.esSatelite) {
+                const planetaPadre = 'planetaPadre' in planetData ? (planetData as any).planetaPadre : 'desconocido';
+                infoHTML += `<p><strong>Tipo:</strong> Satélite natural de ${planetaPadre}</p>`;
+              }
+              
+              bodyElement.innerHTML = infoHTML;
               windowElement.style.display = 'block';
             }
           }
@@ -1018,6 +1630,100 @@
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   }
 
+  .fecha-actual {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .fecha-actual strong {
+    color: #333;
+  }
+
+
+
+  .tiempo-controles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin: 8px 0;
+  }
+
+  .play-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    min-width: 100px;
+  }
+
+  .fecha-slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fecha-slider-container label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #666;
+    margin-top: 4px;
+    padding: 0 2px;
+  }
+
+  #fecha-slider {
+    width: 100%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+    appearance: none;
+  }
+
+  #fecha-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  #fecha-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .fecha-actual {
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    font-weight: 500;
+  }
+
   .labels-container {
     position: absolute;
     top: 0;
@@ -1083,9 +1789,11 @@
   }
 
   .label-line {
-    stroke: #666;
-    stroke-width: 1;
-    opacity: 0.5;
+    stroke: #00aaff;
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 3px rgba(0, 170, 255, 0.3));
   }
 
   .info-window {
