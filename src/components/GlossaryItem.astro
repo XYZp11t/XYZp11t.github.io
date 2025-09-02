@@ -1,0 +1,21 @@
+---
+interface Props {
+	id?: string;
+	term: string;
+	definition: string;
+}
+
+const { id, term, definition } = Astro.props as Props;
+---
+<section class="glossary-item" id={id || term.toLowerCase().replace(/\s+/g, '-') } itemscope itemtype="https://schema.org/DefinedTerm">
+	<h3 itemprop="name">{term}</h3>
+	<p itemprop="description">{definition}</p>
+</section>
+
+<style>
+	.glossary-item { background: #fff; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+	.glossary-item + .glossary-item { margin-top: 1rem; }
+	.glossary-item h3 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
+	.glossary-item p { margin: 0; color: #333; }
+</style>
+

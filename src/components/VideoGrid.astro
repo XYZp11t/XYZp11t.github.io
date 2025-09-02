@@ -1,0 +1,51 @@
+---
+interface Props {
+	videos: string[];
+	title?: string;
+}
+
+const { videos = [], title = 'Videos' } = Astro.props as Props;
+---
+<section class="video-grid" aria-label={title}>
+	{title && <h2>{title}</h2>}
+	<div class="grid">
+		{videos.map((url) => (
+			<article class="video-item">
+				<iframe
+					loading="lazy"
+					title="Video de YouTube"
+					width="560"
+					height="315"
+					src={url.replace('shorts/', 'embed/').replace('watch?v=', 'embed/')}
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+					allowfullscreen
+				></iframe>
+			</article>
+		))}
+	</div>
+</section>
+
+<style>
+	.video-grid { max-width: var(--max-content-width); margin: 0 auto; padding: 1rem 0; }
+	.video-grid h2 { margin: 0 0 1rem 0; color: var(--color-primary); }
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1rem;
+	}
+	.video-item {
+		position: relative;
+		padding-top: 56.25%;
+		background: #000;
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+	}
+	.video-item iframe {
+		position: absolute;
+		top: 0; left: 0;
+		width: 100%; height: 100%;
+		border: 0;
+	}
+</style>
+

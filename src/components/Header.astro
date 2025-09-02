@@ -1,0 +1,91 @@
+---
+const navItems = [
+	{ href: '/', label: 'Ciencias Espaciales' },
+	{ href: '/capas-solares', label: 'Capas Solares 3D' },
+	{ href: '/sistema-solar', label: 'Sistema Solar 3D' },
+	{ href: '/fisica-solar', label: 'Física Solar' },
+	{ href: '/fisica-planetaria', label: 'Física Planetaria' },
+	{ href: '/videos', label: 'Videos' },
+	{ href: '/glosario', label: 'Glosario Geoespacial' },
+	{ href: '/comunidad', label: 'Comunidad' },
+];
+---
+<header class="site-header">
+	<div class="container">
+		<a href="/" class="brand" aria-label="Inicio">
+			<div class="logo" aria-hidden="true"></div>
+			<span class="brand-text">Ciencias Espaciales</span>
+		</a>
+		<nav class="nav" aria-label="Principal">
+			<ul>
+				{navItems.map((item) => (
+					<li><a href={item.href}>{item.label}</a></li>
+				))}
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+		background: var(--color-primary);
+		border-bottom: 4px solid var(--color-secondary);
+		color: #fff;
+	}
+
+	.container {
+		max-width: var(--max-content-width);
+		margin: 0 auto;
+		padding: 0.5rem 1.25rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		text-decoration: none;
+		color: #fff;
+		font-weight: 700;
+	}
+
+	.logo {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: radial-gradient(circle at 30% 30%, #fff 0%, #ffefb3 35%, var(--color-secondary) 70%, #e0a300 100%);
+		box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+	}
+
+	.brand-text { letter-spacing: 0.2px; }
+
+	.nav { margin-left: auto; }
+	.nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+	.nav a {
+		color: #fff;
+		text-decoration: none;
+		padding: 0.4rem 0.7rem;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.nav a:hover,
+	.nav a:focus { background: rgba(255, 255, 255, 0.15); outline: none; }
+
+	@media (max-width: 860px) {
+		.nav a { font-size: 0.9rem; }
+	}
+</style>
+

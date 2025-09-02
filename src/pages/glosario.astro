@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GlossaryItem from '../components/GlossaryItem.astro';
+
+const items = [
+	{ term: 'Heliosfera', definition: 'Región del espacio dominada por el viento solar y el campo magnético del Sol.' },
+	{ term: 'Fotosfera', definition: 'Capa visible del Sol desde la que se emite la mayor parte de la luz.' },
+	{ term: 'Exosfera', definition: 'Capa superior de una atmósfera planetaria donde las partículas pueden escapar al espacio.' },
+	{ term: 'Eclíptica', definition: 'Plano de la órbita de la Tierra alrededor del Sol, usado como referencia para otras órbitas.' },
+];
+---
+
+<Layout title="Glosario Geoespacial - Ciencias Espaciales" description="Glosario con términos de ciencias espaciales, optimizado para SEO.">
+	<section class="header-block">
+		<h1>Glosario Geoespacial</h1>
+		<p>Definiciones de términos frecuentes en geociencias y astronomía.</p>
+	</section>
+
+	<section class="glossary" aria-label="Glosario">
+		<nav class="index" aria-label="Índice">
+			{items.map((i) => (
+				<a href={`#${i.term.toLowerCase().replace(/\s+/g, '-')}`}>{i.term}</a>
+			))}
+		</nav>
+		<div class="list">
+			{items.map((i) => (
+				<GlossaryItem term={i.term} definition={i.definition} />
+			))}
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.header-block { text-align: center; padding: 1.5rem 1rem; background: #f5f5f5; border-radius: 12px; margin-bottom: 1rem; }
+	.header-block h1 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
+	.header-block p { margin: 0; color: #333; }
+	.glossary { display: grid; grid-template-columns: 220px 1fr; gap: 1rem; }
+	.index { display: flex; flex-direction: column; gap: 0.4rem; position: sticky; top: 80px; align-self: start; }
+	.index a { text-decoration: none; color: var(--color-primary); font-weight: 700; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 0.4rem 0.6rem; }
+	.index a:hover { background: #fafafa; }
+	.list { display: flex; flex-direction: column; }
+	@media (max-width: 860px) { .glossary { grid-template-columns: 1fr; } .index { position: static; flex-direction: row; flex-wrap: wrap; } }
+</style>
+

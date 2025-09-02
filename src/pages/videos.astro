@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VideoGrid from '../components/VideoGrid.astro';
+
+const videos = [
+	'https://www.youtube.com/shorts/SWGMwwDVzuc',
+	'https://www.youtube.com/shorts/h0tB7YRniHg',
+	'https://www.youtube.com/shorts/CcYMv9GKehM',
+	'https://www.youtube.com/shorts/X6VhTzsgQjg',
+	'https://www.youtube.com/shorts/7VjpKr7VIMg',
+	'https://www.youtube.com/shorts/K4UGakcIRtU',
+	'https://www.youtube.com/shorts/a36ESqml9ao',
+	'https://www.youtube.com/shorts/VFjD_TnJbhA',
+];
+---
+
+<Layout title="Videos - Ciencias Espaciales">
+	<section class="header-block">
+		<h1>Videos</h1>
+		<p>Galería de videos breves. Carga diferida para mejor rendimiento.</p>
+	</section>
+	<VideoGrid videos={videos} title="Selección inicial" />
+</Layout>
+
+<style>
+	.header-block { text-align: center; padding: 1.5rem 1rem; background: #f5f5f5; border-radius: 12px; margin-bottom: 1rem; }
+	.header-block h1 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
+	.header-block p { margin: 0; color: #333; }
+</style>
+

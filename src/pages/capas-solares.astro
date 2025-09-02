@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ModeloCapasSolares from '../components/CapasSolares.astro';
+---
+
+<Layout title="Capas Solares 3D - Ciencias Espaciales">
+	<section class="header-block">
+		<h1>Capas Solares 3D</h1>
+		<p>Modelo interactivo de las capas solares: núcleo, zonas radiativa y convectiva, fotosfera, cromosfera y corona.</p>
+	</section>
+
+	<ModeloCapasSolares />
+</Layout>
+
+<style>
+	.header-block { text-align: center; padding: 1.5rem 1rem; background: #f5f5f5; border-radius: 12px; margin-bottom: 1rem; }
+	.header-block h1 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
+	.header-block p { margin: 0; color: #333; }
+</style>
+
