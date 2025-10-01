@@ -10,11 +10,118 @@ import ModeloCapasSolares from '../components/CapasSolares.astro';
 	</section>
 
 	<ModeloCapasSolares />
+
+	<section class="ayuda-rapida">
+		<details class="controles-ayuda">
+			<summary>🎮 Ayuda de Controles</summary>
+			<div class="ayuda-contenido">
+				<p><strong>🖱️ Ratón:</strong> Clic y arrastra para rotar el modelo</p>
+				<p><strong>🔍 Rueda:</strong> Zoom in/out</p>
+				<p><strong>🏷️ Etiquetas:</strong> Clic en el nombre de una capa para ver información</p>
+				<p><strong>ℹ️ Información:</strong> Clic en el icono (i) para detalles de cada capa</p>
+				<p><strong>✂️ Corte:</strong> Activa/desactiva la vista en corte del modelo</p>
+			</div>
+		</details>
+	</section>
 </Layout>
 
 <style>
-	.header-block { text-align: center; padding: 1.5rem 1rem; background: #f5f5f5; border-radius: 12px; margin-bottom: 1rem; }
-	.header-block h1 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
-	.header-block p { margin: 0; color: #333; }
+	.header-block {
+		text-align: center;
+		padding: 1.5rem 1rem;
+		background: #f5f5f5;
+		border-radius: 12px;
+		margin-bottom: 1rem;
+	}
+	
+	.header-block h1 {
+		margin: 0 0 0.5rem 0;
+		color: #2056a8;
+	}
+	
+	.header-block p {
+		margin: 0;
+		color: #333;
+	}
+
+	.ayuda-rapida {
+		max-width: 800px;
+		margin: 2rem auto;
+		padding: 0 1rem;
+	}
+
+	.controles-ayuda {
+		background: linear-gradient(135deg, #f0f4ff 0%, #e6eeff 100%);
+		border: 2px solid #2056a8;
+		border-radius: 12px;
+		padding: 0;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(32, 86, 168, 0.15);
+		margin: 0 auto;
+	}
+
+	.controles-ayuda summary {
+		padding: 1.2rem 1.5rem;
+		cursor: pointer;
+		font-size: 1.2rem;
+		font-weight: 600;
+		color: #2056a8;
+		background: rgba(255, 255, 255, 0.7);
+		user-select: none;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.controles-ayuda summary:hover {
+		background: rgba(255, 255, 255, 0.9);
+		color: #133a6b;
+	}
+
+	.controles-ayuda[open] summary {
+		background: #2056a8;
+		color: white;
+		border-bottom: 2px solid #133a6b;
+	}
+
+	.ayuda-contenido {
+		padding: 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1rem;
+	}
+
+	.ayuda-contenido p {
+		margin: 0;
+		padding: 0.8rem 1rem;
+		background: white;
+		border-radius: 8px;
+		border-left: 4px solid #2056a8;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+		font-size: 0.95rem;
+		color: #333;
+	}
+
+	.ayuda-contenido strong {
+		color: #2056a8;
+		display: block;
+		margin-bottom: 0.3rem;
+	}
+
+	@media (max-width: 768px) {
+		.ayuda-contenido {
+			grid-template-columns: 1fr;
+		}
+		
+		.controles-ayuda summary {
+			font-size: 1rem;
+			padding: 1rem 1.2rem;
+		}
+		
+		.ayuda-contenido {
+			padding: 1rem;
+		}
+	}
 </style>
 

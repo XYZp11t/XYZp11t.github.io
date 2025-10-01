@@ -13,9 +13,9 @@
       <p>Error al cargar el sistema solar. Verifica la consola para más detalles.</p>
     </div>
     <div class="controles-checkbox floating" id="controles-checkbox">
-      <div class="controles-header" id="controles-header">
-        <span> Controles </span>
-        <button id="btn-minimizar" aria-label="Minimizar">_</button>
+      <div class="controles-header" id="controles-header" role="button" tabindex="0" aria-label="Expandir o contraer controles">
+        <span>⚙️ Controles</span>
+        <span id="btn-minimizar" class="icono-toggle" aria-hidden="true">▼</span>
       </div>
       <div class="controles-opciones" id="controles-opciones">
         <label><input type="checkbox" id="chk-orbitas" checked> Mostrar órbitas</label>
@@ -187,6 +187,11 @@
 
     // Configuración de la escena
     const escena = new THREE.Scene();
+    // Grupo raíz para el sistema completo
+    const grupoSistema = new THREE.Group();
+    escena.add(grupoSistema);
+    // Rotación poloidal global (180° sobre el eje X)
+    grupoSistema.rotation.x = Math.PI;
 
     // Fondo estrellado
     const textureLoader = new THREE.TextureLoader();
@@ -197,7 +202,9 @@
 
     // Configuración de la cámara
     const camara = new THREE.PerspectiveCamera(75, ancho / alto, 0.1, 10000);
-    camara.position.set(0, 50, 100);
+    // Vista desde arriba, invertida 180° alrededor del eje Y
+    camara.position.set(120, 180, 0.01);
+    camara.lookAt(0, 0, 0);
 
     // Configuración del renderizador
     const renderizador = new THREE.WebGLRenderer({ 
@@ -434,10 +441,12 @@
           // Posicionar en el centro
           modelo.position.set(0, 0, 0);
           
-                  // Aplicar inclinación del eje del Sol
+          // Aplicar inclinación del eje del Sol
         if (datosPlanetas.sol.obliquity_deg) {
           modelo.rotation.z = (datosPlanetas.sol.obliquity_deg * Math.PI) / 180;
         }
+        // Giro poloidal 180° para corregir orientación del Sol
+        //modelo.rotation.x += Math.PI;
           
           // Hacer todos los materiales más brillantes y emisivos
           modelo.traverse((child) => {
@@ -467,10 +476,11 @@
             anguloOrbital: 0,
             velocidadRotacionHoras: datosPlanetas.sol.rot_period_hours ? (2 * Math.PI) / Math.abs(datosPlanetas.sol.rot_period_hours) : 0,
             velocidadOrbitalDias: 0,
-            planetaMesh: modelo
+            planetaMesh: modelo,
+            rotacionBaseY: modelo.rotation.y
           };
           
-          escena.add(modelo);
+          grupoSistema.add(modelo);
           planetas['sol'] = modelo;
           modeloSolCargado = true;
           
@@ -629,6 +639,9 @@
             const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
             planeta.rotation.z = obliquidad;
           }
+          // Giro poloidal 180° para corregir orientación del satélite
+          planeta.rotation.x += Math.PI;
+          
           
           // Obtener el mesh del planeta padre (no el grupo)
           let meshPlanetaPadre;
@@ -654,9 +667,12 @@
           const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
           planeta.rotation.z = obliquidad;
         }
+        // Giro poloidal 180° para corregir orientación del planeta
+        planeta.rotation.x += Math.PI;
+        
         
         grupoPlaneta.add(planeta);
-        escena.add(grupoPlaneta);
+        grupoSistema.add(grupoPlaneta);
         
         // Crear órbita solo para planetas
         crearOrbita(datos, nombre);
@@ -680,7 +696,8 @@
         grupo: datos.esSatelite ? null : grupoPlaneta, // Referencia al grupo para órbitas
         // Para satélites como la Luna
         velocidadRotacionSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0,
-        velocidadOrbitalSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0
+        velocidadOrbitalSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0,
+        rotacionBaseY: planeta.rotation.y
       };
 
       planetas[nombre] = objetoFinal;
@@ -806,7 +823,7 @@
       });
       
       const orbita = new THREE.Line(geometria, material);
-      escena.add(orbita);
+      grupoSistema.add(orbita);
       orbitas[nombre] = orbita;
     }
 
@@ -938,10 +955,10 @@
       inicializarTiempo();
       // Limpiar sistema anterior
       Object.values(planetas).forEach(planeta => {
-        escena.remove(planeta);
+        grupoSistema.remove(planeta);
       });
       Object.values(orbitas).forEach(orbita => {
-        escena.remove(orbita);
+        grupoSistema.remove(orbita);
       });
       planetas = {};
       orbitas = {};
@@ -1038,12 +1055,19 @@
           // Calcular ángulo de spin basado en tiempo transcurrido
           const tiempoHoras = tiempoActual * 24; // días a horas
           const spinAngle = (2 * Math.PI * tiempoHoras / Math.abs(planeta.userData.datos.rot_period_hours)) * direccion;
+          const baseY = (planeta.userData.rotacionBaseY ?? 0);
+          // El Sol debe rotar en la misma dirección que el sistema (invertir si iba contrario)
+          let finalSpin = spinAngle;
+          if (planeta.userData.nombre === 'sol') {
+            finalSpin = -spinAngle;
+          }
+          const newY = baseY + finalSpin;
           
-          // Aplicar rotación al mesh del planeta
+          // Aplicar rotación al mesh del planeta manteniendo el offset base
           if (planeta.userData.planetaMesh) {
-            planeta.userData.planetaMesh.rotation.y = spinAngle;
-          } else if (planeta.userData.nombre !== 'sol') {
-            planeta.rotation.y = spinAngle;
+            planeta.userData.planetaMesh.rotation.y = newY;
+          } else {
+            planeta.rotation.y = newY;
           }
         }
       });
@@ -1434,51 +1458,173 @@
       }
     });
 
-    // Controles flotantes
-    document.getElementById('btn-minimizar')?.addEventListener('click', () => {
-      const opciones = document.getElementById('controles-opciones');
-      const btnMinimizar = document.getElementById('btn-minimizar');
-      
-      if (opciones && btnMinimizar) {
-        const isVisible = opciones.style.display !== 'none';
-        opciones.style.display = isVisible ? 'none' : 'block';
-        btnMinimizar.textContent = isVisible ? '+' : '_';
+    // Controles flotantes - Header completo clickeable
+    const controlesHeader = document.getElementById('controles-header');
+    const controlesOpciones = document.getElementById('controles-opciones');
+    const iconoToggle = document.getElementById('btn-minimizar');
+    
+    // Estado inicial contraído
+    if (controlesOpciones && iconoToggle && controlesHeader) {
+      controlesOpciones.style.display = 'none';
+      iconoToggle.textContent = '▶';
+      controlesHeader.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleControles() {
+      if (controlesOpciones && iconoToggle) {
+        const isVisible = controlesOpciones.style.display !== 'none';
+        controlesOpciones.style.display = isVisible ? 'none' : 'block';
+        iconoToggle.textContent = isVisible ? '▶' : '▼';
+        controlesHeader?.setAttribute('aria-expanded', isVisible ? 'false' : 'true');
+      }
+    }
+    
+    controlesHeader?.addEventListener('click', toggleControles);
+    controlesHeader?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleControles();
       }
     });
 
-    // Pantalla completa
-    document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        contenedor.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    });
+    // Pantalla completa mejorada para móvil
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    let isFullscreen = false;
+    let orientationLocked = false;
 
-    document.addEventListener('fullscreenchange', () => {
-      const enterIcon = document.querySelector('.fullscreen-icon.enter') as HTMLElement;
-      const exitIcon = document.querySelector('.fullscreen-icon.exit') as HTMLElement;
-      
-      if (document.fullscreenElement) {
-        if (enterIcon) enterIcon.style.display = 'none';
-        if (exitIcon) exitIcon.style.display = 'block';
-      } else {
-        if (enterIcon) enterIcon.style.display = 'block';
-        if (exitIcon) exitIcon.style.display = 'none';
-      }
-      
-      // Redimensionar canvas
+    // Detectar iOS/Safari
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(typeof window === 'undefined') && (window as any).MSStream === undefined;
+    }
+
+    function isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+
+    const esIOS = isIOS();
+    const esSafari = isSafari();
+
+    // Mensaje para iOS
+    function mostrarMensajeIOS() {
+      alert('El modo pantalla completa no es soportado en este dispositivo. Usa el dispositivo en horizontal para mejor experiencia.');
+    }
+
+    // Detectar si es móvil
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Función para forzar render
+    function forceRender() {
+      if (renderizador) renderizador.render(escena, camara);
+    }
+
+    // Escuchar orientationchange y resize
+    window.addEventListener('orientationchange', () => {
       setTimeout(() => {
         if (contenedor) {
           const newAncho = contenedor.clientWidth;
           const newAlto = contenedor.clientHeight;
-          
           camara.aspect = newAncho / newAlto;
           camara.updateProjectionMatrix();
           renderizador.setSize(newAncho, newAlto);
+          forceRender();
         }
       }, 100);
     });
+
+    // Pantalla completa
+    if (btnFullscreen && contenedor) {
+      btnFullscreen.addEventListener('click', async () => {
+        if (esIOS || esSafari) {
+          mostrarMensajeIOS();
+          return;
+        } else {
+          if (!isFullscreen) {
+            if (contenedor.requestFullscreen) {
+              await contenedor.requestFullscreen();
+              isFullscreen = true;
+              
+              // Cambiar icono
+              const enterIcon = btnFullscreen.querySelector('.fullscreen-icon.enter');
+              const exitIcon = btnFullscreen.querySelector('.fullscreen-icon.exit');
+              if (enterIcon && exitIcon) {
+                (enterIcon as HTMLElement).style.display = 'none';
+                (exitIcon as HTMLElement).style.display = 'block';
+              }
+              
+              // Forzar orientación horizontal en móvil
+              if (window.screen.orientation && window.innerWidth < 800) {
+                try {
+                  await (window.screen.orientation as any).lock('landscape');
+                  orientationLocked = true;
+                } catch (e) {
+                  orientationLocked = false;
+                }
+              }
+            }
+          } else {
+            if (document.exitFullscreen) {
+              await document.exitFullscreen();
+              isFullscreen = false;
+              
+              // Cambiar icono
+              const enterIcon = btnFullscreen.querySelector('.fullscreen-icon.enter');
+              const exitIcon = btnFullscreen.querySelector('.fullscreen-icon.exit');
+              if (enterIcon && exitIcon) {
+                (enterIcon as HTMLElement).style.display = 'block';
+                (exitIcon as HTMLElement).style.display = 'none';
+              }
+              
+              // Restaurar orientación
+              if (window.screen.orientation && orientationLocked) {
+                try {
+                  await (window.screen.orientation as any).unlock();
+                } catch (e) {}
+                orientationLocked = false;
+              }
+            }
+          }
+        }
+      });
+
+      // Detectar salida de fullscreen por otros medios
+      document.addEventListener('fullscreenchange', () => {
+        isFullscreen = !!document.fullscreenElement;
+        
+        // Cambiar icono según el estado
+        const enterIcon = btnFullscreen?.querySelector('.fullscreen-icon.enter');
+        const exitIcon = btnFullscreen?.querySelector('.fullscreen-icon.exit');
+        if (enterIcon && exitIcon) {
+          if (isFullscreen) {
+            (enterIcon as HTMLElement).style.display = 'none';
+            (exitIcon as HTMLElement).style.display = 'block';
+          } else {
+            (enterIcon as HTMLElement).style.display = 'block';
+            (exitIcon as HTMLElement).style.display = 'none';
+          }
+        }
+        
+        if (!isFullscreen && window.screen.orientation && orientationLocked) {
+          try {
+            (window.screen.orientation as any).unlock();
+          } catch (e) {}
+          orientationLocked = false;
+        }
+        
+        // Forzar resize tras salir de fullscreen
+        setTimeout(() => {
+          if (contenedor) {
+            const newAncho = contenedor.clientWidth;
+            const newAlto = contenedor.clientHeight;
+            camara.aspect = newAncho / newAlto;
+            camara.updateProjectionMatrix();
+            renderizador.setSize(newAncho, newAlto);
+            forceRender();
+          }
+        }, 100);
+      });
+    }
 
     // Redimensionamiento de ventana
     window.addEventListener('resize', () => {
@@ -1506,12 +1652,20 @@
     background: #000;
     border-radius: 8px;
     overflow: hidden;
+    /* Safe area para iPhone notch */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
   }
 
   #contenedor-sistema {
     width: 100%;
     height: 100%;
     position: relative;
+    /* Safe area para iPhone notch */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
   }
 
   #sistema-canvas {
@@ -1553,64 +1707,86 @@
   .controles-checkbox {
     position: absolute;
     top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
+    left: 20px;
+    background: rgba(20, 40, 80, 0.98);
+    border: 2px solid #00eaff;
+    border-radius: 10px;
     padding: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     z-index: 100;
-    min-width: 200px;
-    backdrop-filter: blur(10px);
+    width: 240px;
+    backdrop-filter: blur(15px);
+    overflow: hidden;
   }
 
   .controles-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2056a8 0%, #133a6b 100%);
     color: white;
-    padding: 12px 16px;
-    border-radius: 8px 8px 0 0;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
     cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    font-size: 16px;
   }
 
-  .controles-header button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .controles-header:hover {
+    background: linear-gradient(135deg, #133a6b 0%, #0d2749 100%);
+  }
+
+  .controles-header:focus {
+    outline: none;
+  }
+
+  .icono-toggle {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    color: #00eaff;
   }
 
   .controles-opciones {
-    padding: 16px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    background: rgba(20, 40, 80, 0.98);
+    border: none;
+    border-radius: 0;
   }
 
   .controles-opciones label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #333;
+    gap: 12px;
+    font-size: 15px;
+    color: #ffffff;
     cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    font-weight: 500;
+  }
+
+  .controles-opciones label:hover {
+    background: rgba(0, 234, 255, 0.1);
   }
 
   .controles-opciones input[type="checkbox"] {
     margin: 0;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #00eaff;
+    flex-shrink: 0;
   }
 
   .control-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6bb6ff 0%, #3a7bd5 100%);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1619,11 +1795,13 @@
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   }
 
   .control-btn:hover {
+    background: linear-gradient(135deg, #3a7bd5 0%, #6bb6ff 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(58, 123, 213, 0.4);
   }
 
   .control-btn.active {
@@ -1649,11 +1827,11 @@
   .tiempo-controles {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    margin: 8px 0;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid rgba(0, 234, 255, 0.3);
+    border-bottom: 1px solid rgba(0, 234, 255, 0.3);
+    margin: 10px 0;
   }
 
   .play-btn {
@@ -1672,7 +1850,7 @@
 
   .fecha-slider-container label {
     font-size: 14px;
-    color: #333;
+    color: #ffffff;
     font-weight: 500;
   }
 
@@ -1680,7 +1858,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 10px;
-    color: #666;
+    color: #b0d4ff;
     margin-top: 4px;
     padding: 0 2px;
   }
@@ -1698,7 +1876,7 @@
     appearance: none;
     width: 18px;
     height: 18px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6bb6ff 0%, #3a7bd5 100%);
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -1707,7 +1885,7 @@
   #fecha-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6bb6ff 0%, #3a7bd5 100%);
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -1715,11 +1893,12 @@
   }
 
   .fecha-actual {
-    padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-    font-size: 11px;
-    color: #666;
+    padding: 8px 12px;
+    background: rgba(0, 234, 255, 0.15);
+    border: 1px solid rgba(0, 234, 255, 0.3);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #ffffff;
     text-align: center;
     font-weight: 500;
   }
@@ -1735,48 +1914,81 @@
   }
 
   .planet-label {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    position: absolute !important;
+    background: rgba(20, 40, 80, 0.98) !important;
+    border: 2px solid #00eaff !important;
+    border-radius: 10px !important;
+    padding: 8px 16px 8px 10px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
     backdrop-filter: blur(5px);
-    pointer-events: auto;
     transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5em !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
+    z-index: 1000 !important;
+    user-select: none !important;
+    font-family: Arial, sans-serif !important;
+    line-height: 1.2 !important;
   }
 
   .planet-label:hover {
-    background: rgba(255, 255, 255, 1);
+    background: #001b63 !important;
+    color: #ff00b3 !important;
+    border-color: #cf68e9 !important;
+    box-shadow: 0 4px 16px rgba(91, 158, 37, 0.822) !important;
     transform: translate(-50%, -50%) scale(1.05);
     cursor: pointer;
   }
 
   .satellite-label {
-    background: rgba(192, 192, 192, 0.9);
-    font-size: 12px;
-    padding: 4px 8px;
+    background: rgba(20, 40, 80, 0.98) !important;
+    border: 2px solid #c0c0c0 !important;
+    font-size: 13px !important;
+    padding: 6px 12px !important;
   }
 
   .satellite-label:hover {
-    background: rgba(192, 192, 192, 1);
+    background: #001b63 !important;
+    border-color: #e0e0e0 !important;
   }
 
   .info-icon {
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     transition: transform 0.2s ease;
+    margin-right: 2px;
+  }
+
+  .info-icon svg {
+    display: block;
+    stroke: #00fcef !important;
+    background: #2a003d;
+    border-radius: 50%;
+    padding: 1px;
+  }
+
+  .planet-label:hover .info-icon svg {
+    stroke: #ff00b3 !important;
+    background: #000f3f;
   }
 
   .info-icon:hover {
     transform: scale(1.2);
+  }
+  
+  .label-text {
+    display: inline-block;
+    vertical-align: middle;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .lines-container {
@@ -1789,70 +2001,124 @@
   }
 
   .label-line {
-    stroke: #00aaff;
-    stroke-width: 2;
-    stroke-dasharray: 5, 5;
-    opacity: 0.8;
-    filter: drop-shadow(0 0 3px rgba(0, 170, 255, 0.3));
+    stroke: #00eaff;
+    stroke-width: 3;
+    stroke-dasharray: 8, 4;
+    opacity: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 234, 255, 0.3));
   }
 
   .info-window {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    max-width: 500px;
-    width: 90%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .info-window-content {
-    border-radius: 12px;
-    overflow: hidden;
+    background: rgba(20, 40, 80, 0.98);
+    border: 2px solid #00eaff;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
   }
 
   .info-window-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 16px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 20px 20px 15px 20px;
+    border-bottom: 1px solid #00eaff;
+    background: linear-gradient(135deg, #2056a8 0%, #133a6b 100%);
+    border-radius: 13px 13px 0 0;
   }
 
   .info-window-header h3 {
     margin: 0;
-    font-size: 1.25rem;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .info-window-close {
     background: none;
     border: none;
-    color: white;
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .info-window-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .info-window-close svg {
     width: 20px;
     height: 20px;
-    fill: currentColor;
+    stroke: #ff0000;
+    fill: #ff0000;
+    stroke-width: 1.3px;
+    scale: 1.6;
   }
 
   .info-window-body {
     padding: 20px;
+    color: #fff;
     line-height: 1.6;
+  }
+
+  .info-section {
+    margin-bottom: 20px;
+  }
+
+  .info-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-description {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-align: justify;
+  }
+
+  .info-section h4 {
+    color: #00eaff;
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .info-section p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .info-section ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+  }
+
+  .info-section li {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
   }
 
   .info-window-body p {
@@ -1863,9 +2129,34 @@
     margin-bottom: 0;
   }
 
+  /* Scrollbar personalizado para la ventana de información */
+  .info-window-content::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .info-window-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  .info-window-content::-webkit-scrollbar-thumb {
+    background: #00eaff;
+    border-radius: 4px;
+  }
+
+  .info-window-content::-webkit-scrollbar-thumb:hover {
+    background: #00b8cc;
+  }
+
+  /* Firefox */
+  .info-window-content {
+    scrollbar-width: auto;
+    scrollbar-color: #00eaff rgba(255, 255, 255, 0.1);
+  }
+
   .fullscreen-btn {
     position: absolute;
-    bottom: 20px;
+    top: 20px;
     right: 20px;
     background: rgba(255, 255, 255, 0.9);
     border: none;
@@ -1877,6 +2168,9 @@
     z-index: 100;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .fullscreen-btn:hover {
@@ -1888,17 +2182,128 @@
     width: 24px;
     height: 24px;
     fill: #333;
+    display: block;
+  }
+
+  /* Responsive para la ventana de información */
+  @media (max-width: 768px) {
+    .info-window {
+      padding: 10px;
+    }
+    
+    .info-window-content {
+      max-width: 100%;
+      max-height: 90vh;
+    }
+    
+    .info-window-header {
+      padding: 15px 15px 10px 15px;
+    }
+    
+    .info-window-header h3 {
+      font-size: 1.3rem;
+    }
+    
+    .info-window-body {
+      padding: 15px;
+    }
+    
+    .info-description {
+      font-size: 0.95rem;
+    }
+    
+    .info-section h4 {
+      font-size: 1rem;
+    }
+    
+    .info-section p,
+    .info-section li {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Estilos específicos para móvil en orientación vertical */
+  @media (max-width: 768px) and (orientation: portrait) {
+    .info-window {
+      padding: 5px;
+      align-items: flex-start;
+      padding-top: 10px;
+    }
+    
+    .info-window-content {
+      max-width: 95%;
+      max-height: 85vh;
+      margin: 0 auto;
+    }
+    
+    .info-window-header {
+      padding: 12px 15px 8px 15px;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #2056a8 0%, #133a6b 100%);
+      z-index: 10;
+    }
+    
+    .info-window-header h3 {
+      font-size: 1.1rem;
+      margin-right: 30px;
+    }
+    
+    .info-window-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 0, 0, 0.8);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 11;
+    }
+    
+    .info-window-close:hover {
+      background: rgba(255, 0, 0, 1);
+    }
+    
+    .info-window-close svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      fill: #ffffff;
+      stroke-width: 2px;
+    }
+    
+    .info-window-body {
+      padding: 12px 15px;
+      max-height: calc(85vh - 60px);
+    }
+  }
+
+  /* Media queries para móvil vertical y horizontal */
+  @media (max-width: 900px) and (orientation: portrait) {
+    .sistema-container {
+      height: 60vh;
+    }
+  }
+
+  @media (max-width: 900px) and (orientation: landscape) {
+    .sistema-container {
+      height: 85vh;
+    }
   }
 
   @media (max-width: 768px) {
     .controles-checkbox {
       top: 10px;
-      right: 10px;
-      min-width: 180px;
+      left: 10px;
+      width: 200px;
+      font-size: 0.92rem;
     }
     
     .fullscreen-btn {
-      bottom: 10px;
+      top: 10px;
       right: 10px;
       width: 40px;
       height: 40px;
@@ -1912,5 +2317,82 @@
     .sistema-container {
       height: 70vh;
     }
+
+    .controles-header {
+      padding: 12px 14px;
+      font-size: 0.95rem;
+    }
+
+    .controles-opciones {
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .controles-opciones label {
+      font-size: 0.9rem;
+      padding: 10px 8px;
+    }
+
+    .control-btn {
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+
+    .planet-label {
+      font-size: 13px !important;
+      padding: 6px 12px 6px 8px !important;
+    }
+
+    .label-line {
+      stroke-width: 2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sistema-container {
+      height: 50vh;
+    }
+
+    .controles-checkbox {
+      width: 180px;
+      font-size: 0.88rem;
+    }
+
+    .controles-header {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .controles-opciones {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .controles-opciones label {
+      font-size: 0.85rem;
+      padding: 8px 6px;
+    }
+
+    .controles-opciones input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .control-btn {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+    }
+
+    .planet-label {
+      font-size: 12px !important;
+      padding: 5px 10px 5px 7px !important;
+    }
+
+    .satellite-label {
+      font-size: 11px !important;
+      padding: 4px 8px !important;
+    }
   }
 </style>
+
+

@@ -1,8 +1,13 @@
 ---
 const navItems = [
 	{ href: '/', label: 'Ciencias Espaciales' },
-	{ href: '/capas-solares', label: 'Capas Solares 3D' },
-	{ href: '/sistema-solar', label: 'Sistema Solar 3D' },
+	{ 
+		label: 'Modelos 3D', 
+		submenu: [
+			{ href: '/capas-solares', label: 'Capas Solares 3D' },
+			{ href: '/sistema-solar', label: 'Sistema Solar 3D' }
+		]
+	},
 	{ href: '/fisica-solar', label: 'Física Solar' },
 	{ href: '/fisica-planetaria', label: 'Física Planetaria' },
 	{ href: '/videos', label: 'Videos' },
@@ -19,10 +24,33 @@ const navItems = [
 		<nav class="nav" aria-label="Principal">
 			<ul>
 				{navItems.map((item) => (
-					<li><a href={item.href}>{item.label}</a></li>
+					<li class={item.submenu ? 'dropdown' : ''}>
+						{item.submenu ? (
+							<>
+								<button class="dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+									{item.label}
+									<span class="dropdown-arrow">▼</span>
+								</button>
+								<ul class="dropdown-menu">
+									{item.submenu.map((subItem) => (
+										<li><a href={subItem.href}>{subItem.label}</a></li>
+									))}
+								</ul>
+							</>
+						) : (
+							<a href={item.href}>{item.label}</a>
+						)}
+					</li>
 				))}
 			</ul>
 		</nav>
+		
+		<!-- Botón hamburguesa para móviles -->
+		<button class="mobile-menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
 	</div>
 </header>
 
@@ -72,7 +100,9 @@ const navItems = [
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.25rem;
+		align-items: center;
 	}
+	
 	.nav a {
 		color: #fff;
 		text-decoration: none;
@@ -80,12 +110,373 @@ const navItems = [
 		border-radius: 6px;
 		font-weight: 600;
 		font-size: 0.95rem;
+		display: block;
+		transition: all 0.3s ease;
 	}
+	
 	.nav a:hover,
-	.nav a:focus { background: rgba(255, 255, 255, 0.15); outline: none; }
+	.nav a:focus { 
+		background: rgba(255, 255, 255, 0.15); 
+		outline: none; 
+	}
 
+	/* Dropdown styles */
+	.dropdown {
+		position: relative;
+	}
+
+	.dropdown-toggle {
+		background: none;
+		border: none;
+		color: #fff;
+		padding: 0.4rem 0.7rem;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.95rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		transition: all 0.3s ease;
+		font-family: inherit;
+	}
+
+	.dropdown-toggle:hover,
+	.dropdown-toggle:focus {
+		background: rgba(255, 255, 255, 0.15);
+		outline: none;
+	}
+
+	.dropdown-arrow {
+		font-size: 0.7rem;
+		transition: transform 0.3s ease;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.dropdown:hover .dropdown-arrow {
+			transform: rotate(180deg);
+		}
+	}
+
+	/* Soporte para dispositivos sin hover (p.ej. tablets/foldables):
+	   permitir abrir el dropdown por click incluso en layouts anchos */
+	@media (hover: none) {
+		.dropdown.active .dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+
+		.dropdown.active .dropdown-arrow {
+			transform: rotate(180deg);
+		}
+	}
+
+	.dropdown-menu {
+		position: absolute;
+		top: calc(100% + 0.25rem);
+		left: 0;
+		background: var(--color-primary);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 6px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		min-width: 200px;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-10px);
+		transition: all 0.3s ease;
+		z-index: 1000;
+		list-style: none;
+		margin: 0;
+		padding: 0.5rem 0;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.dropdown:hover .dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+	}
+
+	/* Permitir que un dropdown abierto por click sea visible en cualquier layout */
+	.dropdown.active .dropdown-menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.dropdown.active .dropdown-arrow {
+		transform: rotate(180deg);
+	}
+
+	.dropdown-menu li {
+		margin: 0;
+	}
+
+	.dropdown-menu a {
+		padding: 0.6rem 1rem;
+		border-radius: 0;
+		font-size: 0.9rem;
+		white-space: nowrap;
+	}
+
+	.dropdown-menu a:hover {
+		background: rgba(255, 255, 255, 0.2);
+	}
+
+	/* Mobile menu toggle */
+	.mobile-menu-toggle {
+		display: none;
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.5rem;
+		flex-direction: column;
+		gap: 0.3rem;
+		margin-left: auto;
+	}
+
+	.mobile-menu-toggle span {
+		width: 25px;
+		height: 3px;
+		background: #fff;
+		border-radius: 2px;
+		transition: all 0.3s ease;
+	}
+
+	.mobile-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+		transform: rotate(45deg) translate(6px, 6px);
+	}
+
+	.mobile-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+		opacity: 0;
+	}
+
+	.mobile-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+		transform: rotate(-45deg) translate(6px, -6px);
+	}
+
+	/* Responsive design */
 	@media (max-width: 860px) {
 		.nav a { font-size: 0.9rem; }
+		.dropdown-toggle { font-size: 0.9rem; }
+	}
+
+	@media (max-width: 768px) {
+		.mobile-menu-toggle {
+			display: flex;
+		}
+
+		.nav {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			background: var(--color-primary);
+			border-top: 1px solid rgba(255, 255, 255, 0.2);
+			transform: translateY(-100%);
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+		}
+
+		.nav.active {
+			transform: translateY(0);
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.nav ul {
+			flex-direction: column;
+			padding: 1rem;
+			gap: 0.5rem;
+		}
+
+		.nav li {
+			width: 100%;
+		}
+
+		.dropdown {
+			position: relative;
+		}
+
+		.nav a,
+		.dropdown-toggle {
+			width: 100%;
+			text-align: left;
+			padding: 0.8rem 1rem;
+			border-radius: 8px;
+		}
+
+		.dropdown-menu {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			background: var(--color-primary);
+			border-radius: 8px;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			max-height: 0;
+			opacity: 0;
+			visibility: hidden;
+			overflow: hidden;
+			transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease, visibility 0s linear 0.3s;
+			pointer-events: none;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		}
+
+		.dropdown.active .dropdown-menu {
+			max-height: 300px;
+			opacity: 1;
+			visibility: visible;
+			padding: 0.5rem 0;
+			pointer-events: auto;
+			transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease, visibility 0s linear 0s;
+		}
+
+		.dropdown-menu li {
+			margin: 0;
+		}
+
+		.dropdown-menu a {
+			display: block;
+			padding: 0.6rem 1rem;
+			color: #fff;
+			text-decoration: none;
+			font-size: 0.9rem;
+			font-weight: 600;
+			background: transparent;
+			transition: background 0.2s ease;
+		}
+
+		.dropdown-menu a:hover,
+		.dropdown-menu a:focus {
+			background: rgba(255, 255, 255, 0.15);
+		}
+
+		.dropdown:hover .dropdown-menu {
+			transform: none;
+		}
+
+		.dropdown-arrow {
+			display: inline-block;
+			font-size: 0.7rem;
+			transition: transform 0.3s ease;
+		}
+
+		.dropdown.active .dropdown-arrow {
+			transform: rotate(180deg);
+		}
 	}
 </style>
+
+<script>
+	// Funcionalidad del menú móvil
+	document.addEventListener('DOMContentLoaded', function() {
+		const mobileToggle = document.querySelector('.mobile-menu-toggle');
+		const nav = document.querySelector('.nav');
+		
+		if (mobileToggle && nav) {
+			mobileToggle.addEventListener('click', function() {
+				const isExpanded = this.getAttribute('aria-expanded') === 'true';
+				this.setAttribute('aria-expanded', !isExpanded);
+				nav.classList.toggle('active');
+			});
+		}
+
+		// Funcionalidad del dropdown en móviles
+		const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+		const supportsHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+		const isTouchCapable = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+		dropdownToggles.forEach(toggle => {
+			toggle.addEventListener('click', function(e) {
+				// Toggle en móviles (menú activo) o en dispositivos táctiles (aunque el menú no esté activo)
+				if (nav.classList.contains('active') || isTouchCapable) {
+					e.preventDefault();
+					const dropdown = this.parentElement;
+					const willOpen = !dropdown.classList.contains('active');
+					
+					// Cerrar otros dropdowns y resetear ARIA
+					dropdownToggles.forEach(otherToggle => {
+						const otherDropdown = otherToggle.parentElement;
+						if (otherDropdown !== dropdown) {
+							otherDropdown.classList.remove('active');
+							otherToggle.setAttribute('aria-expanded', 'false');
+						}
+					});
+
+					// Toggle del dropdown actual + ARIA
+					dropdown.classList.toggle('active');
+					this.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+				}
+			});
+		});
+
+		// Cerrar menú móvil al hacer clic en un enlace
+		const navLinks = document.querySelectorAll('.nav a');
+		navLinks.forEach(link => {
+			link.addEventListener('click', function() {
+				if (nav.classList.contains('active')) {
+					mobileToggle.setAttribute('aria-expanded', 'false');
+					nav.classList.remove('active');
+					
+					// Cerrar todos los dropdowns y resetear ARIA
+					document.querySelectorAll('.dropdown').forEach(dropdown => {
+						dropdown.classList.remove('active');
+					});
+					dropdownToggles.forEach(t => t.setAttribute('aria-expanded', 'false'));
+				}
+			});
+		});
+
+		// Cerrar menú móvil al hacer clic fuera
+			document.addEventListener('click', function(event) {
+			if (event.target instanceof Node) {
+				const clickedOutsideMenu = !nav.contains(event.target) && !mobileToggle.contains(event.target);
+				if (clickedOutsideMenu) {
+					if (nav.classList.contains('active')) {
+						mobileToggle.setAttribute('aria-expanded', 'false');
+						nav.classList.remove('active');
+					}
+						// Cerrar todos los dropdowns y resetear ARIA (móvil o táctil)
+					document.querySelectorAll('.dropdown').forEach(dropdown => {
+						dropdown.classList.remove('active');
+					});
+					dropdownToggles.forEach(t => t.setAttribute('aria-expanded', 'false'));
+				} else if (nav.classList.contains('active')) {
+					// Clic dentro del nav pero fuera de un dropdown: cerrar dropdowns abiertos (móvil)
+					const targetInsideDropdown = (event.target as Element).closest('.dropdown');
+					if (!targetInsideDropdown) {
+						document.querySelectorAll('.dropdown').forEach(dropdown => {
+							dropdown.classList.remove('active');
+						});
+						dropdownToggles.forEach(t => t.setAttribute('aria-expanded', 'false'));
+					}
+					} else if (isTouchCapable) {
+						// Layout ancho táctil: cerrar dropdowns si se hace click fuera de uno
+					const targetInsideDropdown = (event.target as Element).closest('.dropdown');
+					if (!targetInsideDropdown) {
+						document.querySelectorAll('.dropdown').forEach(dropdown => dropdown.classList.remove('active'));
+						dropdownToggles.forEach(t => t.setAttribute('aria-expanded', 'false'));
+					}
+				}
+			}
+		});
+
+		// Cerrar dropdowns al colapsar el menú móvil manualmente
+		mobileToggle.addEventListener('click', function() {
+			const nowExpanded = this.getAttribute('aria-expanded') === 'true';
+			// Si después del click el menú queda cerrado, reseteamos submenús
+			if (!nowExpanded) {
+				document.querySelectorAll('.dropdown').forEach(dropdown => {
+					dropdown.classList.remove('active');
+				});
+				dropdownToggles.forEach(t => t.setAttribute('aria-expanded', 'false'));
+			}
+		});
+	});
+</script>
 
