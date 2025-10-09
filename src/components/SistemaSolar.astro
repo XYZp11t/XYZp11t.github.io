@@ -23,11 +23,22 @@
         
         <!-- Control de tiempo -->
         <div class="tiempo-controles">
-          <button id="btn-play-pause" class="control-btn play-btn">
-            <span class="play-icon">▶</span>
-            <span class="pause-icon" style="display: none;">⏸</span>
-            <span class="btn-text">Play</span>
-          </button>
+          <div class="play-speed-container">
+            <button id="btn-play-pause" class="control-btn play-btn">
+              <span class="play-icon">▶</span>
+              <span class="pause-icon" style="display: none;">⏸</span>
+              <span class="btn-text">Play</span>
+            </button>
+            
+            <div class="speed-selector">
+              <label for="speed-select"><strong>Velocidad:</strong></label>
+              <select id="speed-select" class="speed-select">
+                <option value="1">Lento (1x)</option>
+                <option value="10">Medio (10x)</option>
+                <option value="100">Rápido (100x)</option>
+              </select>
+            </div>
+          </div>
           
           <div class="fecha-slider-container">
             <label for="fecha-slider"><strong>Fecha:</strong></label>
@@ -37,9 +48,16 @@
               <span>Hoy</span>
               <span>+20 años</span>
             </div>
-            <div class="fecha-actual">
-              <span id="fecha-simulacion"></span>
-            </div>
+          </div>
+          
+          <div class="fecha-manual-container">
+            <label for="fecha-manual-input"><strong>Fecha y hora:</strong></label>
+            <input type="datetime-local" id="fecha-manual-input" class="fecha-input">
+            <button id="btn-aplicar-fecha" class="control-btn btn-small">Aplicar</button>
+          </div>
+          
+          <div class="fecha-actual">
+            <span id="fecha-simulacion"></span>
           </div>
         </div>
         
@@ -241,7 +259,9 @@
     let fechaBaseActual = new Date(); // Fecha real actual (hoy)
     let tiempoSimuladoAnios = 0; // Años desde la fecha base (puede ser negativo, rango ±20)
     let tiempoActual = 0; // Días desde J2000 para cálculos orbitales
-    let factorAnimacionAnios = 0.00138; // Factor de velocidad de animación (0.5 días por frame ≈ 0.00137 años por frame)
+    const factorAnimacionBase = 0.0000138; // Factor base de velocidad de animación
+    let multiplicadorVelocidad = 1; // Multiplicador de velocidad (1x, 10x, 100x)
+    let factorAnimacionAnios = factorAnimacionBase * multiplicadorVelocidad;
 
     // Datos de los planetas basados en elementos orbitales J2000.0
     const datosPlanetas = {
@@ -301,8 +321,8 @@
         M0_deg: 357.51716,
         n_deg_per_day: 0.98561009,
         rot_period_hours: 23.9345,
-        obliquity_deg: 23.44,
-        textura: '/texturas/2k_earth_daymap.jpg',
+        obliquity_deg: -23.44,
+        textura: '/texturas/iloveimg-rotateed/2k_earth_daymap.jpg',
         color: 0x6b93d6,
         info: 'La Tierra es el único planeta conocido que alberga vida, con océanos líquidos y atmósfera protectora.'
       },
@@ -400,10 +420,14 @@
         orbital_period_hours: 655.7, // sincronizado con rotación
         orbital_period_days: 27.321661, // Período sidéreo en días
         obliquity_deg: 6.7, // inclinación respecto a su órbita
-        // Elementos orbitales simplificados para la Luna (geocéntricos)
+        // Elementos orbitales precisos para la Luna (geocéntricos) época J2000
         a_km: 384400, // Semieje mayor en km
         e_luna: 0.0549, // Excentricidad orbital de la Luna
         i_luna_deg: 5.145, // Inclinación orbital respecto a la eclíptica
+        Omega_luna_deg: 125.04, // Longitud del nodo ascendente en J2000
+        omega_luna_deg: 318.15, // Argumento del perigeo en J2000
+        M0_luna_deg: 135.27, // Anomalía media en J2000
+        n_luna_deg_per_day: 13.176358, // Movimiento medio (360/27.321661)
         textura: '/texturas/2k_moon.jpg',
         color: 0xc0c0c0,
         esSatelite: true,
@@ -560,12 +584,12 @@
       });
       
       // Cargar texturas de día y noche
-      textureLoader.load('/texturas/2k_earth_daymap.jpg', (texture) => {
+      textureLoader.load('/texturas/iloveimg-rotateed/2k_earth_daymap.jpg', (texture) => {
         material.uniforms.dayTexture.value = texture;
         material.needsUpdate = true;
       });
       
-      textureLoader.load('/texturas/2k_earth_nightmap.jpg', (texture) => {
+      textureLoader.load('/texturas/iloveimg-rotateed/2k_earth_nightmap.jpg', (texture) => {
         material.uniforms.nightTexture.value = texture;
         material.needsUpdate = true;
       });
@@ -643,9 +667,9 @@
               grupoOrbitaLuna.name = 'grupoOrbitaLuna';
               // Inclinación de la órbita lunar respecto a la eclíptica
               const iLuna = (datos.i_luna_deg || 5.145) * Math.PI / 180;
-              grupoOrbitaLuna.rotation.x = iLuna;
+              grupoOrbitaLuna.rotation.y = iLuna;
               // Giro poloidal de 180° para la órbita lunar
-              grupoOrbitaLuna.rotation.x += Math.PI;
+              grupoOrbitaLuna.rotation.y += Math.PI;
               planetaPadre.add(grupoOrbitaLuna);
               planetaPadre.userData.grupoOrbitaLuna = grupoOrbitaLuna;
               // Si la línea de la órbita lunar ya existe, reubicarla bajo este grupo para inclinarla
@@ -989,11 +1013,29 @@
       const fechaSimulada = new Date(fechaBaseActual.getTime() + diasSimulados * 86400000);
       const fechaElement = document.getElementById('fecha-simulacion');
       if (fechaElement) {
-        fechaElement.textContent = fechaSimulada.toLocaleDateString('es-ES', {
+        // Mostrar fecha y hora completa
+        const opciones: Intl.DateTimeFormatOptions = {
           year: 'numeric',
           month: 'long',
-          day: 'numeric'
-        });
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        };
+        fechaElement.textContent = fechaSimulada.toLocaleString('es-ES', opciones);
+      }
+      
+      // Actualizar el input de fecha manual con la fecha actual de simulación
+      const fechaInput = document.getElementById('fecha-manual-input') as HTMLInputElement;
+      if (fechaInput && !fechaInput.matches(':focus')) {
+        // Formatear para datetime-local (YYYY-MM-DDTHH:mm)
+        const año = fechaSimulada.getFullYear();
+        const mes = String(fechaSimulada.getMonth() + 1).padStart(2, '0');
+        const dia = String(fechaSimulada.getDate()).padStart(2, '0');
+        const hora = String(fechaSimulada.getHours()).padStart(2, '0');
+        const minuto = String(fechaSimulada.getMinutes()).padStart(2, '0');
+        fechaInput.value = `${año}-${mes}-${dia}T${hora}:${minuto}`;
       }
     }
 
@@ -1047,6 +1089,15 @@
         console.error('Error cargando el Sol GLB:', error);
       }
 
+      // Actualizar posiciones y rotaciones iniciales para evitar el "salto" al presionar play
+      // Esperar un frame para que todos los objetos estén completamente creados
+      requestAnimationFrame(() => {
+        actualizarPosicionesPlanetas();
+        actualizarRotacionesPlanetas();
+        actualizarShaderTierra();
+        console.log('Posiciones y rotaciones iniciales aplicadas');
+      });
+
       if (loadingElement) {
         loadingElement.style.display = 'none';
       }
@@ -1069,36 +1120,62 @@
                 posicion.y * escalaConfig.distancia  // y se mapea a z
               );
             }
-          } else {
-            // Actualizar posición orbital de satélites (Luna)
-            if (planeta.userData.datos.orbital_period_days) {
-              const anguloOrbital = (2 * Math.PI * tiempoActual) / planeta.userData.datos.orbital_period_days;
-              
-              // Aplicar excentricidad básica para la Luna
-              const e = planeta.userData.datos.e_luna || 0.0549;
-              const a = planeta.userData.distanciaOrbital;
-              
-              // Anomalía media simple para la Luna
-              const M = anguloOrbital;
-              let E = M;
-              // Iteración simple para anomalía excéntrica
-              for (let i = 0; i < 3; i++) {
-                E = M + e * Math.sin(E);
-              }
-              
-              // Posición con excentricidad
-              const r = a * (1 - e * Math.cos(E));
-              const nu = 2 * Math.atan2(
-                Math.sqrt(1 + e) * Math.sin(E / 2),
-                Math.sqrt(1 - e) * Math.cos(E / 2)
-              );
-              
-              planeta.position.x = r * Math.cos(nu);
-              planeta.position.z = r * Math.sin(nu);
-              
-              // Acoplamiento de marea para la Luna
-              planeta.rotation.y = -nu; // Siempre muestra la misma cara
+          } else if (planeta.userData.nombre === 'luna') {
+            // Actualizar posición orbital de la Luna usando elementos orbitales precisos
+            const datos = planeta.userData.datos;
+            
+            // Elementos orbitales de la Luna
+            const e = datos.e_luna || 0.0549;
+            const i = (datos.i_luna_deg || 5.145) * Math.PI / 180;
+            const Omega = (datos.Omega_luna_deg || 125.04) * Math.PI / 180;
+            const omega = (datos.omega_luna_deg || 318.15) * Math.PI / 180;
+            const M0 = (datos.M0_luna_deg || 135.27) * Math.PI / 180;
+            const n = (datos.n_luna_deg_per_day || 13.176358) * Math.PI / 180; // rad/día
+            
+            // Anomalía media en el tiempo actual
+            const M = M0 + n * tiempoActual;
+            
+            // Resolver ecuación de Kepler para anomalía excéntrica
+            let E = M;
+            for (let i = 0; i < 10; i++) {
+              E = M + e * Math.sin(E);
             }
+            
+            // Anomalía verdadera
+            const nu = 2 * Math.atan2(
+              Math.sqrt(1 + e) * Math.sin(E / 2),
+              Math.sqrt(1 - e) * Math.cos(E / 2)
+            );
+            
+            // Distancia geocéntrica normalizada
+            const r_norm = (1 - e * Math.cos(E));
+            const a = planeta.userData.distanciaOrbital;
+            const r = a * r_norm;
+            
+            // Posición en el plano orbital
+            const x_orb = r * Math.cos(nu);
+            const y_orb = r * Math.sin(nu);
+            
+            // Rotaciones para orientar la órbita (simplificado para geocéntrico)
+            const cos_Omega = Math.cos(Omega);
+            const sin_Omega = Math.sin(Omega);
+            const cos_omega = Math.cos(omega);
+            const sin_omega = Math.sin(omega);
+            const cos_i = Math.cos(i);
+            const sin_i = Math.sin(i);
+            
+            // Transformación al sistema de referencia terrestre (simplificado)
+            // En el grupo de órbita lunar ya aplicamos la inclinación
+            const x = (cos_omega * x_orb - sin_omega * y_orb);
+            const z = (sin_omega * x_orb + cos_omega * y_orb);
+            
+            planeta.position.x = x;
+            planeta.position.z = z;
+            
+            // Acoplamiento de marea: la Luna siempre muestra la misma cara a la Tierra
+            // Calcular ángulo desde la Tierra hacia la Luna
+            const anguloHaciaTierra = Math.atan2(z, x);
+            planeta.rotation.y = -anguloHaciaTierra - Math.PI / 2;
           }
         }
       });
@@ -1417,6 +1494,50 @@
     document.getElementById('fecha-slider')?.addEventListener('input', (e) => {
       const valor = parseFloat((e.target as HTMLInputElement).value);
       actualizarTiempoSimulado(valor);
+    });
+
+    // Control del selector de velocidad
+    document.getElementById('speed-select')?.addEventListener('change', (e) => {
+      multiplicadorVelocidad = parseFloat((e.target as HTMLSelectElement).value);
+      factorAnimacionAnios = factorAnimacionBase * multiplicadorVelocidad;
+      console.log(`Velocidad de animación actualizada: ${multiplicadorVelocidad}x`);
+    });
+
+    // Control de fecha manual
+    document.getElementById('btn-aplicar-fecha')?.addEventListener('click', () => {
+      const fechaInput = document.getElementById('fecha-manual-input') as HTMLInputElement;
+      if (fechaInput && fechaInput.value) {
+        const fechaIngresada = new Date(fechaInput.value);
+        
+        // Verificar que la fecha sea válida
+        if (!isNaN(fechaIngresada.getTime())) {
+          // Calcular la diferencia en años desde la fecha base actual
+          const diferenciaMilisegundos = fechaIngresada.getTime() - fechaBaseActual.getTime();
+          const diferenciaAnios = diferenciaMilisegundos / (365.25 * 24 * 60 * 60 * 1000);
+          
+          // Limitar al rango permitido [-20, 20]
+          const aniosLimitados = Math.max(-20, Math.min(20, diferenciaAnios));
+          
+          // Actualizar el slider y la simulación
+          const slider = document.getElementById('fecha-slider') as HTMLInputElement;
+          if (slider) {
+            slider.value = aniosLimitados.toString();
+          }
+          
+          actualizarTiempoSimulado(aniosLimitados);
+          
+          console.log(`Fecha manual aplicada: ${fechaIngresada.toLocaleString('es-ES')}`);
+        } else {
+          alert('Por favor, ingresa una fecha válida.');
+        }
+      }
+    });
+
+    // Permitir aplicar fecha con Enter
+    document.getElementById('fecha-manual-input')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('btn-aplicar-fecha')?.click();
+      }
     });
 
     document.getElementById('btn-reset')?.addEventListener('click', () => {
@@ -1921,18 +2042,22 @@
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   }
 
-  .fecha-actual {
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 6px;
+  .btn-small {
+    padding: 6px 12px;
     font-size: 12px;
-    color: #555;
-    text-align: center;
-    margin-top: 8px;
   }
 
-  .fecha-actual strong {
-    color: #333;
+  .fecha-actual {
+    padding: 8px 12px;
+    background: rgba(0, 234, 255, 0.15);
+    border: 1px solid rgba(0, 234, 255, 0.3);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 8px;
+    font-weight: 500;
+    line-height: 1.4;
   }
 
 
@@ -1947,12 +2072,88 @@
     margin: 10px 0;
   }
 
+  .play-speed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .play-btn {
     display: flex;
     align-items: center;
     gap: 8px;
     justify-content: center;
     min-width: 100px;
+  }
+
+  .speed-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .speed-selector label {
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  .speed-select {
+    width: 100%;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 234, 255, 0.5);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.2s ease;
+  }
+
+  .speed-select:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #00eaff;
+  }
+
+  .speed-select:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.2);
+  }
+
+  .fecha-manual-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fecha-manual-container label {
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  .fecha-input {
+    width: 100%;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 234, 255, 0.5);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #333;
+    transition: all 0.2s ease;
+  }
+
+  .fecha-input:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #00eaff;
+  }
+
+  .fecha-input:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.2);
   }
 
   .fecha-slider-container {
@@ -2481,8 +2682,24 @@
 
     .fecha-actual {
       padding: 6px 8px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       margin-top: 6px;
+    }
+
+    .speed-select,
+    .fecha-input {
+      font-size: 0.8rem;
+      padding: 5px 8px;
+    }
+
+    .speed-selector label,
+    .fecha-manual-container label {
+      font-size: 0.8rem;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 0.8rem;
     }
 
     .planet-label {
@@ -2555,8 +2772,24 @@
 
     .fecha-actual {
       padding: 4px 6px;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       margin-top: 4px;
+    }
+
+    .speed-select,
+    .fecha-input {
+      font-size: 0.75rem;
+      padding: 4px 6px;
+    }
+
+    .speed-selector label,
+    .fecha-manual-container label {
+      font-size: 0.75rem;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 0.75rem;
     }
 
     .planet-label {
