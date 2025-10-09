@@ -23,9 +23,21 @@ import ModeloCapasSolares from '../components/CapasSolares.astro';
 			</div>
 		</details>
 	</section>
+	<footer class="page-footer">
+		<div class="nav-links">
+		  <a href="/about" class="nav-link">ℹ️ Acerca del Proyecto</a>
+		  <a href="/sistema-solar" class="nav-link">🪐 Sistema Solar</a>
+		  <a href="/" class="nav-link">🏠 Inicio</a>
+		</div>
+	  </footer>
 </Layout>
 
 <style>
+	main {
+    	min-height: 100vh;
+    	display: flex;
+    	flex-direction: column;
+ 	}
 	.header-block {
 		text-align: center;
 		padding: 1.5rem 1rem;
@@ -37,11 +49,14 @@ import ModeloCapasSolares from '../components/CapasSolares.astro';
 	.header-block h1 {
 		margin: 0 0 0.5rem 0;
 		color: #2056a8;
+		font-size: 2.5rem;
+		font-weight: 700;
 	}
 	
 	.header-block p {
 		margin: 0;
 		color: #333;
+		font-size: 1.1rem;
 	}
 
 	.ayuda-rapida {
@@ -108,6 +123,33 @@ import ModeloCapasSolares from '../components/CapasSolares.astro';
 		display: block;
 		margin-bottom: 0.3rem;
 	}
+	.page-footer {
+	    margin-top: auto;
+	    padding: 2rem 1rem;
+	    background: #f8f9fa;
+	    border-top: 1px solid #e9ecef;
+	  }
+
+	.nav-links {
+	    display: flex;
+	    justify-content: center;
+	    gap: 2rem;
+	    flex-wrap: wrap;
+	  }
+
+	.nav-link {
+	    color: #6c757d;
+	    text-decoration: none;
+	    font-weight: 500;
+	    transition: color 0.3s ease;
+	    padding: 0.5rem 1rem;
+	    border-radius: 6px;
+	  }
+
+	.nav-link:hover {
+	    color: #495057;
+	    background: rgba(0, 0, 0, 0.05);
+	  }
 
 	@media (max-width: 768px) {
 		.ayuda-contenido {
@@ -122,6 +164,11 @@ import ModeloCapasSolares from '../components/CapasSolares.astro';
 		.ayuda-contenido {
 			padding: 1rem;
 		}
+		.nav-links {
+      		flex-direction: column;
+      		align-items: center;
+      		gap: 1rem;
+    	}
 	}
 </style>
 

@@ -352,7 +352,7 @@
         M0_deg: 317.51238,
         n_deg_per_day: 0.03347063,
         rot_period_hours: 10.656,
-        obliquity_deg: 26.73,
+        obliquity_deg: -26.73,
         anillos: true,
         textura: '/texturas/2k_saturn.jpg',
         color: 0xfab27b,
@@ -619,8 +619,12 @@
       
       // Los planetas ahora se iluminan desde el generador de luz solar centralizado
       
-      // Crear un grupo para aplicar inclinación orbital
+      // Crear jerarquía: grupo orbital -> grupo oblicuidad -> grupo giro -> mesh
       const grupoPlaneta = new THREE.Group();
+      const grupoOblicuidad = new THREE.Group();
+      const grupoGiro = new THREE.Group();
+      grupoPlaneta.add(grupoOblicuidad);
+      grupoOblicuidad.add(grupoGiro);
       
       // Posición inicial
       let distancia, planetaPadre = null;
@@ -631,47 +635,68 @@
         // Para la Luna, usar distancia en km convertida a unidades de escena con escala reducida
         distancia = (datos.distancia_terra_km / 149597870.7) * escalaConfig.distancia * 15; // km -> UA -> escala (reducido de 100 a 15)
         if (planetaPadre) {
-          // Para satélites, no usar grupo - añadir directamente al planeta padre
-          planeta.position.set(distancia, 0, 0);
-          
-          // Aplicar obliquidad respecto al plano orbital del satélite
-          if (datos.obliquity_deg !== undefined) {
-            const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
-            planeta.rotation.z = obliquidad;
-          }
-          // Giro poloidal 180° para corregir orientación del satélite
-          planeta.rotation.x += Math.PI;
-          
-          
-          // Obtener el mesh del planeta padre (no el grupo)
-          let meshPlanetaPadre;
-          if (planetaPadre.userData.planetaMesh) {
-            meshPlanetaPadre = planetaPadre.userData.planetaMesh;
+          if (nombre === 'luna') {
+            // Crear o reutilizar grupo de órbita lunar bajo el grupo orbital de la Tierra (no inclinado por oblicuidad terrestre)
+            let grupoOrbitaLuna = planetaPadre.userData.grupoOrbitaLuna;
+            if (!grupoOrbitaLuna) {
+              grupoOrbitaLuna = new THREE.Group();
+              grupoOrbitaLuna.name = 'grupoOrbitaLuna';
+              // Inclinación de la órbita lunar respecto a la eclíptica
+              const iLuna = (datos.i_luna_deg || 5.145) * Math.PI / 180;
+              grupoOrbitaLuna.rotation.x = iLuna;
+              // Giro poloidal de 180° para la órbita lunar
+              grupoOrbitaLuna.rotation.x += Math.PI;
+              planetaPadre.add(grupoOrbitaLuna);
+              planetaPadre.userData.grupoOrbitaLuna = grupoOrbitaLuna;
+              // Si la línea de la órbita lunar ya existe, reubicarla bajo este grupo para inclinarla
+              if (orbitas['luna']) {
+                grupoOrbitaLuna.add(orbitas['luna']);
+              }
+            }
+            // Posicionar la Luna sobre el eje X local del grupo de órbita lunar
+            planeta.position.set(distancia, 0, 0);
+            // Oblicuidad propia de la Luna (inclinación del eje de la Luna)
+            if (datos.obliquity_deg !== undefined) {
+              const obliquidadLuna = (datos.obliquity_deg * Math.PI) / 180;
+              planeta.rotation.x = obliquidadLuna;
+            }
+            grupoOrbitaLuna.add(planeta);
           } else {
-            meshPlanetaPadre = planetaPadre;
+            // Satélites genéricos: se agregan al mesh del planeta padre
+            planeta.position.set(distancia, 0, 0);
+            if (datos.obliquity_deg !== undefined) {
+              const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
+              planeta.rotation.x = obliquidad;
+            }
+            let meshPlanetaPadre;
+            if (planetaPadre.userData.planetaMesh) {
+              meshPlanetaPadre = planetaPadre.userData.planetaMesh;
+            } else {
+              meshPlanetaPadre = planetaPadre;
+            }
+            meshPlanetaPadre.add(planeta);
           }
-          meshPlanetaPadre.add(planeta);
         }
       } else {
         // Es un planeta, orbita alrededor del Sol
         // Calcular posición inicial basada en la fecha actual
         const posicionInicial = calcularPosicionOrbital(datos, tiempoActual);
-        planeta.position.set(
+        grupoPlaneta.position.set(
           posicionInicial.x * escalaConfig.distancia,
           posicionInicial.z * escalaConfig.distancia, // z se mapea a y
           posicionInicial.y * escalaConfig.distancia  // y se mapea a z
         );
         
-        // Aplicar obliquidad respecto al plano orbital del planeta
+        // Aplicar obliquidad respecto al plano orbital (inclinación sobre eje X local)
         if (datos.obliquity_deg !== undefined) {
           const obliquidad = (datos.obliquity_deg * Math.PI) / 180;
-          planeta.rotation.z = obliquidad;
+          grupoOblicuidad.rotation.x = obliquidad;
         }
-        // Giro poloidal 180° para corregir orientación del planeta
-        planeta.rotation.x += Math.PI;
         
-        
-        grupoPlaneta.add(planeta);
+        // Insertar el mesh dentro del grupo de giro
+        grupoGiro.add(planeta);
+        // Giro poloidal 180° para cada planeta respecto a la eclíptica (no afecta órbitas)
+        grupoGiro.rotation.x += Math.PI;
         grupoSistema.add(grupoPlaneta);
         
         // Crear órbita solo para planetas
@@ -694,10 +719,12 @@
         planetaPadre: planetaPadre,
         planetaMesh: planeta, // Referencia al mesh del planeta para rotación
         grupo: datos.esSatelite ? null : grupoPlaneta, // Referencia al grupo para órbitas
+        grupoOblicuidad: datos.esSatelite ? null : grupoOblicuidad,
+        grupoGiro: datos.esSatelite ? null : grupoGiro,
         // Para satélites como la Luna
         velocidadRotacionSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0,
         velocidadOrbitalSatelite: datos.orbital_period_hours ? (2 * Math.PI) / datos.orbital_period_hours : 0,
-        rotacionBaseY: planeta.rotation.y
+        rotacionBaseY: datos.esSatelite ? planeta.rotation.y : grupoGiro.rotation.y
       };
 
       planetas[nombre] = objetoFinal;
@@ -858,8 +885,11 @@
       
       const orbitaLuna = new THREE.Line(geometria, material);
       
-      // Añadir la órbita como hijo del planeta Tierra
-      if (planetaTierra.userData.planetaMesh) {
+      // Añadir la órbita como hijo del grupo de órbita lunar si existe
+      const grupoOrbitaLuna = planetaTierra.userData?.grupoOrbitaLuna;
+      if (grupoOrbitaLuna) {
+        grupoOrbitaLuna.add(orbitaLuna);
+      } else if (planetaTierra.userData.planetaMesh) {
         planetaTierra.userData.planetaMesh.add(orbitaLuna);
       } else {
         planetaTierra.add(orbitaLuna);
@@ -870,19 +900,53 @@
 
     // Función para crear anillos de Saturno
     function crearAnillosSaturno(planeta: THREE.Mesh, radioInterno: number) {
-      const geometriaAnillo = new THREE.RingGeometry(radioInterno * 1.2, radioInterno * 2.5, 32);
-      
-      // Cargar textura de anillos
-      textureLoader.load('/texturas/2k_saturn_ring_alpha.png', (texture) => {
+      const radioInterior = radioInterno * 1.12;
+      const radioExterior = radioInterno * 2.33;
+      const geometriaAnillo = new THREE.RingGeometry(radioInterior, radioExterior, 128);
+
+      // Recalcular las UV para mapeo radial (u = radio normalizado, v fijo)
+      const posicionAttr = (geometriaAnillo.attributes as any).position;
+      const uvAttr = (geometriaAnillo.attributes as any).uv;
+      if (posicionAttr && uvAttr) {
+        const tmp = new THREE.Vector3();
+        const eps = 0.002; // pequeño padding para evitar muestreo del borde (u=0/1)
+        for (let i = 0; i < posicionAttr.count; i++) {
+          tmp.fromBufferAttribute(posicionAttr, i);
+          const r = Math.sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+          let t = (r - radioInterior) / (radioExterior - radioInterior);
+          t = Math.min(1 - eps, Math.max(eps, t));
+          // Usar v=0.5 para muestrear la fila central y evitar artefactos en los bordes verticales
+          uvAttr.setXY(i, t, 0.5);
+        }
+        uvAttr.needsUpdate = true;
+      }
+
+      // Cargar textura alpha de anillos
+      textureLoader.load('/texturas/2k_saturn_ring_alpha_c.png', (texture) => {
+        // La imagen es una alpha; usar como alphaMap y ajustar filtros para evitar moiré
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+
         const materialAnillo = new THREE.MeshBasicMaterial({
-          map: texture,
+          color: 0xcdb79e, // tinte suave beige para los anillos
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.8
+          alphaMap: texture,
+          depthWrite: false,
+          alphaTest: 0.15,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+          polygonOffsetUnits: -1
         });
-        
+
         const anillos = new THREE.Mesh(geometriaAnillo, materialAnillo);
-        anillos.rotation.x = Math.PI / 2; // Rotar para que esté horizontal
+        anillos.rotation.x = Math.PI / 2 ; // Rotar para que esté horizontal
+        // Giro poloidal de 180° para acompañar el giro aplicado a los planetas
+        //anillos.rotation.x -= Math.PI/4;
+        anillos.renderOrder = 1; // Asegurar orden de mezcla sobre el planeta
         planeta.add(anillos);
       });
     }
@@ -998,14 +1062,12 @@
             if (planeta.userData.datos.n_deg_per_day) {
               const posicion = calcularPosicionOrbital(planeta.userData.datos, tiempoActual);
               
-              // Aplicar posición precisa al mesh del planeta dentro del grupo
-              if (planeta.userData.planetaMesh) {
-                planeta.userData.planetaMesh.position.set(
-                  posicion.x * escalaConfig.distancia,
-                  posicion.z * escalaConfig.distancia, // z se mapea a y
-                  posicion.y * escalaConfig.distancia  // y se mapea a z
-                );
-              }
+              // Mover el grupo orbital completo (no el mesh) para mantener oblicuidad estable
+              planeta.position.set(
+                posicion.x * escalaConfig.distancia,
+                posicion.z * escalaConfig.distancia, // z se mapea a y
+                posicion.y * escalaConfig.distancia  // y se mapea a z
+              );
             }
           } else {
             // Actualizar posición orbital de satélites (Luna)
@@ -1063,8 +1125,10 @@
           }
           const newY = baseY + finalSpin;
           
-          // Aplicar rotación al mesh del planeta manteniendo el offset base
-          if (planeta.userData.planetaMesh) {
+          // Aplicar rotación al grupo de giro si existe; para satélites, al mesh
+          if (planeta.userData.grupoGiro) {
+            planeta.userData.grupoGiro.rotation.y = newY;
+          } else if (planeta.userData.planetaMesh) {
             planeta.userData.planetaMesh.rotation.y = newY;
           } else {
             planeta.rotation.y = newY;
@@ -1434,7 +1498,7 @@
               
               // Obliquidad
               if ('obliquity_deg' in planetData && planetData.obliquity_deg !== undefined) {
-                infoHTML += `<p><strong>Obliquidad:</strong> ${planetData.obliquity_deg.toFixed(1)}°</p>`;
+                infoHTML += `<p><strong>Obliquidad:</strong> ${Math.abs(planetData.obliquity_deg).toFixed(1)}°</p>`;
               }
               
               // Tipo para satélites
@@ -1451,10 +1515,36 @@
       }
     });
 
-    document.getElementById('info-window-close')?.addEventListener('click', () => {
+    // Función para cerrar la ventana de información
+    function cerrarVentanaInfo() {
       const infoWindow = document.getElementById('info-window');
       if (infoWindow) {
         infoWindow.style.display = 'none';
+      }
+    }
+
+    // Cerrar ventana con el botón X
+    document.getElementById('info-window-close')?.addEventListener('click', cerrarVentanaInfo);
+
+    // Cerrar ventana al hacer clic fuera de ella (en el fondo oscuro)
+    const infoWindowElement = document.getElementById('info-window');
+    infoWindowElement?.addEventListener('click', (e) => {
+      // Solo cerrar si el clic fue en el fondo (no en el contenido)
+      if (e.target === e.currentTarget) {
+        cerrarVentanaInfo();
+      }
+    });
+
+    // Cerrar ventana al presionar Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        const infoWindow = document.getElementById('info-window');
+        // Si la ventana de información está visible, cerrarla
+        if (infoWindow && infoWindow.style.display !== 'none') {
+          e.preventDefault();
+          e.stopPropagation();
+          cerrarVentanaInfo();
+        }
       }
     });
 
@@ -1717,6 +1807,7 @@
     width: 240px;
     backdrop-filter: blur(15px);
     overflow: hidden;
+    max-height: 80vh;
   }
 
   .controles-header {
@@ -1757,6 +1848,28 @@
     background: rgba(20, 40, 80, 0.98);
     border: none;
     border-radius: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #00eaff rgba(255, 255, 255, 0.1);
+  }
+
+  .controles-opciones::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .controles-opciones::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .controles-opciones::-webkit-scrollbar-thumb {
+    background: #00eaff;
+    border-radius: 3px;
+  }
+
+  .controles-opciones::-webkit-scrollbar-thumb:hover {
+    background: #00b8cc;
   }
 
   .controles-opciones label {
@@ -2298,8 +2411,9 @@
     .controles-checkbox {
       top: 10px;
       left: 10px;
-      width: 200px;
-      font-size: 0.92rem;
+      width: 180px;
+      font-size: 0.85rem;
+      max-height: 70vh;
     }
     
     .fullscreen-btn {
@@ -2319,23 +2433,56 @@
     }
 
     .controles-header {
-      padding: 12px 14px;
-      font-size: 0.95rem;
+      padding: 10px 12px;
+      font-size: 0.9rem;
     }
 
     .controles-opciones {
-      padding: 14px;
-      gap: 14px;
+      padding: 12px;
+      gap: 10px;
+      max-height: 50vh;
     }
 
     .controles-opciones label {
-      font-size: 0.9rem;
-      padding: 10px 8px;
+      font-size: 0.85rem;
+      padding: 8px 6px;
+      gap: 8px;
+    }
+
+    .controles-opciones input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
     }
 
     .control-btn {
-      padding: 8px 14px;
-      font-size: 0.9rem;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      min-width: 80px;
+    }
+
+    .tiempo-controles {
+      gap: 10px;
+      padding: 10px 0;
+      margin: 8px 0;
+    }
+
+    .fecha-slider-container {
+      gap: 6px;
+    }
+
+    .fecha-slider-container label {
+      font-size: 0.8rem;
+    }
+
+    .slider-labels {
+      font-size: 9px;
+      margin-top: 2px;
+    }
+
+    .fecha-actual {
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      margin-top: 6px;
     }
 
     .planet-label {
@@ -2354,33 +2501,62 @@
     }
 
     .controles-checkbox {
-      width: 180px;
-      font-size: 0.88rem;
+      width: 160px;
+      font-size: 0.8rem;
+      max-height: 60vh;
     }
 
     .controles-header {
-      padding: 10px 12px;
-      font-size: 0.9rem;
+      padding: 8px 10px;
+      font-size: 0.85rem;
     }
 
     .controles-opciones {
-      padding: 12px;
-      gap: 12px;
+      padding: 10px;
+      gap: 8px;
+      max-height: 45vh;
     }
 
     .controles-opciones label {
-      font-size: 0.85rem;
-      padding: 8px 6px;
+      font-size: 0.8rem;
+      padding: 6px 4px;
+      gap: 6px;
     }
 
     .controles-opciones input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
     }
 
     .control-btn {
-      padding: 7px 12px;
-      font-size: 0.85rem;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      min-width: 70px;
+    }
+
+    .tiempo-controles {
+      gap: 8px;
+      padding: 8px 0;
+      margin: 6px 0;
+    }
+
+    .fecha-slider-container {
+      gap: 4px;
+    }
+
+    .fecha-slider-container label {
+      font-size: 0.75rem;
+    }
+
+    .slider-labels {
+      font-size: 8px;
+      margin-top: 1px;
+    }
+
+    .fecha-actual {
+      padding: 4px 6px;
+      font-size: 0.7rem;
+      margin-top: 4px;
     }
 
     .planet-label {
@@ -2391,6 +2567,68 @@
     .satellite-label {
       font-size: 11px !important;
       padding: 4px 8px !important;
+    }
+  }
+
+  /* Media query para pantallas muy pequeñas */
+  @media (max-width: 360px) {
+    .controles-checkbox {
+      width: 140px;
+      font-size: 0.75rem;
+      max-height: 55vh;
+    }
+
+    .controles-header {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+
+    .controles-opciones {
+      padding: 8px;
+      gap: 6px;
+      max-height: 40vh;
+    }
+
+    .controles-opciones label {
+      font-size: 0.75rem;
+      padding: 4px 2px;
+      gap: 4px;
+    }
+
+    .controles-opciones input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+    }
+
+    .control-btn {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      min-width: 60px;
+    }
+
+    .tiempo-controles {
+      gap: 6px;
+      padding: 6px 0;
+      margin: 4px 0;
+    }
+
+    .fecha-slider-container {
+      gap: 3px;
+    }
+
+    .fecha-slider-container label {
+      font-size: 0.7rem;
+    }
+
+    .slider-labels {
+      font-size: 7px;
+      margin-top: 0px;
+    }
+
+    .fecha-actual {
+      padding: 3px 4px;
+      font-size: 0.65rem;
+      margin-top: 3px;
     }
   }
 </style>
