@@ -1,0 +1,63 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+}
+
+const { titulo, subtitulo } = Astro.props;
+---
+
+<section class="page-header">
+  <div class="container">
+    <div class="page-header__content">
+      <div class="page-header__info">
+        {subtitulo && <span class="page-header__label">{subtitulo}</span>}
+        <h1 class="page-header__title">{titulo}</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-header {
+    padding: var(--space-lg) 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .page-header__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .page-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .page-header__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .page-header__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 768px) {
+    .page-header__content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

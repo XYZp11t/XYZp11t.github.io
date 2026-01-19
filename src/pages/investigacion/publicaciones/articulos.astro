@@ -1,0 +1,254 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import { getCollection } from 'astro:content';
+
+const publicaciones = await getCollection('publicaciones');
+const todosArticulos = publicaciones.filter(p => p.data.tipo === 'articulo').sort((a, b) => b.data.anio - a.data.anio);
+
+// Separar por categoría
+const articulosProduccion = todosArticulos.filter(p => p.data.categoria === 'produccion');
+const articulosPrevios = todosArticulos.filter(p => p.data.categoria === 'previa');
+---
+
+<Layout 
+  title="Artículos Científicos | LACIGE"
+  description="Artículos de investigación publicados por el Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Artículos Científicos"
+    subtitulo="Publicaciones"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/investigacion">Investigación</a>
+        <span>/</span>
+        <a href="/investigacion/publicaciones">Publicaciones</a>
+        <span>/</span>
+        <span>Artículos</span>
+      </div>
+
+      <!-- Producción Científica -->
+      {articulosProduccion.length > 0 && (
+        <div class="articles-section">
+          <h2 class="section-title">Producción Científica</h2>
+          <div class="articles-list">
+            {articulosProduccion.map((articulo) => (
+              <article class="article-item">
+                <div class="article-item__year">
+                  <span>{articulo.data.anio}</span>
+                </div>
+                <div class="article-item__content">
+                  <h3 class="article-item__title">
+                    <a href={articulo.data.enlace} target="_blank" rel="noopener">{articulo.data.titulo}</a>
+                  </h3>
+                  <p class="article-item__authors">
+                    {articulo.data.autores.join(', ')}
+                  </p>
+                  {articulo.data.revista && (
+                    <p class="article-item__journal">
+                      {articulo.data.revista}
+                    </p>
+                  )}
+                  {articulo.data.doi && (
+                    <p class="article-item__doi">
+                      DOI: <a href={`https://doi.org/${articulo.data.doi}`} target="_blank" rel="noopener">{articulo.data.doi}</a>
+                    </p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Previas a la creación del laboratorio -->
+      {articulosPrevios.length > 0 && (
+        <div class="articles-section">
+          <h2 class="section-title">Previas a la creación del laboratorio</h2>
+          <div class="articles-list">
+            {articulosPrevios.map((articulo) => (
+              <article class="article-item">
+                <div class="article-item__year">
+                  <span>{articulo.data.anio}</span>
+                </div>
+                <div class="article-item__content">
+                  <h3 class="article-item__title">
+                    <a href={articulo.data.enlace} target="_blank" rel="noopener">{articulo.data.titulo}</a>
+                  </h3>
+                  <p class="article-item__authors">
+                    {articulo.data.autores.join(', ')}
+                  </p>
+                  {articulo.data.revista && (
+                    <p class="article-item__journal">
+                      {articulo.data.revista}
+                    </p>
+                  )}
+                  {articulo.data.doi && (
+                    <p class="article-item__doi">
+                      DOI: <a href={`https://doi.org/${articulo.data.doi}`} target="_blank" rel="noopener">{articulo.data.doi}</a>
+                    </p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {articulosProduccion.length === 0 && articulosPrevios.length === 0 && (
+        <p class="no-content">No hay artículos publicados aún.</p>
+      )}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb span {
+    color: var(--color-gray-400);
+  }
+
+  .articles-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .articles-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .article-item {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .article-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .article-item__year {
+    flex-shrink: 0;
+  }
+
+  .article-item__year span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: var(--radius-md);
+  }
+
+  .article-item__content {
+    flex-grow: 1;
+  }
+
+  .article-item__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    line-height: 1.4;
+  }
+
+  .article-item__title a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .article-item__title a:hover {
+    color: var(--color-accent-dark);
+    text-decoration: underline;
+  }
+
+  .article-item__authors {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-xs);
+    line-height: 1.5;
+  }
+
+  .article-item__journal {
+    font-size: 0.9375rem;
+    color: var(--color-earth);
+    font-style: italic;
+    margin-bottom: var(--space-xs);
+  }
+
+  .article-item__doi {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    margin: 0;
+  }
+
+  .article-item__doi a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .article-item__doi a:hover {
+    text-decoration: underline;
+  }
+
+  .no-content {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 768px) {
+    .article-item {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .article-item__year span {
+      width: 56px;
+      height: 56px;
+      font-size: 1.125rem;
+    }
+  }
+</style>

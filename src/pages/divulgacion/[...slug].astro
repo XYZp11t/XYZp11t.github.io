@@ -1,0 +1,411 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+import '../../styles/article.css';
+
+export async function getStaticPaths() {
+  const articulos = await getCollection('divulgacion');
+  return articulos.map((articulo) => ({
+    params: { slug: articulo.id },
+    props: { articulo },
+  }));
+}
+
+const { articulo } = Astro.props;
+const { Content } = await render(articulo);
+
+const fechaFormateada = new Intl.DateTimeFormat('es-ES', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+}).format(articulo.data.fecha);
+
+// ID para la transicion de imagen (debe coincidir con ArticleCard)
+const imageId = articulo.data.imagen ? `card-img-${articulo.data.imagen.replace(/[^a-zA-Z0-9]/g, '-')}` : undefined;
+---
+
+<Layout 
+  title={`${articulo.data.titulo} | LACIGE`}
+  description={articulo.data.descripcion}
+  image={articulo.data.imagen}
+>
+  <article class="article">
+    <!-- Hero del artículo -->
+    <header class="article-hero">
+      {articulo.data.imagen && (
+        <div class="article-hero__image">
+          <img 
+            src={articulo.data.imagen} 
+            alt={articulo.data.titulo}
+            fetchpriority="high"
+            decoding="async"
+            transition:name={imageId}
+            transition:animate="none"
+          />
+          <div class="article-hero__overlay"></div>
+        </div>
+      )}
+      <div class="article-hero__content container">
+        <div class="article-meta">
+          <span class="article-meta__category">Divulgación</span>
+          <span class="article-meta__date">{fechaFormateada}</span>
+        </div>
+        <h1 class="article-title">{articulo.data.titulo}</h1>
+        <p class="article-excerpt">{articulo.data.descripcion}</p>
+        <div class="article-author">
+          <div class="article-author__avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="article-author__info">
+            <span class="article-author__name">{articulo.data.autor}</span>
+            <span class="article-author__role">LACIGE</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido del artículo -->
+    <div class="article-body">
+      <div class="container container--narrow">
+        <!-- Etiquetas -->
+        {articulo.data.etiquetas && articulo.data.etiquetas.length > 0 && (
+          <div class="article-tags">
+            {articulo.data.etiquetas.map((tag: string) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+
+        <!-- Contenido Markdown -->
+        <div class="prose">
+          <Content />
+        </div>
+
+        <!-- Compartir -->
+        <div class="article-share">
+          <span class="article-share__label">Compartir:</span>
+          <div class="article-share__buttons">
+            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(articulo.data.titulo)}&url=${encodeURIComponent(Astro.url.href)}`} target="_blank" rel="noopener" class="share-btn" aria-label="Compartir en Twitter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(Astro.url.href)}&title=${encodeURIComponent(articulo.data.titulo)}`} target="_blank" rel="noopener" class="share-btn" aria-label="Compartir en LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+            <a href={`mailto:?subject=${encodeURIComponent(articulo.data.titulo)}&body=${encodeURIComponent(Astro.url.href)}`} class="share-btn" aria-label="Compartir por email">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación -->
+    <nav class="article-nav">
+      <div class="container">
+        <a href="/divulgacion" class="article-nav__back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver a Divulgación
+        </a>
+      </div>
+    </nav>
+  </article>
+</Layout>
+
+<style>
+  .article-hero {
+    position: relative;
+    min-height: 50vh;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-4xl) 0 var(--space-3xl);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .article-hero__image {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-primary);
+  }
+
+  .article-hero__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Optimizacion de renderizado */
+    content-visibility: auto;
+  }
+
+  .article-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 61, 121, 0.95) 0%,
+      rgba(0, 61, 121, 0.7) 50%,
+      rgba(0, 61, 121, 0.5) 100%
+    );
+  }
+
+  .article-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .article-meta__category {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary-dark);
+    background-color: var(--color-accent);
+    border-radius: var(--radius-sm);
+  }
+
+  .article-meta__date {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .article-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--color-white);
+    line-height: 1.2;
+    margin-bottom: var(--space-lg);
+  }
+
+  .article-excerpt {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin-bottom: var(--space-xl);
+  }
+
+  .article-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .article-author__avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    color: var(--color-white);
+  }
+
+  .article-author__avatar svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .article-author__info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-author__name {
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .article-author__role {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Cuerpo del artículo */
+  .article-body {
+    padding: var(--space-4xl) 0;
+  }
+
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+  }
+
+  /* Prosa (estilos para contenido Markdown) */
+  .prose {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-gray-700);
+  }
+
+  .prose :global(h1),
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4) {
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .prose :global(h2) {
+    font-size: 1.75rem;
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--color-gray-200);
+  }
+
+  .prose :global(h3) {
+    font-size: 1.375rem;
+  }
+
+  .prose :global(p) {
+    margin-bottom: var(--space-lg);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: var(--space-lg);
+    padding-left: var(--space-xl);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-sm);
+  }
+
+  .prose :global(blockquote) {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    padding-left: var(--space-xl);
+    background-color: var(--color-gray-100);
+    border-left: 4px solid var(--color-accent);
+    font-style: italic;
+    color: var(--color-gray-600);
+  }
+
+  .prose :global(code) {
+    padding: 2px 6px;
+    font-size: 0.9em;
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-sm);
+  }
+
+  .prose :global(pre) {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    background-color: var(--color-gray-700);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+  }
+
+  .prose :global(pre code) {
+    padding: 0;
+    background-color: transparent;
+    color: var(--color-white);
+  }
+
+  .prose :global(img) {
+    margin: var(--space-xl) 0;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .prose :global(hr) {
+    margin: var(--space-2xl) 0;
+    border: none;
+    border-top: 2px solid var(--color-gray-200);
+  }
+
+  .prose :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose :global(a:hover) {
+    color: var(--color-accent-dark);
+  }
+
+  .prose :global(strong) {
+    font-weight: 600;
+    color: var(--color-gray-800);
+  }
+
+  /* Compartir */
+  .article-share {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-gray-200);
+  }
+
+  .article-share__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-600);
+  }
+
+  .article-share__buttons {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-gray-500);
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+  }
+
+  .share-btn:hover {
+    color: var(--color-white);
+    background-color: var(--color-primary);
+  }
+
+  /* Navegación */
+  .article-nav {
+    padding: var(--space-xl) 0;
+    background-color: var(--color-gray-100);
+  }
+
+  .article-nav__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .article-nav__back:hover {
+    color: var(--color-accent-dark);
+  }
+
+
+</style>

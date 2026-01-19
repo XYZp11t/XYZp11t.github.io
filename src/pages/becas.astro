@@ -1,0 +1,489 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+
+const becasDisponibles = [
+  {
+    tipo: 'Licenciatura',
+    nombre: 'Beca de Investigación para Estudiantes de Licenciatura',
+    descripcion: 'Apoyo económico para estudiantes que deseen realizar su servicio social o tesis en el laboratorio.',
+    duracion: '6-12 meses',
+    monto: 'Variable',
+    requisitos: [
+      'Ser estudiante activo de licenciatura en física, matemáticas o áreas afines',
+      'Promedio mínimo de 8.5',
+      'Disponibilidad de 20 horas semanales',
+      'Carta de recomendación de un profesor'
+    ],
+    estado: 'Abierta'
+  },
+  {
+    tipo: 'Maestría',
+    nombre: 'Beca CONAHCyT para Maestría en Ciencias',
+    descripcion: 'Beca completa para estudios de maestría en el programa de posgrado asociado al laboratorio.',
+    duracion: '24 meses',
+    monto: 'Completa (manutención + colegiatura)',
+    requisitos: [
+      'Título de licenciatura en física, geofísica o áreas relacionadas',
+      'Promedio mínimo de 8.0',
+      'Aprobar examen de admisión',
+      'Propuesta de investigación'
+    ],
+    estado: 'Próxima convocatoria: Febrero 2026'
+  },
+  {
+    tipo: 'Doctorado',
+    nombre: 'Beca para Estudios de Doctorado',
+    descripcion: 'Apoyo integral para estudiantes de doctorado que desarrollen su investigación en LACIGE.',
+    duracion: '48 meses',
+    monto: 'Completa',
+    requisitos: [
+      'Grado de maestría en ciencias',
+      'Experiencia en investigación demostrable',
+      'Publicaciones científicas (deseable)',
+      'Proyecto de investigación doctoral'
+    ],
+    estado: 'Abierta'
+  },
+  {
+    tipo: 'Posdoctorado',
+    nombre: 'Estancia Posdoctoral',
+    descripcion: 'Posiciones para investigadores recién doctorados interesados en desarrollar proyectos en física solar y clima espacial.',
+    duracion: '12-24 meses',
+    monto: 'Competitivo',
+    requisitos: [
+      'Doctorado en física, astrofísica o áreas afines',
+      'Publicaciones en revistas indexadas',
+      'Experiencia en análisis de datos o modelado numérico',
+      'Propuesta de investigación original'
+    ],
+    estado: 'Por convocatoria'
+  }
+];
+
+const procesoAplicacion = [
+  { paso: 1, titulo: 'Revisa requisitos', descripcion: 'Verifica que cumples con los requisitos de la beca de tu interés.' },
+  { paso: 2, titulo: 'Prepara documentos', descripcion: 'Reúne todos los documentos solicitados en formato digital.' },
+  { paso: 3, titulo: 'Envía solicitud', descripcion: 'Completa el formulario de aplicación y adjunta tus documentos.' },
+  { paso: 4, titulo: 'Evaluación', descripcion: 'Tu solicitud será evaluada por el comité académico.' },
+  { paso: 5, titulo: 'Entrevista', descripcion: 'Los candidatos preseleccionados serán contactados para entrevista.' },
+  { paso: 6, titulo: 'Resultados', descripcion: 'Recibirás notificación de los resultados por correo electrónico.' }
+];
+---
+
+<Layout 
+  title="Becas | LACIGE"
+  description="Oportunidades de becas y financiamiento para estudiar e investigar en el Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Becas y Oportunidades"
+    subtitulo="Únete a Nosotros"
+  />
+
+  <!-- Becas disponibles -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Oportunidades"
+        titulo="Becas Disponibles"
+        descripcion="Explora las diferentes opciones de financiamiento según tu nivel académico."
+      />
+      
+      <div class="scholarships-grid">
+        {becasDisponibles.map((beca) => (
+          <article class="scholarship-card">
+            <div class="scholarship-card__header">
+              <span class="scholarship-card__type">{beca.tipo}</span>
+              <span class={`scholarship-card__status ${beca.estado === 'Abierta' ? 'scholarship-card__status--open' : ''}`}>
+                {beca.estado}
+              </span>
+            </div>
+            <h3 class="scholarship-card__title">{beca.nombre}</h3>
+            <p class="scholarship-card__description">{beca.descripcion}</p>
+            
+            <div class="scholarship-card__details">
+              <div class="detail">
+                <span class="detail__label">Duración</span>
+                <span class="detail__value">{beca.duracion}</span>
+              </div>
+              <div class="detail">
+                <span class="detail__label">Monto</span>
+                <span class="detail__value">{beca.monto}</span>
+              </div>
+            </div>
+            
+            <div class="scholarship-card__requirements">
+              <h4>Requisitos</h4>
+              <ul>
+                {beca.requisitos.map((req) => (
+                  <li>{req}</li>
+                ))}
+              </ul>
+            </div>
+            
+            <a href="/contacto" class="btn btn--primary">Solicitar Información</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Proceso de aplicación -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Cómo Aplicar"
+        titulo="Proceso de Solicitud"
+      />
+      
+      <div class="process-grid">
+        {procesoAplicacion.map((item) => (
+          <div class="process-step">
+            <span class="process-step__number">{item.paso}</span>
+            <h4 class="process-step__title">{item.titulo}</h4>
+            <p class="process-step__description">{item.descripcion}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Documentos requeridos -->
+  <section class="section">
+    <div class="container container--narrow">
+      <SectionHeader 
+        subtitulo="Documentación"
+        titulo="Documentos Generales"
+        descripcion="Lista de documentos comúnmente solicitados para las becas."
+      />
+      
+      <div class="documents-list">
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Currículum Vitae actualizado</span>
+        </div>
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Historial académico oficial</span>
+        </div>
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Carta de exposición de motivos</span>
+        </div>
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Cartas de recomendación (2-3)</span>
+        </div>
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Propuesta de investigación (según nivel)</span>
+        </div>
+        <div class="document-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>Identificación oficial vigente</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section--primary">
+    <div class="container">
+      <div class="cta-content">
+        <h2>¿Tienes Preguntas?</h2>
+        <p>
+          Nuestro equipo está disponible para resolver tus dudas sobre el proceso de solicitud 
+          y los requisitos de cada programa.
+        </p>
+        <div class="cta-buttons">
+          <a href="/contacto" class="btn btn--accent">Contactar</a>
+          <a href="mailto:becas@lacige.edu" class="btn btn--secondary btn--light">becas@lacige.edu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .scholarships-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .scholarship-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scholarship-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+  }
+
+  .scholarship-card__type {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-earth);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-sm);
+  }
+
+  .scholarship-card__status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+  }
+
+  .scholarship-card__status--open {
+    color: #22c55e;
+  }
+
+  .scholarship-card__title {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .scholarship-card__description {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+  }
+
+  .scholarship-card__details {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-md);
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-xs);
+  }
+
+  .detail__value {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .scholarship-card__requirements {
+    flex-grow: 1;
+    margin-bottom: var(--space-lg);
+  }
+
+  .scholarship-card__requirements h4 {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-sm);
+  }
+
+  .scholarship-card__requirements ul {
+    list-style: none;
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+  }
+
+  .scholarship-card__requirements li {
+    position: relative;
+    padding-left: var(--space-lg);
+    margin-bottom: var(--space-xs);
+    line-height: 1.5;
+  }
+
+  .scholarship-card__requirements li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+  }
+
+  /* Process */
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .process-step {
+    text-align: center;
+    position: relative;
+  }
+
+  .process-step::after {
+    content: '→';
+    position: absolute;
+    right: -20px;
+    top: 24px;
+    color: var(--color-accent);
+    font-size: 1.25rem;
+  }
+
+  .process-step:last-child::after {
+    display: none;
+  }
+
+  .process-step__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-md);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: var(--radius-full);
+  }
+
+  .process-step__title {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .process-step__description {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Documents */
+  .documents-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  .document-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--color-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .document-item svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .document-item span {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+  }
+
+  /* CTA */
+  .cta-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .cta-content h2 {
+    color: var(--color-white);
+    margin-bottom: var(--space-md);
+  }
+
+  .cta-content p {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: var(--space-xl);
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .btn--light {
+    color: var(--color-white);
+    border-color: var(--color-white);
+  }
+
+  .btn--light:hover {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 1024px) {
+    .scholarships-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .process-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .process-step::after {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .process-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .documents-list {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+    }
+  }
+</style>

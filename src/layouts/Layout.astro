@@ -1,22 +1,154 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const { 
+  title = 'LACIGE - Laboratorio de Ciencias Geoespaciales',
+  description = 'Laboratorio de Ciencias Geoespaciales - Investigaci?n, innovaci?n y divulgaci?n en ciencias del espacio y geof?sica.',
+  image = '/favicon.svg'
+} = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- DNS Prefetch para recursos comunes -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    
+    <!-- View Transitions con prefetch habilitado -->
+    <ViewTransitions />
+  </head>
+  <body>
+    <Header />
+    <main transition:animate="none">
+      <slot />
+    </main>
+    <Footer />
+  </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+  main {
+    min-height: calc(100vh - 80px);
+  }
 </style>
+
+<style is:global>
+  /* Transiciones instantaneas */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+  }
+
+  /* Fondo consistente */
+  html, body {
+    background-color: var(--color-off-white);
+  }
+
+  /* Optimizar renderizado de imagenes */
+  img {
+    content-visibility: auto;
+  }
+
+  /* Prefetch styles - indicador visual opcional */
+  [data-astro-prefetch] {
+    /* Los enlaces con prefetch cargan la pagina en segundo plano */
+  }
+</style>
+
+<script>
+  // Cache de imagenes para evitar recargas
+  const imageCache = new Map<string, string>();
+
+  // Precargar imagenes visibles
+  function preloadVisibleImages() {
+    const images = document.querySelectorAll('img[src]');
+    images.forEach(img => {
+      const src = img.getAttribute('src');
+      if (src && !imageCache.has(src)) {
+        imageCache.set(src, src);
+      }
+    });
+  }
+
+  // Restaurar imagenes desde cache despues de navegacion
+  function restoreImagesFromCache() {
+    const images = document.querySelectorAll('img[src]') as NodeListOf<HTMLImageElement>;
+    images.forEach(img => {
+      const src = img.getAttribute('src');
+      if (src && imageCache.has(src)) {
+        // La imagen ya esta en cache del navegador, forzar uso de cache
+        if (!img.complete) {
+          img.loading = 'eager';
+        }
+      }
+    });
+  }
+
+  // Precargar enlaces al hacer hover
+  function setupLinkPrefetch() {
+    const links = document.querySelectorAll('a[href^="/"]');
+    links.forEach(link => {
+      link.addEventListener('mouseenter', () => {
+        const href = link.getAttribute('href');
+        if (href && !link.hasAttribute('data-prefetched')) {
+          // Crear link de prefetch
+          const prefetchLink = document.createElement('link');
+          prefetchLink.rel = 'prefetch';
+          prefetchLink.href = href;
+          document.head.appendChild(prefetchLink);
+          link.setAttribute('data-prefetched', 'true');
+        }
+      }, { once: true });
+    });
+  }
+
+  // Ejecutar al cargar la pagina
+  document.addEventListener('DOMContentLoaded', () => {
+    preloadVisibleImages();
+    setupLinkPrefetch();
+  });
+
+  // Ejecutar despues de cada navegacion con View Transitions
+  document.addEventListener('astro:page-load', () => {
+    restoreImagesFromCache();
+    preloadVisibleImages();
+    setupLinkPrefetch();
+  });
+
+  // Antes de la navegacion, guardar imagenes en cache
+  document.addEventListener('astro:before-swap', () => {
+    preloadVisibleImages();
+  });
+</script>

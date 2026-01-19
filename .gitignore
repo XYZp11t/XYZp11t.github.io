@@ -3,6 +3,13 @@ dist/
 
 # generated types
 .astro/
+.cursor/
+.vscode/
+.antigravity/
+.claude/
+.gemini/
+.agent/
+
 
 # dependencies
 node_modules/

@@ -1,0 +1,271 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+---
+
+<Layout 
+  title="Sobre Nosotros | LACIGE"
+  description="Conoce al Laboratorio de Ciencias Geoespaciales, nuestra historia, misión y equipo de investigación."
+>
+  <PageHeader 
+    titulo="Sobre Nosotros"
+    subtitulo="LACIGE"
+  />
+
+  <!-- Misión y Visión -->
+  <section class="section">
+    <div class="container">
+      <div class="mission-grid">
+        <div class="mission-card">
+          <div class="mission-card__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2"/>
+              <path d="M24 12v12l8 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Misión</h3>
+          <p>
+            Realizar investigación científica de excelencia en ciencias geoespaciales, formando 
+            recursos humanos especializados y contribuyendo al desarrollo tecnológico del país 
+            mediante el estudio del Sol y su interacción con el entorno terrestre.
+          </p>
+        </div>
+        
+        <div class="mission-card">
+          <div class="mission-card__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M24 4l6 18h18l-15 10 6 18-15-12-15 12 6-18L0 22h18z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Visión</h3>
+          <p>
+            Ser reconocidos como un centro de investigación líder en América Latina en el estudio 
+            del clima espacial y las ciencias geoespaciales, con impacto global en la comprensión 
+            de los fenómenos solares y sus efectos en la Tierra.
+          </p>
+        </div>
+        
+        <div class="mission-card">
+          <div class="mission-card__icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M24 4v8M12 12l6 6M4 24h8M12 36l6-6M24 44v-8M36 36l-6-6M44 24h-8M36 12l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>Valores</h3>
+          <p>
+            Excelencia científica, integridad académica, colaboración interdisciplinaria, 
+            responsabilidad social y compromiso con la divulgación del conocimiento científico 
+            para el beneficio de la sociedad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secciones -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Explora"
+        titulo="Conoce Más Sobre LACIGE"
+      />
+      
+      <div class="grid grid--2">
+        <FeatureCard 
+          titulo="Nuestra Historia"
+          descripcion="Desde nuestra fundación hasta hoy, una trayectoria de investigación y descubrimiento científico."
+          icono="historia"
+          enlace="/sobre-nosotros/historia"
+        />
+        <FeatureCard 
+          titulo="Infraestructura"
+          descripcion="Instalaciones, equipamiento y recursos tecnológicos que hacen posible nuestra investigación."
+          icono="infraestructura"
+          enlace="/sobre-nosotros/infraestructura"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipo -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Nuestro Equipo"
+        titulo="Investigadores y Personal"
+        descripcion="Un equipo multidisciplinario comprometido con la excelencia científica."
+      />
+      
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="team-member__image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h4 class="team-member__name">Dra. María González</h4>
+          <span class="team-member__role">Directora</span>
+          <p class="team-member__bio">Especialista en física solar y clima espacial con más de 20 años de experiencia.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-member__image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h4 class="team-member__name">Dr. Carlos Hernández</h4>
+          <span class="team-member__role">Investigador Principal</span>
+          <p class="team-member__bio">Experto en modelado del viento solar y predicción del clima espacial.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-member__image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h4 class="team-member__name">Dra. Ana López</h4>
+          <span class="team-member__role">Investigadora</span>
+          <p class="team-member__bio">Especialista en teledetección y sistemas de información geográfica.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-member__image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h4 class="team-member__name">Dr. Roberto Silva</h4>
+          <span class="team-member__role">Investigador</span>
+          <p class="team-member__bio">Experto en instrumentación solar y técnicas observacionales.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .mission-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .mission-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: transform var(--transition-base);
+  }
+
+  .mission-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .mission-card__icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
+    border-radius: var(--radius-full);
+  }
+
+  .mission-card__icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mission-card h3 {
+    font-size: 1.375rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+  }
+
+  .mission-card p {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Equipo */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .team-member {
+    text-align: center;
+  }
+
+  .team-member__image {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-gray-200) 0%, var(--color-gray-300) 100%);
+    color: var(--color-gray-500);
+    border-radius: var(--radius-full);
+  }
+
+  .team-member__image svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .team-member__name {
+    font-size: 1.0625rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .team-member__role {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+  }
+
+  .team-member__bio {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .mission-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .team-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .team-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

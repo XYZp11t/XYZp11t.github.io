@@ -1,0 +1,291 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+
+const lineasInvestigacion = [
+  {
+    titulo: 'Galería Solar',
+    descripcion: 'Monitoreo continuo del Sol mediante telescopios especializados. Capturamos y analizamos imágenes de la fotosfera, cromosfera y corona solar.',
+    icono: 'sol',
+    enlace: '/investigacion/galeria-solar'
+  },
+  {
+    titulo: 'Predicción del Viento Solar',
+    descripcion: 'Desarrollamos modelos computacionales avanzados para predecir la llegada y características del viento solar a la magnetosfera terrestre.',
+    icono: 'viento',
+    enlace: '/investigacion/prediccion-viento-solar'
+  },
+  {
+    titulo: 'Publicaciones Científicas',
+    descripcion: 'Artículos de investigación publicados en revistas indexadas y de alto impacto en el área de física solar y clima espacial.',
+    icono: 'publicacion',
+    enlace: '/investigacion/publicaciones/articulos'
+  },
+  {
+    titulo: 'Tesis de Investigación',
+    descripcion: 'Trabajos de tesis de licenciatura, maestría y doctorado desarrollados por estudiantes del laboratorio.',
+    icono: 'publicacion',
+    enlace: '/investigacion/publicaciones/tesis'
+  }
+];
+
+const proyectosActuales = [
+  {
+    nombre: 'PREDICT-SW',
+    descripcion: 'Desarrollo de un sistema de predicción del viento solar basado en redes neuronales.',
+    estado: 'En progreso',
+    financiamiento: 'CONAHCyT'
+  },
+  {
+    nombre: 'SOLAR-MONITOR',
+    descripcion: 'Red de estaciones de monitoreo solar en territorio nacional.',
+    estado: 'Activo',
+    financiamiento: 'DGAPA-UNAM'
+  },
+  {
+    nombre: 'GEOMAGNET',
+    descripcion: 'Estudio de las variaciones del campo geomagnético durante tormentas solares.',
+    estado: 'En progreso',
+    financiamiento: 'SEP-PRODEP'
+  }
+];
+---
+
+<Layout 
+  title="Investigación | LACIGE"
+  description="Conoce las líneas de investigación del Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Investigación"
+    subtitulo="Nuestro Trabajo"
+  />
+
+  <!-- Líneas de Investigación -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Líneas de Investigación"
+        titulo="Áreas de Estudio"
+        descripcion="Nuestro trabajo abarca desde la observación solar hasta la predicción del clima espacial."
+      />
+      
+      <div class="grid grid--2">
+        {lineasInvestigacion.map((linea) => (
+          <FeatureCard {...linea} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Proyectos Actuales -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Proyectos"
+        titulo="Investigación en Curso"
+        descripcion="Proyectos de investigación actualmente en desarrollo en nuestro laboratorio."
+      />
+      
+      <div class="projects-grid">
+        {proyectosActuales.map((proyecto) => (
+          <article class="project-card">
+            <div class="project-card__status">
+              <span class="status-badge">{proyecto.estado}</span>
+            </div>
+            <h3 class="project-card__title">{proyecto.nombre}</h3>
+            <p class="project-card__description">{proyecto.descripcion}</p>
+            <div class="project-card__meta">
+              <span class="project-card__funding">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                {proyecto.financiamiento}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Metodología -->
+  <section class="section">
+    <div class="container">
+      <div class="methodology-grid">
+        <div class="methodology-content">
+          <SectionHeader 
+            subtitulo="Metodología"
+            titulo="Nuestro Enfoque Científico"
+            centrado={false}
+          />
+          <div class="methodology-steps">
+            <div class="step">
+              <span class="step__number">01</span>
+              <div class="step__content">
+                <h4>Observación</h4>
+                <p>Recopilación de datos mediante instrumentación especializada y satélites.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step__number">02</span>
+              <div class="step__content">
+                <h4>Análisis</h4>
+                <p>Procesamiento y análisis de datos utilizando técnicas estadísticas avanzadas.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step__number">03</span>
+              <div class="step__content">
+                <h4>Modelado</h4>
+                <p>Desarrollo de modelos físicos y computacionales para predecir fenómenos.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step__number">04</span>
+              <div class="step__content">
+                <h4>Validación</h4>
+                <p>Verificación de resultados mediante comparación con observaciones.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="methodology-image">
+          <img src="/12-01-2025.jpg" alt="Metodología de investigación" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  .project-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .project-card__status {
+    margin-bottom: var(--space-md);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--color-accent);
+    color: var(--color-primary-dark);
+    border-radius: var(--radius-sm);
+  }
+
+  .project-card__title {
+    font-size: 1.375rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .project-card__description {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+  }
+
+  .project-card__meta {
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-gray-200);
+  }
+
+  .project-card__funding {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.875rem;
+    color: var(--color-earth);
+  }
+
+  /* Metodología */
+  .methodology-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+
+  .methodology-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .step {
+    display: flex;
+    gap: var(--space-lg);
+    align-items: flex-start;
+  }
+
+  .step__number {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: var(--radius-md);
+  }
+
+  .step__content h4 {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .step__content p {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    margin: 0;
+  }
+
+  .methodology-image img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+  }
+
+  @media (max-width: 1024px) {
+    .methodology-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .methodology-image {
+      order: -1;
+    }
+  }
+</style>

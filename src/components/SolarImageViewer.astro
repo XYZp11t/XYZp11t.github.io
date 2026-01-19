@@ -1,0 +1,892 @@
+---
+// Componente de visor de imágenes solares con navegación
+// Se usa tanto en inicio como en la galería solar
+// Las imágenes están ordenadas de más reciente a más antigua (índice 0 = más reciente)
+// Navegación: izquierda = más antigua, derecha = más reciente
+
+interface ImageData {
+  path: string;
+  fechaStr: string;
+  id: string;
+}
+
+interface Props {
+  imagenes: ImageData[];
+}
+
+const { imagenes } = Astro.props;
+const imagenesJSON = JSON.stringify(imagenes);
+---
+
+<!-- Visor de imagen (Modal) -->
+<div class="solar-viewer" id="solarViewer" aria-hidden="true">
+  <div class="solar-viewer__backdrop" id="solarViewerBackdrop"></div>
+  
+  <!-- Botón cerrar - siempre visible -->
+  <button class="solar-viewer__close" id="solarViewerClose" type="button" aria-label="Cerrar visor">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- Navegación fija - siempre visible en desktop -->
+  <button class="solar-viewer__nav solar-viewer__nav--prev" id="solarViewerPrev" type="button" aria-label="Imagen más antigua">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  
+  <button class="solar-viewer__nav solar-viewer__nav--next" id="solarViewerNext" type="button" aria-label="Imagen más reciente">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </button>
+
+  <div class="solar-viewer__wrapper">
+    <!-- Header móvil -->
+    <div class="solar-viewer__header">
+      <div class="solar-viewer__header-info">
+        <span class="solar-viewer__header-title">Imagen Solar</span>
+        <span class="solar-viewer__header-counter" id="solarViewerCounterMobile"></span>
+      </div>
+      <button class="solar-viewer__close-mobile" id="solarViewerCloseMobile" type="button" aria-label="Cerrar visor">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="solar-viewer__content">
+      <div class="solar-viewer__main">
+        <div class="solar-viewer__image-container" id="solarViewerImageContainer">
+          <img src="" alt="" class="solar-viewer__image" id="solarViewerImage" />
+        </div>
+        
+        <!-- Navegación móvil inferior -->
+        <div class="solar-viewer__mobile-nav">
+          <button class="solar-viewer__mobile-btn" id="solarViewerPrevMobile" type="button" aria-label="Imagen más antigua">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            <span>Más antigua</span>
+          </button>
+          <span class="solar-viewer__mobile-date" id="solarViewerDateMobile"></span>
+          <button class="solar-viewer__mobile-btn" id="solarViewerNextMobile" type="button" aria-label="Imagen más reciente">
+            <span>Más reciente</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="solar-viewer__meta">
+        <h3 class="solar-viewer__title">Imagen Solar</h3>
+        <p class="solar-viewer__date" id="solarViewerDate"></p>
+        <div class="solar-viewer__counter" id="solarViewerCounter"></div>
+        <div class="solar-viewer__details">
+          <div class="solar-viewer__detail">
+            <span class="detail-label">Instrumento</span>
+            <span class="detail-value">Telescopio Solar H-alpha</span>
+          </div>
+          <div class="solar-viewer__detail">
+            <span class="detail-label">Resolución</span>
+            <span class="detail-value">Alta definición</span>
+          </div>
+          <div class="solar-viewer__detail">
+            <span class="detail-label">Ubicación</span>
+            <span class="detail-value">LACIGE, ENES Morelia</span>
+          </div>
+        </div>
+        <div class="solar-viewer__actions">
+          <a href="" class="btn btn--primary solar-viewer__download" id="solarViewerDownload" download>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Descargar
+          </a>
+          <a href="/investigacion/galeria-solar" class="btn btn--secondary">
+            Ver galería
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Datos para JavaScript -->
+<script id="solar-viewer-data" type="application/json" set:html={imagenesJSON}></script>
+
+<script>
+  (function() {
+    let abortController: AbortController | null = null;
+    
+    function initSolarViewer() {
+      // Limpiar listeners anteriores
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const signal = abortController.signal;
+      
+      // Obtener datos
+      const dataScript = document.getElementById('solar-viewer-data');
+      if (!dataScript) return;
+      
+      let imagenes: Array<{ path: string; fechaStr: string; id: string }>;
+      try {
+        imagenes = JSON.parse(dataScript.textContent || '[]');
+      } catch (e) {
+        return;
+      }
+      
+      if (imagenes.length === 0) return;
+      
+      // Elementos del visor
+      const viewer = document.getElementById('solarViewer');
+      const backdrop = document.getElementById('solarViewerBackdrop');
+      const closeBtn = document.getElementById('solarViewerClose');
+      const closeBtnMobile = document.getElementById('solarViewerCloseMobile');
+      const prevBtn = document.getElementById('solarViewerPrev') as HTMLButtonElement;
+      const nextBtn = document.getElementById('solarViewerNext') as HTMLButtonElement;
+      const prevBtnMobile = document.getElementById('solarViewerPrevMobile') as HTMLButtonElement;
+      const nextBtnMobile = document.getElementById('solarViewerNextMobile') as HTMLButtonElement;
+      const image = document.getElementById('solarViewerImage') as HTMLImageElement;
+      const imageContainer = document.getElementById('solarViewerImageContainer');
+      const dateEl = document.getElementById('solarViewerDate');
+      const dateMobileEl = document.getElementById('solarViewerDateMobile');
+      const counterEl = document.getElementById('solarViewerCounter');
+      const counterMobileEl = document.getElementById('solarViewerCounterMobile');
+      const downloadBtn = document.getElementById('solarViewerDownload') as HTMLAnchorElement;
+      
+      if (!viewer || !image || !downloadBtn || !prevBtn || !nextBtn) return;
+      
+      // Asegurar que el visor esté cerrado al iniciar
+      viewer.classList.remove('is-open');
+      viewer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      
+      let currentIndex = 0;
+      let touchStartX = 0;
+      let touchEndX = 0;
+      let viewerOpenedWithHistory = false;
+      
+      function updateViewer() {
+        const img = imagenes[currentIndex];
+        if (!img || !viewer || !image || !downloadBtn) return;
+        
+        image.src = img.path;
+        image.alt = `Imagen solar del ${img.fechaStr}`;
+        
+        if (dateEl) dateEl.textContent = img.fechaStr;
+        if (dateMobileEl) dateMobileEl.textContent = img.fechaStr;
+        
+        downloadBtn.href = img.path;
+        
+        const counterText = `${currentIndex + 1} de ${imagenes.length}`;
+        if (counterEl) counterEl.textContent = counterText;
+        if (counterMobileEl) counterMobileEl.textContent = counterText;
+        
+        // Navegación invertida:
+        // - prevBtn (izquierda) va a imágenes más antiguas (índice mayor)
+        // - nextBtn (derecha) va a imágenes más recientes (índice menor)
+        const canGoOlder = currentIndex < imagenes.length - 1;
+        const canGoNewer = currentIndex > 0;
+        
+        // Botones desktop
+        prevBtn.disabled = !canGoOlder;
+        nextBtn.disabled = !canGoNewer;
+        prevBtn.style.opacity = canGoOlder ? '1' : '0.3';
+        nextBtn.style.opacity = canGoNewer ? '1' : '0.3';
+        
+        // Botones móvil
+        if (prevBtnMobile) {
+          prevBtnMobile.disabled = !canGoOlder;
+          prevBtnMobile.style.opacity = canGoOlder ? '1' : '0.5';
+        }
+        if (nextBtnMobile) {
+          nextBtnMobile.disabled = !canGoNewer;
+          nextBtnMobile.style.opacity = canGoNewer ? '1' : '0.5';
+        }
+      }
+      
+      function openViewer(imagePath: string) {
+        if (!viewer) return;
+        
+        // Encontrar el índice de la imagen
+        const index = imagenes.findIndex(img => img.path === imagePath);
+        currentIndex = index >= 0 ? index : 0;
+        
+        // Actualizar contenido primero (sin mostrar)
+        updateViewer();
+        
+        // Mostrar visor con animación CSS
+        viewer.classList.add('is-open');
+        viewer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        
+        // Forzar reflow para que la animación funcione
+        viewer.offsetHeight;
+        viewer.classList.add('is-visible');
+        
+        // Añadir entrada al historial para que el botón "regresar" cierre el visor
+        if (!viewerOpenedWithHistory) {
+          history.pushState({ solarViewerOpen: true }, '');
+          viewerOpenedWithHistory = true;
+        }
+      }
+      
+      function closeViewer(fromPopState = false) {
+        if (!viewer) return;
+        
+        // Iniciar animación de cierre
+        viewer.classList.remove('is-visible');
+        
+        // Esperar a que termine la animación antes de ocultar
+        setTimeout(() => {
+          viewer.classList.remove('is-open');
+          viewer.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        }, 300);
+        
+        // Si no viene del evento popstate, volver atrás en el historial
+        if (viewerOpenedWithHistory && !fromPopState) {
+          viewerOpenedWithHistory = false;
+          history.back();
+        } else {
+          viewerOpenedWithHistory = false;
+        }
+      }
+      
+      // Ir a imagen más antigua (índice mayor)
+      function goToOlder() {
+        if (currentIndex < imagenes.length - 1) {
+          // Animación de salida
+          image.classList.add('slide-out-left');
+          
+          setTimeout(() => {
+            currentIndex++;
+            updateViewer();
+            image.classList.remove('slide-out-left');
+            image.classList.add('slide-in-right');
+            
+            setTimeout(() => {
+              image.classList.remove('slide-in-right');
+            }, 200);
+          }, 150);
+        }
+      }
+      
+      // Ir a imagen más reciente (índice menor)
+      function goToNewer() {
+        if (currentIndex > 0) {
+          // Animación de salida
+          image.classList.add('slide-out-right');
+          
+          setTimeout(() => {
+            currentIndex--;
+            updateViewer();
+            image.classList.remove('slide-out-right');
+            image.classList.add('slide-in-left');
+            
+            setTimeout(() => {
+              image.classList.remove('slide-in-left');
+            }, 200);
+          }, 150);
+        }
+      }
+      
+      // Event listeners
+      if (backdrop) {
+        backdrop.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeViewer();
+        }, { signal });
+      }
+      
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeViewer();
+        }, { signal });
+      }
+
+      if (closeBtnMobile) {
+        closeBtnMobile.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeViewer();
+        }, { signal });
+      }
+      
+      // Botón izquierda = más antigua
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        goToOlder();
+      }, { signal });
+      
+      // Botón derecha = más reciente
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        goToNewer();
+      }, { signal });
+      
+      // Botones móvil
+      if (prevBtnMobile) {
+        prevBtnMobile.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToOlder();
+        }, { signal });
+      }
+      
+      if (nextBtnMobile) {
+        nextBtnMobile.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToNewer();
+        }, { signal });
+      }
+      
+      // Teclado (invertido)
+      document.addEventListener('keydown', (e) => {
+        if (!viewer.classList.contains('is-open')) return;
+        
+        if (e.key === 'Escape') {
+          closeViewer();
+        } else if (e.key === 'ArrowLeft') {
+          // Izquierda = más antigua
+          goToOlder();
+        } else if (e.key === 'ArrowRight') {
+          // Derecha = más reciente
+          goToNewer();
+        }
+      }, { signal });
+      
+      // Botón regresar del navegador (para móvil principalmente)
+      window.addEventListener('popstate', (e) => {
+        if (viewer.classList.contains('is-open')) {
+          // Cerrar el visor sin modificar el historial (ya se hizo con popstate)
+          closeViewer(true);
+        }
+      }, { signal });
+      
+      // Soporte táctil (swipe)
+      if (imageContainer) {
+        imageContainer.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { signal, passive: true });
+        
+        imageContainer.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { signal, passive: true });
+      }
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+          if (diff > 0) {
+            // Swipe izquierda = más antigua
+            goToOlder();
+          } else {
+            // Swipe derecha = más reciente
+            goToNewer();
+          }
+        }
+      }
+      
+      // Exponer función global para abrir el visor
+      (window as any).openSolarViewer = openViewer;
+      
+      // Listener para elementos que quieren abrir el visor
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const btn = target.closest('[data-solar-viewer]') as HTMLElement | null;
+        
+        if (btn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const imagePath = btn.dataset.solarViewer;
+          if (imagePath) {
+            openViewer(imagePath);
+          }
+        }
+      }, { signal });
+    }
+    
+    // Inicializar
+    document.addEventListener('astro:page-load', initSolarViewer);
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSolarViewer);
+    } else {
+      initSolarViewer();
+    }
+  })();
+</script>
+
+<style>
+  .solar-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    pointer-events: none;
+  }
+
+  .solar-viewer.is-open {
+    display: block;
+    pointer-events: auto;
+  }
+
+  .solar-viewer__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 20, 50, 0.97);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .solar-viewer.is-visible .solar-viewer__backdrop {
+    opacity: 1;
+  }
+
+  /* Botón cerrar - fijo en esquina superior derecha */
+  .solar-viewer__close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-full);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 10010;
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .solar-viewer.is-visible .solar-viewer__close {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s, background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .solar-viewer__close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Navegación fija a los lados */
+  .solar-viewer__nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%) scale(0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 10010;
+    opacity: 0;
+  }
+
+  .solar-viewer.is-visible .solar-viewer__nav {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s, background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .solar-viewer__nav:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .solar-viewer__nav:disabled {
+    cursor: not-allowed;
+  }
+
+  .solar-viewer__nav--prev {
+    left: 20px;
+  }
+
+  .solar-viewer__nav--next {
+    right: 20px;
+  }
+
+  .solar-viewer__wrapper {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 10000;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .solar-viewer.is-visible .solar-viewer__wrapper {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Header móvil - oculto en desktop */
+  .solar-viewer__header {
+    display: none;
+  }
+
+  .solar-viewer__close-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: var(--radius-full);
+    color: var(--color-white);
+    cursor: pointer;
+  }
+
+  .solar-viewer__content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-xl);
+    padding: 80px 100px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    align-items: center;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .solar-viewer__main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .solar-viewer__image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    width: 100%;
+    max-height: calc(100vh - 160px);
+  }
+
+  .solar-viewer__image {
+    max-width: 100%;
+    max-height: calc(100vh - 160px);
+    object-fit: contain;
+    display: block;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  /* Animaciones de navegación entre imágenes */
+  .solar-viewer__image.slide-out-left {
+    opacity: 0;
+    transform: translateX(-30px) scale(0.95);
+  }
+
+  .solar-viewer__image.slide-out-right {
+    opacity: 0;
+    transform: translateX(30px) scale(0.95);
+  }
+
+  .solar-viewer__image.slide-in-left {
+    animation: slideInLeft 0.2s ease forwards;
+  }
+
+  .solar-viewer__image.slide-in-right {
+    animation: slideInRight 0.2s ease forwards;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  /* Navegación móvil */
+  .solar-viewer__mobile-nav {
+    display: none;
+  }
+
+  .solar-viewer__meta {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    align-self: center;
+  }
+
+  .solar-viewer__title {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .solar-viewer__date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-earth);
+    margin: 0;
+  }
+
+  .solar-viewer__counter {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-full);
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .solar-viewer__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md) 0;
+    border-top: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .solar-viewer__detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .detail-label {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+  }
+
+  .detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .solar-viewer__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: auto;
+  }
+
+  .solar-viewer__actions .btn {
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Tablet */
+  @media (max-width: 1100px) {
+    .solar-viewer__content {
+      grid-template-columns: 1fr 280px;
+      padding: 80px 90px 40px;
+    }
+  }
+
+  /* Móvil */
+  @media (max-width: 900px) {
+    /* Ocultar controles desktop */
+    .solar-viewer__close,
+    .solar-viewer__nav {
+      display: none;
+    }
+
+    .solar-viewer__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 10;
+    }
+
+    .solar-viewer__header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .solar-viewer__header-title {
+      color: var(--color-white);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .solar-viewer__header-counter {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8125rem;
+    }
+
+    .solar-viewer__content {
+      grid-template-columns: 1fr;
+      padding: 0;
+      gap: 0;
+      overflow-y: auto;
+    }
+
+    .solar-viewer__main {
+      padding: var(--space-md);
+      height: auto;
+    }
+
+    .solar-viewer__image-container {
+      max-height: 50vh;
+      border-radius: var(--radius-md);
+    }
+
+    .solar-viewer__image {
+      max-height: 50vh;
+    }
+
+    .solar-viewer__mobile-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      padding: var(--space-sm);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+    }
+
+    .solar-viewer__mobile-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-white);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .solar-viewer__mobile-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .solar-viewer__mobile-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .solar-viewer__mobile-date {
+      color: var(--color-white);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+
+    .solar-viewer__meta {
+      margin: 0 var(--space-md) var(--space-md);
+      max-height: none;
+      padding: var(--space-lg);
+    }
+
+    .solar-viewer__title {
+      font-size: 1.25rem;
+    }
+
+    .solar-viewer__date {
+      font-size: 1.125rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .solar-viewer__header {
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    .solar-viewer__main {
+      padding: var(--space-sm);
+    }
+
+    .solar-viewer__meta {
+      margin: 0 var(--space-sm) var(--space-sm);
+      padding: var(--space-md);
+    }
+
+    .solar-viewer__mobile-btn span {
+      display: none;
+    }
+
+    .solar-viewer__mobile-btn {
+      padding: var(--space-sm);
+    }
+
+    .solar-viewer__details {
+      display: none;
+    }
+
+    .solar-viewer__actions {
+      flex-direction: row;
+    }
+
+    .solar-viewer__actions .btn {
+      flex: 1;
+      padding: var(--space-sm);
+      font-size: 0.875rem;
+    }
+  }
+</style>

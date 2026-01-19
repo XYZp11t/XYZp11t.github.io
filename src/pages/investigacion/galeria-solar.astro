@@ -1,0 +1,768 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SolarImageViewer from '../../components/SolarImageViewer.astro';
+
+// Obtener imágenes solares diarias
+const imagenesGlob = import.meta.glob('/public/imagen-solar-diaria/*.{jpg,jpeg,png}', { eager: true });
+const imagenesSolares = Object.keys(imagenesGlob)
+  .map(path => {
+    const filename = path.split('/').pop() || '';
+    const match = filename.match(/^(\d{1,2})-(\d{1,2})-(\d{4})\.(jpg|jpeg|png)$/i);
+    if (!match) return null;
+    const [, dia, mes, anio] = match;
+    const fecha = new Date(parseInt(anio), parseInt(mes) - 1, parseInt(dia));
+    return {
+      path: path.replace('/public', ''),
+      filename,
+      timestamp: fecha.getTime(),
+      dia: parseInt(dia),
+      mes: parseInt(mes),
+      anio: parseInt(anio),
+      fechaStr: `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${anio}`,
+      id: `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) => b!.timestamp - a!.timestamp) as {
+    path: string;
+    filename: string;
+    timestamp: number;
+    dia: number;
+    mes: number;
+    anio: number;
+    fechaStr: string;
+    id: string;
+  }[];
+
+const imagenMasReciente = imagenesSolares[0];
+
+const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+// Calcular meses disponibles (solo meses que tienen fotos)
+const mesesConFotos = new Set<string>();
+imagenesSolares.forEach(img => {
+  mesesConFotos.add(`${img.anio}-${img.mes.toString().padStart(2, '0')}`);
+});
+const mesesDisponibles = Array.from(mesesConFotos).sort().reverse(); // Ordenados de más reciente a más antiguo
+
+// Preparar datos para el visor y calendario
+const imagenesParaVisor = imagenesSolares.map(img => ({
+  path: img.path,
+  fechaStr: img.fechaStr,
+  id: img.id
+}));
+
+// Serializar datos para JavaScript del calendario
+const imagenesCalendarioJSON = JSON.stringify(imagenesSolares.map(img => ({
+  path: img.path,
+  fechaStr: img.fechaStr,
+  id: img.id,
+  dia: img.dia,
+  mes: img.mes,
+  anio: img.anio
+})));
+const mesesDisponiblesJSON = JSON.stringify(mesesDisponibles);
+const mesesJSON = JSON.stringify(meses);
+---
+
+<Layout 
+  title="Galería Solar | LACIGE"
+  description="Archivo de imágenes solares capturadas por el Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Galería Solar"
+    subtitulo="Investigación"
+  />
+
+  <!-- Imagen Destacada -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="featured-grid">
+        <div class="featured-image-wrapper">
+          {imagenMasReciente && (
+            <button 
+              class="featured-image-btn" 
+              data-solar-viewer={imagenMasReciente.path}
+              type="button"
+              aria-label="Ver imagen en detalle"
+            >
+              <img 
+                src={imagenMasReciente.path} 
+                alt={`Imagen solar del ${imagenMasReciente.fechaStr}`}
+                class="featured-image"
+              />
+              <div class="featured-overlay">
+                <span class="featured-zoom">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <line x1="11" y1="8" x2="11" y2="14"/>
+                    <line x1="8" y1="11" x2="14" y2="11"/>
+                  </svg>
+                  Ver en detalle
+                </span>
+              </div>
+            </button>
+          )}
+        </div>
+        <div class="featured-info">
+          <div class="featured-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            Imagen más reciente
+          </div>
+          <h2 class="featured-title">Observación Solar Diaria</h2>
+          {imagenMasReciente && (
+            <p class="featured-date">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              {imagenMasReciente.fechaStr}
+            </p>
+          )}
+          <p class="featured-desc">
+            Nuestra galería solar presenta imágenes capturadas diariamente por los instrumentos del laboratorio. 
+            Estas observaciones contribuyen al monitoreo de la actividad solar y al estudio de fenómenos como 
+            manchas solares, fulguraciones y eyecciones de masa coronal.
+          </p>
+          <div class="featured-stats">
+            <div class="stat">
+              <span class="stat-value">{imagenesSolares.length}</span>
+              <span class="stat-label">Imágenes disponibles</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calendario -->
+  <section class="calendar-section">
+    <div class="container">
+      <h2 class="calendar-title">Archivo de Observaciones</h2>
+      <p class="calendar-subtitle">Selecciona una fecha para ver la imagen correspondiente</p>
+      
+      <div class="calendar-wrapper">
+        <div class="calendar-nav">
+          <button class="calendar-nav-btn" id="prevMonth" type="button" aria-label="Mes anterior">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <h3 class="calendar-month" id="currentMonth"></h3>
+          <button class="calendar-nav-btn" id="nextMonth" type="button" aria-label="Mes siguiente">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-header">
+            {diasSemana.map(dia => (
+              <span class="calendar-day-name">{dia}</span>
+            ))}
+          </div>
+          <div class="calendar-days" id="calendarDays"></div>
+        </div>
+      </div>
+
+      <!-- Imágenes en miniatura del mes actual -->
+      <div class="month-images" id="monthImages"></div>
+    </div>
+  </section>
+
+  <!-- Visor de imágenes solares -->
+  <SolarImageViewer imagenes={imagenesParaVisor} />
+
+  <!-- Datos para JavaScript del calendario -->
+  <script id="calendar-images-data" type="application/json" set:html={imagenesCalendarioJSON}></script>
+  <script id="calendar-meses-disponibles" type="application/json" set:html={mesesDisponiblesJSON}></script>
+  <script id="calendar-meses" type="application/json" set:html={mesesJSON}></script>
+</Layout>
+
+<script>
+  (function() {
+    let abortController: AbortController | null = null;
+    
+    function initCalendar() {
+      // Limpiar listeners anteriores
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const signal = abortController.signal;
+      
+      // Obtener datos
+      const imagenesData = document.getElementById('calendar-images-data');
+      const mesesDisponiblesData = document.getElementById('calendar-meses-disponibles');
+      const mesesData = document.getElementById('calendar-meses');
+      
+      if (!imagenesData || !mesesDisponiblesData || !mesesData) return;
+      
+      let imagenesSolares: Array<{ path: string; fechaStr: string; id: string; dia: number; mes: number; anio: number }>;
+      let mesesDisponibles: string[]; // Array de "YYYY-MM" ordenados de más reciente a más antiguo
+      let meses: string[];
+      
+      try {
+        imagenesSolares = JSON.parse(imagenesData.textContent || '[]');
+        mesesDisponibles = JSON.parse(mesesDisponiblesData.textContent || '[]');
+        meses = JSON.parse(mesesData.textContent || '[]');
+      } catch (e) {
+        return;
+      }
+      
+      if (mesesDisponibles.length === 0) return;
+      
+      const imagenesMap = new Map();
+      imagenesSolares.forEach(img => {
+        imagenesMap.set(img.id, img);
+      });
+
+      // Índice del mes actual en el array de meses disponibles
+      let currentMonthIndex = 0;
+
+      const calendarDays = document.getElementById('calendarDays');
+      const currentMonthEl = document.getElementById('currentMonth');
+      const monthImagesEl = document.getElementById('monthImages');
+      const prevMonthBtn = document.getElementById('prevMonth') as HTMLButtonElement;
+      const nextMonthBtn = document.getElementById('nextMonth') as HTMLButtonElement;
+
+      if (!calendarDays || !currentMonthEl || !monthImagesEl || !prevMonthBtn || !nextMonthBtn) return;
+
+      function getCurrentYearMonth(): { year: number; month: number } {
+        const [year, month] = mesesDisponibles[currentMonthIndex].split('-').map(Number);
+        return { year, month };
+      }
+
+      function getDaysInMonth(year: number, month: number): number {
+        return new Date(year, month, 0).getDate();
+      }
+
+      function getFirstDayOfMonth(year: number, month: number): number {
+        return new Date(year, month - 1, 1).getDay();
+      }
+
+      function formatId(year: number, month: number, day: number): string {
+        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+
+      function renderCalendar() {
+        if (!calendarDays || !currentMonthEl) return;
+        
+        const { year: currentYear, month: currentMonth } = getCurrentYearMonth();
+        const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+        const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
+        
+        currentMonthEl.textContent = `${meses[currentMonth - 1]} ${currentYear}`;
+        
+        let html = '';
+        
+        for (let i = 0; i < firstDay; i++) {
+          html += '<span class="calendar-day calendar-day--empty"></span>';
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+          const id = formatId(currentYear, currentMonth, day);
+          const imagen = imagenesMap.get(id);
+          
+          if (imagen) {
+            html += `<button type="button" class="calendar-day calendar-day--available" data-solar-viewer="${imagen.path}">
+              <span class="day-number">${day}</span>
+              <span class="day-indicator"></span>
+            </button>`;
+          } else {
+            html += `<span class="calendar-day"><span class="day-number">${day}</span></span>`;
+          }
+        }
+        
+        calendarDays.innerHTML = html;
+        renderMonthImages();
+        updateNavButtons();
+      }
+
+      function renderMonthImages() {
+        if (!monthImagesEl) return;
+        
+        const { year: currentYear, month: currentMonth } = getCurrentYearMonth();
+        const monthImages = imagenesSolares.filter(img => 
+          img.anio === currentYear && img.mes === currentMonth
+        ).sort((a, b) => b.dia - a.dia);
+
+        if (monthImages.length === 0) {
+          monthImagesEl.innerHTML = '<p class="no-images">No hay imágenes disponibles para este mes</p>';
+          return;
+        }
+
+        let html = '<div class="thumbnails-grid">';
+        monthImages.forEach(img => {
+          html += `<button type="button" class="thumbnail" data-solar-viewer="${img.path}">
+            <img src="${img.path}" alt="Imagen solar del ${img.fechaStr}" loading="lazy" />
+            <span class="thumbnail-date">${img.dia} ${meses[img.mes - 1].substring(0, 3)}</span>
+          </button>`;
+        });
+        html += '</div>';
+        
+        monthImagesEl.innerHTML = html;
+      }
+
+      function updateNavButtons() {
+        // prevBtn va hacia meses más antiguos (índice mayor)
+        // nextBtn va hacia meses más recientes (índice menor)
+        const canGoOlder = currentMonthIndex < mesesDisponibles.length - 1;
+        const canGoNewer = currentMonthIndex > 0;
+        
+        prevMonthBtn.disabled = !canGoOlder;
+        nextMonthBtn.disabled = !canGoNewer;
+      }
+
+      // Event listeners
+      // Botón izquierda = mes más antiguo
+      prevMonthBtn.addEventListener('click', () => {
+        if (currentMonthIndex < mesesDisponibles.length - 1) {
+          currentMonthIndex++;
+          renderCalendar();
+        }
+      }, { signal });
+
+      // Botón derecha = mes más reciente
+      nextMonthBtn.addEventListener('click', () => {
+        if (currentMonthIndex > 0) {
+          currentMonthIndex--;
+          renderCalendar();
+        }
+      }, { signal });
+
+      // Inicializar calendario en el mes más reciente
+      renderCalendar();
+    }
+    
+    // Inicializar
+    document.addEventListener('astro:page-load', initCalendar);
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCalendar);
+    } else {
+      initCalendar();
+    }
+  })();
+</script>
+
+<style>
+  /* Sección destacada */
+  .featured-section {
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(180deg, var(--color-off-white) 0%, var(--color-white) 100%);
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+
+  .featured-image-wrapper {
+    position: relative;
+  }
+
+  .featured-image-btn {
+    display: block;
+    width: 100%;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+
+  .featured-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .featured-image-btn:hover .featured-image {
+    transform: scale(1.02);
+  }
+
+  .featured-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0, 61, 121, 0.8) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-xl);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .featured-image-btn:hover .featured-overlay {
+    opacity: 1;
+  }
+
+  .featured-zoom {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .featured-info {
+    padding: var(--space-lg) 0;
+  }
+
+  .featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-dark);
+    background: rgba(213, 159, 15, 0.15);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+  }
+
+  .featured-badge svg {
+    color: var(--color-accent);
+  }
+
+  .featured-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 var(--space-md);
+    line-height: 1.2;
+  }
+
+  .featured-date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .featured-desc {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-gray-600);
+    margin: 0 0 var(--space-xl);
+  }
+
+  .featured-stats {
+    display: flex;
+    gap: var(--space-xl);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+  }
+
+  /* Calendario */
+  .calendar-section {
+    padding: var(--space-4xl) 0;
+    background-color: var(--color-gray-100);
+  }
+
+  .calendar-title {
+    text-align: center;
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .calendar-subtitle {
+    text-align: center;
+    color: var(--color-gray-500);
+    margin: 0 0 var(--space-2xl);
+  }
+
+  .calendar-wrapper {
+    max-width: 500px;
+    margin: 0 auto var(--space-3xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+  }
+
+  .calendar-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--color-gray-100);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .calendar-nav-btn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .calendar-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .calendar-month {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+  }
+
+  .calendar-day-name {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-400);
+    padding: var(--space-sm);
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    position: relative;
+  }
+
+  .calendar-day--empty {
+    background: transparent;
+  }
+
+  .calendar-day--available {
+    background: var(--color-gray-100);
+    border: none;
+    cursor: pointer;
+    color: var(--color-primary);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+  }
+
+  .calendar-day--available:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .calendar-day--available:hover .day-indicator {
+    background: var(--color-white);
+  }
+
+  .day-number {
+    line-height: 1;
+  }
+
+  .day-indicator {
+    position: absolute;
+    bottom: 6px;
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent);
+    border-radius: 50%;
+  }
+
+  /* Miniaturas - estilos básicos (los estilos detallados están en style is:global) */
+  .month-images {
+    margin-top: 2rem;
+  }
+
+  .no-images {
+    text-align: center;
+    color: var(--color-gray-500);
+    padding: 2rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .featured-image-wrapper {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .calendar-wrapper {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<!-- Estilos globales para elementos generados dinámicamente con JavaScript -->
+<style is:global>
+  /* Miniaturas del mes - generadas dinámicamente */
+  .thumbnails-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .thumbnails-grid .thumbnail {
+    position: relative;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 200px;
+    height: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 200px;
+    max-height: 200px;
+    flex: 0 0 200px;
+  }
+
+  .thumbnails-grid .thumbnail:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
+  .thumbnails-grid .thumbnail img {
+    width: 200px;
+    height: 200px;
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumbnails-grid .thumbnail .thumbnail-date {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1px 2px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    color: white;
+    font-size: 8px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 640px) {
+    .thumbnails-grid .thumbnail,
+    .thumbnails-grid .thumbnail img {
+      width: 100px;
+      height: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      min-height: 100px;
+      max-height: 100px;
+      flex: 0 0 100px;
+    }
+
+    .thumbnails-grid {
+      gap: 6px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .thumbnails-grid .thumbnail,
+    .thumbnails-grid .thumbnail img {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      max-width: 80px;
+      min-height: 80px;
+      max-height: 80px;
+      flex: 0 0 80px;
+    }
+
+    .thumbnails-grid .thumbnail .thumbnail-date {
+      font-size: 6px;
+    }
+  }
+</style>

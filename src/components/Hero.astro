@@ -1,0 +1,287 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  descripcion?: string;
+  imagen?: string;
+  ctaPrimario?: { texto: string; enlace: string };
+  ctaSecundario?: { texto: string; enlace: string };
+  overlay?: boolean;
+  centrado?: boolean;
+  altura?: 'full' | 'large' | 'medium' | 'small';
+}
+
+const { 
+  titulo, 
+  subtitulo, 
+  descripcion, 
+  imagen,
+  ctaPrimario,
+  ctaSecundario,
+  overlay = true,
+  centrado = true,
+  altura = 'large'
+} = Astro.props;
+
+const alturaClases = {
+  full: 'hero--full',
+  large: 'hero--large',
+  medium: 'hero--medium',
+  small: 'hero--small'
+};
+---
+
+<section class={`hero ${alturaClases[altura]} ${centrado ? 'hero--centered' : ''}`}>
+  {imagen && (
+    <div class="hero__background">
+      <img src={imagen} alt="" loading="eager" />
+      {overlay && <div class="hero__overlay"></div>}
+    </div>
+  )}
+  
+  <div class="hero__particles" aria-hidden="true">
+    {Array.from({ length: 20 }).map((_, i) => (
+      <span class="particle" style={`--delay: ${i * 0.5}s; --x: ${Math.random() * 100}%; --duration: ${15 + Math.random() * 10}s;`}></span>
+    ))}
+  </div>
+
+  <div class="hero__content container">
+    {subtitulo && <span class="hero__subtitle">{subtitulo}</span>}
+    <h1 class="hero__title">{titulo}</h1>
+    {descripcion && <p class="hero__description">{descripcion}</p>}
+    
+    {(ctaPrimario || ctaSecundario) && (
+      <div class="hero__actions">
+        {ctaPrimario && (
+          <a href={ctaPrimario.enlace} class="btn btn--accent">
+            {ctaPrimario.texto}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        )}
+        {ctaSecundario && (
+          <a href={ctaSecundario.enlace} class="btn btn--secondary btn--light">
+            {ctaSecundario.texto}
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <span>Descubre más</span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .hero--full {
+    min-height: 100vh;
+  }
+
+  .hero--large {
+    min-height: 85vh;
+  }
+
+  .hero--medium {
+    min-height: 60vh;
+  }
+
+  .hero--small {
+    min-height: 40vh;
+    padding: var(--space-4xl) 0;
+  }
+
+  .hero--centered {
+    text-align: center;
+  }
+
+  .hero--centered .hero__content {
+    align-items: center;
+  }
+
+  .hero--centered .hero__description {
+    max-width: 600px;
+  }
+
+  .hero__background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero__background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg, 
+      rgba(0, 61, 121, 0.92) 0%, 
+      rgba(0, 42, 84, 0.85) 50%,
+      rgba(132, 117, 78, 0.7) 100%
+    );
+  }
+
+  .hero__particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    opacity: 0.4;
+    left: var(--x);
+    animation: float var(--duration) var(--delay) infinite linear;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(100vh) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.4;
+    }
+    90% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(-10vh) scale(1);
+      opacity: 0;
+    }
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    color: var(--color-white);
+    padding: var(--space-4xl) var(--space-lg);
+  }
+
+  .hero__subtitle {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  .hero__title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-white);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
+  .hero__description {
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.8s;
+    opacity: 0;
+  }
+
+  .btn--light {
+    color: var(--color-white);
+    border-color: var(--color-white);
+  }
+
+  .btn--light:hover {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  .hero__scroll {
+    position: absolute;
+    bottom: var(--space-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(8px);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero__actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .hero__actions .btn {
+      width: 100%;
+    }
+
+    .hero__scroll {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,321 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+
+const instalaciones = [
+  {
+    nombre: 'Observatorio Solar',
+    descripcion: 'Instalación equipada con telescopios solares de última generación para el monitoreo continuo del Sol.',
+    caracteristicas: [
+      'Telescopio refractor de 150mm con filtro H-alpha',
+      'Coronógrafo para observación de la corona solar',
+      'Sistema de seguimiento automático',
+      'Cámara CCD científica de alta resolución'
+    ],
+    imagen: '/12-01-2025.jpg'
+  },
+  {
+    nombre: 'Laboratorio de Procesamiento',
+    descripcion: 'Centro de cómputo de alto rendimiento para análisis de datos y modelado numérico.',
+    caracteristicas: [
+      'Cluster de cómputo con 128 núcleos',
+      'Almacenamiento de 100TB para datos científicos',
+      'Software especializado en física solar',
+      'Conexión de alta velocidad a redes académicas'
+    ],
+    imagen: '/16-01-2025.jpg'
+  },
+  {
+    nombre: 'Estación de Monitoreo Geomagnético',
+    descripcion: 'Sistema de sensores para medición continua de las variaciones del campo magnético terrestre.',
+    caracteristicas: [
+      'Magnetómetros fluxgate triaxiales',
+      'Sistemas de adquisición de datos 24/7',
+      'Sincronización GPS de alta precisión',
+      'Transmisión de datos en tiempo real'
+    ],
+    imagen: '/12-01-2025.jpg'
+  }
+];
+
+const equipamiento = [
+  { nombre: 'Telescopio Solar H-alpha', cantidad: 2 },
+  { nombre: 'Coronógrafo LACIGE-1', cantidad: 1 },
+  { nombre: 'Magnetómetros', cantidad: 5 },
+  { nombre: 'Servidores de cómputo', cantidad: 8 },
+  { nombre: 'Estaciones meteorológicas', cantidad: 3 },
+  { nombre: 'Cámaras CCD científicas', cantidad: 4 }
+];
+---
+
+<Layout 
+  title="Infraestructura | LACIGE"
+  description="Conoce las instalaciones y equipamiento del Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Infraestructura"
+    subtitulo="Sobre Nosotros"
+  />
+
+  <!-- Instalaciones principales -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Instalaciones"
+        titulo="Nuestras Facilidades"
+        descripcion="Espacios diseñados para la investigación científica de excelencia."
+      />
+      
+      <div class="facilities-list">
+        {instalaciones.map((instalacion, index) => (
+          <div class={`facility-item ${index % 2 === 1 ? 'facility-item--reverse' : ''}`}>
+            <div class="facility-item__image">
+              <img src={instalacion.imagen} alt={instalacion.nombre} loading="lazy" />
+            </div>
+            <div class="facility-item__content">
+              <h3>{instalacion.nombre}</h3>
+              <p class="facility-item__description">{instalacion.descripcion}</p>
+              <ul class="facility-item__features">
+                {instalacion.caracteristicas.map((caracteristica) => (
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    {caracteristica}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipamiento -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Recursos"
+        titulo="Equipamiento Científico"
+      />
+      
+      <div class="equipment-grid">
+        {equipamiento.map((item) => (
+          <div class="equipment-card">
+            <span class="equipment-card__quantity">{item.cantidad}</span>
+            <span class="equipment-card__name">{item.nombre}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Mapa/Ubicación -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Ubicación"
+        titulo="Encuéntranos"
+        descripcion="Nuestras instalaciones se encuentran en el campus universitario principal."
+      />
+      
+      <div class="location-card">
+        <div class="location-card__map">
+          <div class="map-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Ciudad Universitaria</span>
+          </div>
+        </div>
+        <div class="location-card__info">
+          <h3>Dirección</h3>
+          <p>
+            Edificio de Investigación Científica<br />
+            Ciudad Universitaria, CP 04510<br />
+            México, D.F.
+          </p>
+          <h4>Horario de atención</h4>
+          <p>
+            Lunes a Viernes: 9:00 - 18:00<br />
+            Sábados: 9:00 - 14:00
+          </p>
+          <a href="/contacto" class="btn btn--primary">Contactar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .facilities-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4xl);
+  }
+
+  .facility-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+
+  .facility-item--reverse {
+    direction: rtl;
+  }
+
+  .facility-item--reverse > * {
+    direction: ltr;
+  }
+
+  .facility-item__image {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .facility-item__image img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+
+  .facility-item__content h3 {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+  }
+
+  .facility-item__description {
+    font-size: 1.0625rem;
+    color: var(--color-gray-600);
+    line-height: 1.7;
+    margin-bottom: var(--space-lg);
+  }
+
+  .facility-item__features {
+    list-style: none;
+  }
+
+  .facility-item__features li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+  }
+
+  .facility-item__features svg {
+    flex-shrink: 0;
+    color: var(--color-accent);
+  }
+
+  /* Equipment */
+  .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .equipment-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+
+  .equipment-card__quantity {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+
+  .equipment-card__name {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    margin-top: var(--space-sm);
+  }
+
+  /* Location */
+  .location-card {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-2xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .location-card__map {
+    min-height: 300px;
+  }
+
+  .map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);
+    color: var(--color-gray-500);
+  }
+
+  .map-placeholder svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-md);
+  }
+
+  .location-card__info {
+    padding: var(--space-xl);
+  }
+
+  .location-card__info h3 {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+  }
+
+  .location-card__info h4 {
+    font-size: 1rem;
+    color: var(--color-primary);
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-sm);
+  }
+
+  .location-card__info p {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    line-height: 1.7;
+  }
+
+  .location-card__info .btn {
+    margin-top: var(--space-xl);
+  }
+
+  @media (max-width: 1024px) {
+    .facility-item {
+      grid-template-columns: 1fr;
+    }
+
+    .facility-item--reverse {
+      direction: ltr;
+    }
+
+    .location-card {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

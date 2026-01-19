@@ -1,0 +1,194 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import { getCollection } from 'astro:content';
+
+const publicaciones = await getCollection('publicaciones');
+const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => b.data.anio - a.data.anio);
+---
+
+<Layout 
+  title="Tesis Publicadas | LACIGE"
+  description="Tesis de investigación desarrolladas en el Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Tesis Publicadas"
+    subtitulo="Publicaciones"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/investigacion">Investigación</a>
+        <span>/</span>
+        <a href="/investigacion/publicaciones">Publicaciones</a>
+        <span>/</span>
+        <span>Tesis</span>
+      </div>
+
+      <div class="thesis-list">
+        {tesis.length > 0 ? (
+          tesis.map((t) => (
+            <article class="thesis-item">
+              <div class="thesis-item__badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+              </div>
+              <div class="thesis-item__content">
+                <span class="thesis-item__year">{t.data.anio}</span>
+                <h3 class="thesis-item__title">{t.data.titulo}</h3>
+                <p class="thesis-item__author">
+                  <strong>Autor:</strong> {t.data.autores.join(', ')}
+                </p>
+                <p class="thesis-item__abstract">{t.data.resumen}</p>
+                {t.data.enlace && (
+                  <a href={t.data.enlace} class="thesis-item__link" target="_blank" rel="noopener">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Descargar PDF
+                  </a>
+                )}
+              </div>
+            </article>
+          ))
+        ) : (
+          <p class="no-content">No hay tesis publicadas aún.</p>
+        )}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb span {
+    color: var(--color-gray-400);
+  }
+
+  .thesis-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .thesis-item {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--color-accent);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .thesis-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .thesis-item__badge {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-earth) 100%);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+  }
+
+  .thesis-item__badge svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .thesis-item__content {
+    flex-grow: 1;
+  }
+
+  .thesis-item__year {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .thesis-item__title {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.4;
+  }
+
+  .thesis-item__author {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-md);
+  }
+
+  .thesis-item__abstract {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    line-height: 1.7;
+    margin-bottom: var(--space-lg);
+  }
+
+  .thesis-item__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+
+  .thesis-item__link:hover {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+  }
+
+  .no-content {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 768px) {
+    .thesis-item {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>

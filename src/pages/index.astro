@@ -1,11 +1,652 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import SolarImageViewer from '../components/SolarImageViewer.astro';
+import { getCollection } from 'astro:content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Obtener imágenes solares diarias
+const imagenesGlob = import.meta.glob('/public/imagen-solar-diaria/*.{jpg,jpeg,png}', { eager: true });
+const imagenesSolares = Object.keys(imagenesGlob)
+  .map(path => {
+    const filename = path.split('/').pop() || '';
+    const match = filename.match(/^(\d{1,2})-(\d{1,2})-(\d{4})\.(jpg|jpeg|png)$/i);
+    if (!match) return null;
+    const [, dia, mes, anio] = match;
+    return {
+      path: path.replace('/public', ''),
+      filename,
+      fecha: new Date(parseInt(anio), parseInt(mes) - 1, parseInt(dia)),
+      fechaStr: `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${anio}`,
+      id: `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) => b!.fecha.getTime() - a!.fecha.getTime()) as {
+    path: string;
+    filename: string;
+    fecha: Date;
+    fechaStr: string;
+    id: string;
+  }[];
+
+const imagenMasReciente = imagenesSolares[0];
+
+// Preparar datos para el visor
+const imagenesParaVisor = imagenesSolares.map(img => ({
+  path: img.path,
+  fechaStr: img.fechaStr,
+  id: img.id
+}));
+
+// Obtener artículos destacados de divulgación
+const articulos = await getCollection('divulgacion');
+const articulosDestacados = articulos
+  .filter(a => a.data.destacado)
+  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime())
+  .slice(0, 3);
+
+const areasInvestigacion = [
+  {
+    titulo: 'Galería Solar',
+    descripcion: 'Observación y registro visual de la actividad solar mediante instrumentación especializada.',
+    icono: 'sol',
+    enlace: '/investigacion/galeria-solar'
+  },
+  {
+    titulo: 'Predicción del Viento Solar',
+    descripcion: 'Modelos avanzados para anticipar eventos de clima espacial y proteger infraestructura crítica.',
+    icono: 'viento',
+    enlace: '/investigacion/prediccion-viento-solar'
+  },
+  {
+    titulo: 'Publicaciones',
+    descripcion: 'Artículos científicos y tesis que contribuyen al avance del conocimiento geoespacial.',
+    icono: 'publicacion',
+    enlace: '/investigacion/publicaciones'
+  }
+];
+
+const estadisticas = [
+  { numero: '25+', etiqueta: 'Años de experiencia' },
+  { numero: '150+', etiqueta: 'Publicaciones científicas' },
+  { numero: '45', etiqueta: 'Investigadores' },
+  { numero: '12', etiqueta: 'Colaboraciones internacionales' }
+];
 ---
 
 <Layout>
-	<Welcome />
+  <!-- Header compacto -->
+  <section class="home-header">
+    <div class="container">
+      <div class="home-header__content">
+        <span class="home-header__badge">LACIGE</span>
+        <h1 class="home-header__title">
+          Laboratorio de <span class="home-header__title--accent">Ciencias Geoespaciales</span>
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <!-- Imagen Solar Diaria Destacada -->
+  <section class="solar-daily">
+    <div class="container">
+      <div class="solar-daily__grid">
+        <div class="solar-daily__image-wrapper">
+          {imagenMasReciente && (
+            <button 
+              type="button" 
+              class="solar-daily__image-btn"
+              data-solar-viewer={imagenMasReciente.path}
+              aria-label="Ver imagen en detalle"
+            >
+              <img 
+                src={imagenMasReciente.path} 
+                alt={`Imagen solar del ${imagenMasReciente.fechaStr}`}
+                class="solar-daily__image"
+              />
+              <div class="solar-daily__image-overlay">
+                <span class="solar-daily__view-more">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <line x1="11" y1="8" x2="11" y2="14"/>
+                    <line x1="8" y1="11" x2="14" y2="11"/>
+                  </svg>
+                  Ver en detalle
+                </span>
+              </div>
+            </button>
+          )}
+        </div>
+        <div class="solar-daily__info">
+          <div class="solar-daily__label">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            Imagen Solar Diaria
+          </div>
+          <h2 class="solar-daily__title">Observación Solar</h2>
+          {imagenMasReciente && (
+            <p class="solar-daily__date">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              {imagenMasReciente.fechaStr}
+            </p>
+          )}
+          <p class="solar-daily__desc">
+            Monitoreo continuo del disco solar capturado desde nuestras instalaciones. 
+            Estas imágenes contribuyen al estudio de la actividad solar y sus efectos en el clima espacial.
+          </p>
+          <div class="solar-daily__actions">
+            <a href="/investigacion/galeria-solar" class="btn btn--primary">
+              Ver archivo completo
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="/investigacion/prediccion-viento-solar" class="btn btn--secondary">Predicción del viento solar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Áreas de Investigación -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Investigación"
+        titulo="Áreas de Estudio"
+        descripcion="Nuestro laboratorio se especializa en el estudio del Sol y su interacción con el entorno terrestre."
+      />
+      
+      <div class="grid grid--3">
+        {areasInvestigacion.map((area) => (
+          <FeatureCard {...area} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Estadísticas -->
+  <section class="stats-section">
+    <div class="stats-background"></div>
+    <div class="container">
+      <div class="stats-grid">
+        {estadisticas.map((stat, index) => (
+          <div class="stat-item" style={`--delay: ${index * 0.1}s`}>
+            <span class="stat-number">{stat.numero}</span>
+            <span class="stat-label">{stat.etiqueta}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Divulgación -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Divulgación"
+        titulo="Últimas Publicaciones"
+        descripcion="Compartimos el conocimiento científico de manera accesible para todos."
+      />
+      
+      <div class="articles-grid">
+        {articulosDestacados.map((articulo) => (
+          <ArticleCard 
+            titulo={articulo.data.titulo}
+            descripcion={articulo.data.descripcion}
+            fecha={articulo.data.fecha}
+            autor={articulo.data.autor}
+            imagen={articulo.data.imagen}
+            etiquetas={articulo.data.etiquetas}
+            enlace={`/divulgacion/${articulo.id}`}
+            destacado={false}
+          />
+        ))}
+      </div>
+      
+      <div class="section-cta">
+        <a href="/divulgacion" class="btn btn--primary">
+          Ver todas las publicaciones
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Sobre Nosotros -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-content">
+          <SectionHeader 
+            subtitulo="Sobre Nosotros"
+            titulo="Ciencia al Servicio de la Sociedad"
+            centrado={false}
+          />
+          <p class="about-text">
+            El Laboratorio de Ciencias Geoespaciales (LACIGE) es un centro de investigación 
+            dedicado al estudio del Sol, el clima espacial y las ciencias de la Tierra. 
+            Desde nuestra fundación, hemos contribuido significativamente al entendimiento 
+            de los fenómenos geoespaciales y su impacto en la sociedad.
+          </p>
+          <p class="about-text">
+            Nuestro equipo multidisciplinario combina experiencia en física, astronomía, 
+            geofísica y ciencias computacionales para abordar los desafíos más complejos 
+            del clima espacial.
+          </p>
+          <div class="about-links">
+            <a href="/sobre-nosotros/historia" class="btn btn--primary">Nuestra Historia</a>
+            <a href="/sobre-nosotros/infraestructura" class="btn btn--secondary">Infraestructura</a>
+          </div>
+        </div>
+        <div class="about-image">
+          <div class="about-image__wrapper">
+            <img src="imagen-solar-diaria/16-01-2026.jpg" alt="Equipo de investigación LACIGE" loading="lazy" />
+            <div class="about-image__accent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Llamado a la acción -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">¿Interesado en formar parte de LACIGE?</h2>
+        <p class="cta-description">
+          Ofrecemos oportunidades de becas y colaboración para estudiantes e investigadores 
+          apasionados por las ciencias geoespaciales.
+        </p>
+        <div class="cta-buttons">
+          <a href="/becas" class="btn btn--accent">
+            Ver Becas Disponibles
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="/contacto" class="btn btn--secondary btn--light">Contactar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visor de imágenes solares -->
+  <SolarImageViewer imagenes={imagenesParaVisor} />
 </Layout>
+
+<style>
+  /* Header compacto */
+  .home-header {
+    padding: var(--space-lg) 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .home-header__content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .home-header__badge {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-primary-dark);
+    background: var(--color-accent);
+    border-radius: var(--radius-sm);
+  }
+
+  .home-header__title {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 600;
+    color: var(--color-white);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .home-header__title--accent {
+    color: var(--color-accent);
+  }
+
+  /* Imagen Solar Diaria */
+  .solar-daily {
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-off-white) 15%);
+  }
+
+  .solar-daily__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+
+  .solar-daily__image-wrapper {
+    position: relative;
+  }
+
+  .solar-daily__image-btn {
+    display: block;
+    width: 100%;
+    position: relative;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .solar-daily__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .solar-daily__image-btn:hover .solar-daily__image {
+    transform: scale(1.03);
+  }
+
+  .solar-daily__image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-xl);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .solar-daily__image-btn:hover .solar-daily__image-overlay {
+    opacity: 1;
+  }
+
+  .solar-daily__view-more {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .solar-daily__info {
+    padding: var(--space-lg) 0;
+  }
+
+  .solar-daily__label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-dark);
+    background: rgba(213, 159, 15, 0.15);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+  }
+
+  .solar-daily__label svg {
+    color: var(--color-accent);
+  }
+
+  .solar-daily__title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 var(--space-md);
+    line-height: 1.2;
+  }
+
+  .solar-daily__date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .solar-daily__desc {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-gray-600);
+    margin: 0 0 var(--space-xl);
+  }
+
+  .solar-daily__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  @media (max-width: 900px) {
+    .solar-daily__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .solar-daily__image-wrapper {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
+
+  /* Estadísticas */
+  .stats-section {
+    position: relative;
+    padding: var(--space-4xl) 0;
+    overflow: hidden;
+  }
+
+  .stats-background {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .stats-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .stats-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+    text-align: center;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Artículos */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .section-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-3xl);
+  }
+
+  /* Sobre Nosotros */
+  .about-section {
+    padding: var(--space-4xl) 0;
+    background-color: var(--color-gray-100);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+
+  .about-text {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-gray-600);
+  }
+
+  .about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .about-image__wrapper {
+    position: relative;
+  }
+
+  .about-image__wrapper img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .about-image__accent {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-earth));
+    border-radius: var(--radius-lg);
+    z-index: -1;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding: var(--space-4xl) 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    text-align: center;
+  }
+
+  .cta-content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .cta-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--color-white);
+    margin-bottom: var(--space-md);
+  }
+
+  .cta-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: var(--space-xl);
+  }
+
+  .cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .btn--light {
+    color: var(--color-white);
+    border-color: var(--color-white);
+  }
+
+  .btn--light:hover {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .about-image {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .home-header__content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

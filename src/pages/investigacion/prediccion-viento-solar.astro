@@ -1,0 +1,747 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Partículas radiales en todas las direcciones (360°)
+const radialParticles = Array.from({ length: 24 }, (_, i) => {
+  const angleDeg = (360 / 24) * i;
+  const angle = (angleDeg * Math.PI) / 180;
+  const distance = 32 + (i % 5) * 5;
+  const dx = Math.cos(angle) * distance;
+  const dy = Math.sin(angle) * distance;
+  const size = 3 + (i % 4);
+  const duration = 2.2 + (i % 5) * 0.3;
+  const delay = i * 0.12;
+  return {
+    dx: dx.toFixed(2),
+    dy: dy.toFixed(2),
+    size,
+    duration: duration.toFixed(2),
+    delay: delay.toFixed(2),
+  };
+});
+
+const directedParticles = Array.from({ length: 6 }, (_, i) => {
+  const dy = (i - 1.5) * 14.5;
+  const dx = 66 + (i % 2 ? 1.5 : -1.5);
+  const size = 6 + (i % 3);
+  const duration = 3.5 + i * 0.25;
+  const delay = 0.5 + i * 0.45;
+  return {
+    dx: dx.toFixed(2),
+    dy: dy.toFixed(2),
+    size,
+    duration: duration.toFixed(2),
+    delay: delay.toFixed(2),
+  };
+});
+---
+
+<Layout 
+  title="Predicción del Viento Solar | LACIGE"
+  description="Predicción semanal del viento solar generada con el modelo SunRunner3D a partir de magnetogramas solares y simulaciones MHD."
+>
+  <!-- Header minimalista con fecha/hora y selector de idioma -->
+  <section class="prediction-header">
+    <div class="container">
+      <div class="prediction-header__content">
+        <div class="prediction-header__info">
+          <span class="prediction-header__label" id="section-label">Investigación</span>
+          <h1 class="prediction-header__title" id="page-title">Predicción del Viento Solar</h1>
+        </div>
+        <div class="prediction-header__controls">
+          <div class="datetime" id="datetime" aria-live="polite"></div>
+          <div class="lang-switch">
+            <button id="lang-toggle" class="lang-switch__btn" aria-haspopup="true" aria-expanded="false">
+              <svg class="lang-switch__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 8l6 6"></path>
+                <path d="M4 14l6-6 2-3"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="M22 22l-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+              </svg>
+              <span id="lang-current">ES</span>
+            </button>
+            <div id="lang-dropdown" class="lang-dropdown" hidden>
+              <button class="lang-option" data-lang="es">Español</button>
+              <button class="lang-option" data-lang="en">English</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seccion principal del video -->
+  <section class="video-section">
+    <div class="container">
+      <div class="video-wrapper">
+        <div class="video-frame">
+          <video
+            class="video-player"
+            src="/public/sw-prediction/cr2301_sw_prediccion_semanal.mp4"
+            preload="metadata"
+            controls
+            playsinline
+            poster="/public/sw-prediction/cr2301_sw_plots_0001.png"
+            data-video
+          ></video>
+        </div>
+      </div>
+      <div class="video-info">
+        <p class="video-info__timestamp">
+          <strong id="timestamp-label">Actualizado el:</strong> 2025-11-21
+        </p>
+        <p class="video-info__description" id="video-description">
+          Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D para los próximos siete días. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seccion informativa: Que es el Viento Solar -->
+  <section class="section section--gray">
+    <div class="container">
+      <div class="intro-grid">
+        <div class="intro-content">
+          <h2 id="what-is-title">¿Qué es el Viento Solar?</h2>
+          <p id="what-is-description">
+            El viento solar es un flujo continuo de partículas cargadas (principalmente protones 
+            y electrones) que emana de la corona solar y se propaga por todo el sistema solar. 
+            Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos 
+            en el entorno espacial terrestre.
+          </p>
+          <p id="prediction-importance">
+            La predicción precisa del viento solar es fundamental para:
+          </p>
+          <ul class="benefits-list">
+            <li id="benefit-1">Proteger satélites y astronautas</li>
+            <li id="benefit-2">Prevenir daños en redes eléctricas</li>
+            <li id="benefit-3">Mantener comunicaciones de radio estables</li>
+            <li id="benefit-4">Asegurar la precisión del GPS</li>
+          </ul>
+        </div>
+        <div class="intro-visual">
+          <div class="solar-wind-diagram">
+            <div class="sun" aria-hidden="true"></div>
+            <div class="particles particles--radial" aria-hidden="true">
+              {radialParticles.map((particle) => (
+                <span
+                  class="particle particle--radial"
+                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
+                ></span>
+              ))}
+            </div>
+            <div class="particles particles--directed" aria-hidden="true">
+              {directedParticles.map((particle) => (
+                <span
+                  class="particle particle--directed"
+                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
+                ></span>
+              ))}
+            </div>
+            <div class="earth" aria-hidden="true">
+              <div class="earth__body"></div>
+              <svg class="magnetosphere" viewBox="0 0 220 140" aria-hidden="true">
+                <!-- Arco frontal (lado día) - sale a 50° desde los polos, radio amplio -->
+                <path class="field-line field-line--front" d="M70 44 C20 8 20 132 70 96" />
+                <!-- Cola (lado noche) - aplanada y extendida como cola real -->
+                <path class="field-line field-line--tail" d="M70 44 C200 55 200 85 70 96" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Instituciones colaboradoras -->
+  <section class="collaborators-section">
+    <div class="container">
+      <div class="collaborators">
+        <span class="collaborators__label" id="collaborators-label">Instituciones colaboradoras:</span>
+        <div class="collaborators__links">
+          <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener">ENES Morelia</a>
+          <a href="https://www.unam.mx/" target="_blank" rel="noopener">UNAM</a>
+          <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script is:inline>
+  // Sistema de internacionalización
+  const i18n = {
+    es: {
+      sectionLabel: 'Investigación',
+      pageTitle: 'Predicción del Viento Solar',
+      updated: 'Actualizado el:',
+      description: 'Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D para los próximos siete días. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.',
+      whatIsTitle: '¿Qué es el Viento Solar?',
+      whatIsDescription: 'El viento solar es un flujo continuo de partículas cargadas (principalmente protones y electrones) que emana de la corona solar y se propaga por todo el Sistema Solar. Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos en el entorno espacial terrestre.',
+      predictionImportance: 'La predicción precisa del viento solar es fundamental para:',
+      benefit1: 'Proteger satélites y astronautas',
+      benefit2: 'Prevenir daños en redes eléctricas',
+      benefit3: 'Mantener comunicaciones de radio estables',
+      benefit4: 'Asegurar la precisión del GPS',
+      collaboratorsLabel: 'Instituciones colaboradoras:'
+    },
+    en: {
+      sectionLabel: 'Research',
+      pageTitle: 'Solar Wind Forecast',
+      updated: 'Updated:',
+      description: 'This visualization summarizes the projected solar wind speed and density from the SunRunner3D model for the next seven days. Lighter tones indicate faster streams, while darker tones highlight regions of lower intensity. Use full screen to examine fine details.',
+      whatIsTitle: 'What is the Solar Wind?',
+      whatIsDescription: 'The solar wind is a continuous flow of charged particles (mainly protons and electrons) emanating from the solar corona and propagating throughout the solar system. Its typical velocity ranges between 300 and 800 km/s, and it can cause significant effects on Earth\'s space environment.',
+      predictionImportance: 'Accurate solar wind prediction is essential for:',
+      benefit1: 'Protecting satellites and astronauts',
+      benefit2: 'Preventing damage to power grids',
+      benefit3: 'Maintaining stable radio communications',
+      benefit4: 'Ensuring GPS accuracy',
+      collaboratorsLabel: 'Collaborating institutions:'
+    }
+  };
+
+  // Formateo de fecha y hora según idioma
+  function formatDateTime(date, lang) {
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit', 
+      timeZone: 'UTC', 
+      timeZoneName: 'short' 
+    };
+    return date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', options);
+  }
+
+  function updateDateTime() {
+    const datetimeEl = document.getElementById('datetime');
+    if (!datetimeEl) return;
+    const lang = localStorage.getItem('prediction-lang') || 'es';
+    const now = new Date();
+    datetimeEl.textContent = formatDateTime(now, lang);
+  }
+
+  function setText(id, value) { 
+    const el = document.getElementById(id); 
+    if (el) el.textContent = value; 
+  }
+
+  function applyLanguage(lang) {
+    const t = i18n[lang] || i18n.es;
+    setText('section-label', t.sectionLabel);
+    setText('page-title', t.pageTitle);
+    setText('timestamp-label', t.updated);
+    setText('video-description', t.description);
+    setText('what-is-title', t.whatIsTitle);
+    setText('what-is-description', t.whatIsDescription);
+    setText('prediction-importance', t.predictionImportance);
+    setText('benefit-1', t.benefit1);
+    setText('benefit-2', t.benefit2);
+    setText('benefit-3', t.benefit3);
+    setText('benefit-4', t.benefit4);
+    setText('collaborators-label', t.collaboratorsLabel);
+    updateDateTime();
+  }
+
+  // Inicialización
+  const savedLang = localStorage.getItem('prediction-lang') || 'es';
+  applyLanguage(savedLang);
+  
+  const langCurrent = document.getElementById('lang-current');
+  if (langCurrent) {
+    langCurrent.textContent = savedLang === 'es' ? 'ES' : 'EN';
+  }
+
+  // Manejo del dropdown de idioma
+  const langToggle = document.getElementById('lang-toggle');
+  const langDropdown = document.getElementById('lang-dropdown');
+  
+  if (langToggle && langDropdown) {
+    langToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = langDropdown.hasAttribute('hidden');
+      if (isHidden) {
+        langDropdown.removeAttribute('hidden');
+        langToggle.setAttribute('aria-expanded', 'true');
+      } else {
+        langDropdown.setAttribute('hidden', '');
+        langToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!langToggle.contains(e.target) && !langDropdown.contains(e.target)) {
+        langDropdown.setAttribute('hidden', '');
+        langToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.querySelectorAll('.lang-option').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newLang = btn.getAttribute('data-lang');
+        localStorage.setItem('prediction-lang', newLang);
+        applyLanguage(newLang);
+        if (langCurrent) {
+          langCurrent.textContent = newLang === 'es' ? 'ES' : 'EN';
+        }
+        langDropdown.setAttribute('hidden', '');
+        langToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // Inicializar y actualizar fecha/hora cada segundo
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
+
+<style>
+  /* Header minimalista */
+  .prediction-header {
+    padding: var(--space-lg) 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  }
+
+  .prediction-header__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .prediction-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .prediction-header__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .prediction-header__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .prediction-header__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  .datetime {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+  }
+
+  /* Selector de idioma */
+  .lang-switch {
+    position: relative;
+  }
+
+  .lang-switch__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    padding: 0.375rem 0.75rem;
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .lang-switch__btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lang-switch__icon {
+    width: 18px;
+    height: 18px;
+    stroke: var(--color-accent);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    background: var(--color-primary);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 100%;
+    z-index: 1000;
+  }
+
+  .lang-dropdown[hidden] {
+    display: none;
+  }
+
+  .lang-option {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+  }
+
+  .lang-option:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Seccion del video */
+  .video-section {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+    background-color: var(--color-off-white);
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary-dark);
+    border: 3px solid var(--color-accent);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  .video-frame {
+    width: 100%;
+    height: 100%;
+    padding: var(--space-sm);
+  }
+
+  .video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000;
+    border-radius: var(--radius-md);
+  }
+
+  .video-info {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+    border-left: 4px solid var(--color-primary);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+  }
+
+  .video-info__timestamp {
+    margin: 0 0 var(--space-sm);
+    font-size: 0.9375rem;
+    color: var(--color-primary);
+  }
+
+  .video-info__description {
+    margin: 0;
+    color: var(--color-gray-600);
+    line-height: 1.7;
+  }
+
+  /* Seccion informativa */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+
+  .intro-content h2 {
+    margin-bottom: var(--space-lg);
+  }
+
+  .intro-content p {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-gray-600);
+  }
+
+  .benefits-list {
+    list-style: none;
+    margin-top: var(--space-lg);
+    padding: 0;
+  }
+
+  .benefits-list li {
+    position: relative;
+    padding-left: var(--space-xl);
+    margin-bottom: var(--space-sm);
+    font-size: 1rem;
+    color: var(--color-gray-600);
+  }
+
+  .benefits-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+  }
+
+  /* Diagrama animado */
+  .solar-wind-diagram {
+    position: relative;
+    height: 300px;
+    --origin-x: 18%;
+    --origin-y: 50%;
+    --earth-x: 84%;
+    --earth-y: 50%;
+    background: radial-gradient(circle at 18% 50%, rgba(213, 159, 15, 0.3) 0%, rgba(213, 159, 15, 0) 42%),
+      radial-gradient(circle at 70% 50%, rgba(0, 35, 80, 0.35) 0%, rgba(0, 35, 80, 0) 45%),
+      linear-gradient(90deg, rgba(25, 18, 6, 0.18) 0%, rgba(0, 30, 70, 0.38) 100%);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .sun {
+    position: absolute;
+    left: var(--origin-x);
+    top: var(--origin-y);
+    transform: translate(-50%, -50%);
+    width: 88px;
+    height: 88px;
+    background: radial-gradient(circle, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(213, 159, 15, 0.5);
+  }
+
+  .sun::after {
+    content: '';
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(213, 159, 15, 0.35) 0%, rgba(213, 159, 15, 0) 70%);
+    filter: blur(2px);
+  }
+
+  .particles {
+    position: absolute;
+    inset: 0;
+  }
+
+  .particle {
+    position: absolute;
+    left: var(--origin-x);
+    top: var(--origin-y);
+    width: var(--size);
+    height: var(--size);
+    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 236, 180, 0.98) 45%, rgba(255, 176, 76, 0.8) 100%);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 10px rgba(255, 236, 180, 0.9));
+    animation: radialParticle var(--duration) var(--delay) infinite linear;
+  }
+
+  .particle--radial {
+    box-shadow: 0 0 14px rgba(255, 224, 160, 0.85), 0 0 26px rgba(255, 176, 76, 0.7);
+  }
+
+  .particle--directed {
+    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 230, 168, 0.98) 55%, rgba(255, 186, 96, 0.78) 100%);
+    box-shadow: 0 0 18px rgba(255, 230, 168, 0.95), 0 0 32px rgba(255, 186, 96, 0.7);
+    animation-name: directedParticle;
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.3, 1);
+  }
+
+  @keyframes radialParticle {
+    0% {
+      left: var(--origin-x);
+      top: var(--origin-y);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+    15% {
+      opacity: 0.95;
+    }
+    100% {
+      left: calc(var(--origin-x) + var(--dx));
+      top: calc(var(--origin-y) + var(--dy));
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.1);
+    }
+  }
+
+  @keyframes directedParticle {
+    0% {
+      left: var(--origin-x);
+      top: var(--origin-y);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.7);
+    }
+    12% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 0.8;
+    }
+    100% {
+      left: calc(var(--origin-x) + var(--dx));
+      top: calc(var(--origin-y) + var(--dy));
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+    }
+  }
+
+  .earth {
+    position: absolute;
+    left: var(--earth-x);
+    top: var(--earth-y);
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    overflow: visible;
+  }
+
+  .earth__body {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(160, 200, 255, 0.9), var(--color-primary) 55%, var(--color-primary-dark) 100%);
+    box-shadow: inset -6px -8px 12px rgba(0, 20, 60, 0.45), 0 0 14px rgba(107, 182, 255, 0.4);
+  }
+
+  .magnetosphere {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 220px;
+    height: 140px;
+    transform: translate(-70px, -70px);
+    overflow: invisible;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgb(0, 238, 255));
+  }
+
+  .field-line {
+    fill: none;
+    stroke: rgba(4 205 255 / 0.88);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .field-line--front {
+    stroke: rgba(0 225 255 / 0.88);
+  }
+
+  .field-line--tail {
+    stroke: rgba(0 218 247 / 0.88);
+    stroke-dasharray: 6 6;
+  }
+  
+
+  /* Seccion de colaboradores */
+  .collaborators-section {
+    padding: var(--space-xl) 0;
+    background-color: var(--color-gray-100);
+    border-top: 1px solid var(--color-gray-200);
+  }
+
+  .collaborators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .collaborators__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+  }
+
+  .collaborators__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+  }
+
+  .collaborators__links a {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .collaborators__links a:hover {
+    color: var(--color-accent);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro-visual {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .prediction-header__content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .prediction-header__controls {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .datetime {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .prediction-header__controls {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+
+    .collaborators {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>

@@ -1,0 +1,303 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+
+const sitiosRelacionados = [
+  {
+    categoria: 'Datos Solares',
+    sitios: [
+      {
+        nombre: 'Solar Dynamics Observatory (SDO)',
+        url: 'https://sdo.gsfc.nasa.gov/',
+        descripcion: 'Imágenes y datos en tiempo real del Sol proporcionados por la NASA.'
+      },
+      {
+        nombre: 'SOHO - Solar and Heliospheric Observatory',
+        url: 'https://soho.nascom.nasa.gov/',
+        descripcion: 'Misión conjunta ESA/NASA para estudiar el Sol desde su núcleo hasta la corona.'
+      },
+      {
+        nombre: 'Helioviewer',
+        url: 'https://www.helioviewer.org/',
+        descripcion: 'Visualización de datos solares de múltiples misiones espaciales.'
+      }
+    ]
+  },
+  {
+    categoria: 'Clima Espacial',
+    sitios: [
+      {
+        nombre: 'NOAA Space Weather Prediction Center',
+        url: 'https://www.swpc.noaa.gov/',
+        descripcion: 'Centro oficial de predicción del clima espacial de Estados Unidos.'
+      },
+      {
+        nombre: 'SpaceWeatherLive',
+        url: 'https://www.spaceweatherlive.com/',
+        descripcion: 'Información en tiempo real sobre la actividad solar y auroras.'
+      },
+      {
+        nombre: 'Observatorio del Clima Espacial - ISES',
+        url: 'https://www.spaceweather.org/',
+        descripcion: 'Red internacional de servicios de clima espacial.'
+      }
+    ]
+  },
+  {
+    categoria: 'Instituciones Científicas',
+    sitios: [
+      {
+        nombre: 'NASA Heliophysics',
+        url: 'https://science.nasa.gov/heliophysics/',
+        descripcion: 'División de Heliofísica de la NASA.'
+      },
+      {
+        nombre: 'European Space Agency - Space Weather',
+        url: 'https://www.esa.int/Space_Safety/Space_weather',
+        descripcion: 'Programa de clima espacial de la Agencia Espacial Europea.'
+      },
+      {
+        nombre: 'Max Planck Institute for Solar System Research',
+        url: 'https://www.mps.mpg.de/',
+        descripcion: 'Instituto de investigación líder en física solar.'
+      }
+    ]
+  },
+  {
+    categoria: 'Herramientas y Recursos',
+    sitios: [
+      {
+        nombre: 'SunPy',
+        url: 'https://sunpy.org/',
+        descripcion: 'Librería de Python para análisis de datos solares.'
+      },
+      {
+        nombre: 'Virtual Solar Observatory',
+        url: 'https://sdac.virtualsolar.org/',
+        descripcion: 'Acceso unificado a datos solares de múltiples fuentes.'
+      },
+      {
+        nombre: 'ADS - Astrophysics Data System',
+        url: 'https://ui.adsabs.harvard.edu/',
+        descripcion: 'Base de datos de publicaciones científicas en astrofísica.'
+      }
+    ]
+  }
+];
+---
+
+<Layout 
+  title="Sitios de Interés | LACIGE"
+  description="Enlaces a recursos y sitios web relacionados con ciencias geoespaciales y clima espacial."
+>
+  <PageHeader 
+    titulo="Sitios de Interés"
+    subtitulo="Recursos"
+  />
+
+  <section class="section">
+    <div class="container">
+      {sitiosRelacionados.map((categoria) => (
+        <div class="category-section">
+          <h2 class="category-title">
+            <span class="category-title__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
+            {categoria.categoria}
+          </h2>
+          
+          <div class="sites-grid">
+            {categoria.sitios.map((sitio) => (
+              <a href={sitio.url} class="site-card" target="_blank" rel="noopener noreferrer">
+                <div class="site-card__content">
+                  <h3 class="site-card__name">{sitio.nombre}</h3>
+                  <p class="site-card__description">{sitio.descripcion}</p>
+                  <span class="site-card__url">{new URL(sitio.url).hostname}</span>
+                </div>
+                <span class="site-card__arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Sugerir sitio -->
+  <section class="section section--gray">
+    <div class="container">
+      <div class="suggest-content">
+        <div class="suggest-text">
+          <h2>¿Conoces algún sitio útil?</h2>
+          <p>
+            Si conoces algún recurso valioso relacionado con ciencias geoespaciales que 
+            debería estar en esta lista, ¡nos encantaría saberlo!
+          </p>
+        </div>
+        <a href="/contacto" class="btn btn--primary">Sugerir un sitio</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .category-section {
+    margin-bottom: var(--space-4xl);
+  }
+
+  .category-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .category-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--color-gray-200);
+  }
+
+  .category-title__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-earth) 100%);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+  }
+
+  .category-title__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sites-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .site-card {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .site-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .site-card__content {
+    flex-grow: 1;
+  }
+
+  .site-card__name {
+    font-size: 1.0625rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+    transition: color var(--transition-fast);
+  }
+
+  .site-card:hover .site-card__name {
+    color: var(--color-accent-dark);
+  }
+
+  .site-card__description {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin-bottom: var(--space-sm);
+  }
+
+  .site-card__url {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--color-earth);
+    background-color: var(--color-gray-100);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .site-card__arrow {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-gray-400);
+    transition: color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .site-card__arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .site-card:hover .site-card__arrow {
+    color: var(--color-primary);
+    transform: translate(4px, -4px);
+  }
+
+  /* Suggest */
+  .suggest-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xl);
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .suggest-text h2 {
+    font-size: 1.375rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .suggest-text p {
+    color: var(--color-gray-600);
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .sites-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sites-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .suggest-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>

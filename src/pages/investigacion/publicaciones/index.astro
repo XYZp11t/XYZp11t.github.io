@@ -1,0 +1,257 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+
+const publicaciones = await getCollection('publicaciones');
+const articulos = publicaciones.filter(p => p.data.tipo === 'articulo').sort((a, b) => b.data.anio - a.data.anio);
+const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => b.data.anio - a.data.anio);
+---
+
+<Layout 
+  title="Publicaciones | LACIGE"
+  description="Publicaciones científicas del Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Publicaciones"
+    subtitulo="Investigación"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="pub-nav">
+        <a href="/investigacion/publicaciones/articulos" class="pub-nav__link">
+          <span class="pub-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </span>
+          <span class="pub-nav__content">
+            <span class="pub-nav__title">Artículos Científicos</span>
+            <span class="pub-nav__count">{articulos.length} publicaciones</span>
+          </span>
+          <span class="pub-nav__arrow">→</span>
+        </a>
+        
+        <a href="/investigacion/publicaciones/tesis" class="pub-nav__link">
+          <span class="pub-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </span>
+          <span class="pub-nav__content">
+            <span class="pub-nav__title">Tesis Publicadas</span>
+            <span class="pub-nav__count">{tesis.length} trabajos</span>
+          </span>
+          <span class="pub-nav__arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Publicaciones Recientes -->
+  <section class="section section--gray">
+    <div class="container">
+      <SectionHeader 
+        subtitulo="Lo más reciente"
+        titulo="Publicaciones Destacadas"
+      />
+      
+      <div class="publications-list">
+        {publicaciones.slice(0, 4).map((pub) => (
+          <article class="publication-item">
+            <div class="publication-item__year">
+              <span>{pub.data.anio}</span>
+            </div>
+            <div class="publication-item__content">
+              <span class="publication-item__type tag tag--primary">
+                {pub.data.tipo === 'articulo' ? 'Artículo' : 'Tesis'}
+              </span>
+              <h3 class="publication-item__title">{pub.data.titulo}</h3>
+              <p class="publication-item__authors">
+                {pub.data.autores.join(', ')}
+              </p>
+              {pub.data.revista && (
+                <p class="publication-item__journal">
+                  <em>{pub.data.revista}</em>
+                </p>
+              )}
+              <p class="publication-item__abstract">{pub.data.resumen}</p>
+              {pub.data.doi && (
+                <a href={`https://doi.org/${pub.data.doi}`} class="publication-item__doi" target="_blank" rel="noopener">
+                  DOI: {pub.data.doi}
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .pub-nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .pub-nav__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .pub-nav__link:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .pub-nav__icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+  }
+
+  .pub-nav__icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .pub-nav__content {
+    flex-grow: 1;
+  }
+
+  .pub-nav__title {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .pub-nav__count {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+  }
+
+  .pub-nav__arrow {
+    font-size: 1.5rem;
+    color: var(--color-accent);
+    transition: transform var(--transition-fast);
+  }
+
+  .pub-nav__link:hover .pub-nav__arrow {
+    transform: translateX(4px);
+  }
+
+  /* Lista de publicaciones */
+  .publications-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .publication-item {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .publication-item__year {
+    flex-shrink: 0;
+  }
+
+  .publication-item__year span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-earth) 100%);
+    border-radius: var(--radius-md);
+  }
+
+  .publication-item__content {
+    flex-grow: 1;
+  }
+
+  .publication-item__type {
+    margin-bottom: var(--space-sm);
+  }
+
+  .publication-item__title {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .publication-item__authors {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-xs);
+  }
+
+  .publication-item__journal {
+    font-size: 0.875rem;
+    color: var(--color-earth);
+    margin-bottom: var(--space-md);
+  }
+
+  .publication-item__abstract {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+  }
+
+  .publication-item__doi {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .publication-item__doi:hover {
+    color: var(--color-accent-dark);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .pub-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .publication-item {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>

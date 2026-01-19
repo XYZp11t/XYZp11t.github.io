@@ -1,0 +1,278 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+
+const hitos = [
+  {
+    anio: '1998',
+    titulo: 'Fundación del Laboratorio',
+    descripcion: 'Se establece LACIGE como grupo de investigación dentro de la Facultad de Ciencias.'
+  },
+  {
+    anio: '2003',
+    titulo: 'Primera Publicación Internacional',
+    descripcion: 'Publicación del primer artículo en una revista indexada sobre física solar.'
+  },
+  {
+    anio: '2008',
+    titulo: 'Instalación del Observatorio',
+    descripcion: 'Se inaugura el observatorio solar con instrumentación de vanguardia.'
+  },
+  {
+    anio: '2012',
+    titulo: 'Colaboración Internacional',
+    descripcion: 'Firma del primer convenio de colaboración con instituciones europeas y estadounidenses.'
+  },
+  {
+    anio: '2015',
+    titulo: 'Centro de Investigación',
+    descripcion: 'LACIGE se convierte oficialmente en Centro de Investigación independiente.'
+  },
+  {
+    anio: '2018',
+    titulo: 'Sistema de Predicción',
+    descripcion: 'Lanzamiento del sistema de predicción del viento solar basado en IA.'
+  },
+  {
+    anio: '2022',
+    titulo: 'Expansión de Infraestructura',
+    descripcion: 'Inauguración de nuevas instalaciones y laboratorios especializados.'
+  },
+  {
+    anio: '2025',
+    titulo: 'Red Nacional de Monitoreo',
+    descripcion: 'Establecimiento de la red nacional de estaciones de monitoreo solar.'
+  }
+];
+---
+
+<Layout 
+  title="Historia | LACIGE"
+  description="Conoce la historia y trayectoria del Laboratorio de Ciencias Geoespaciales."
+>
+  <PageHeader 
+    titulo="Nuestra Historia"
+    subtitulo="Sobre Nosotros"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="intro">
+        <p>
+          El Laboratorio de Ciencias Geoespaciales (LACIGE) nació de la visión de un grupo de 
+          investigadores comprometidos con el estudio del Sol y su influencia en el entorno 
+          terrestre. Desde su fundación en 1998, hemos crecido hasta convertirnos en un centro 
+          de referencia en investigación geoespacial en América Latina.
+        </p>
+      </div>
+
+      <div class="timeline">
+        {hitos.map((hito, index) => (
+          <div class={`timeline-item ${index % 2 === 0 ? 'timeline-item--left' : 'timeline-item--right'}`}>
+            <div class="timeline-item__content">
+              <span class="timeline-item__year">{hito.anio}</span>
+              <h3 class="timeline-item__title">{hito.titulo}</h3>
+              <p class="timeline-item__description">{hito.descripcion}</p>
+            </div>
+            <div class="timeline-item__marker">
+              <span></span>
+            </div>
+          </div>
+        ))}
+        <div class="timeline-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logros -->
+  <section class="section section--gray">
+    <div class="container">
+      <h2 class="section-title">Logros Destacados</h2>
+      
+      <div class="achievements-grid">
+        <div class="achievement-card">
+          <span class="achievement-card__number">150+</span>
+          <span class="achievement-card__label">Publicaciones Científicas</span>
+        </div>
+        <div class="achievement-card">
+          <span class="achievement-card__number">45</span>
+          <span class="achievement-card__label">Tesis Graduadas</span>
+        </div>
+        <div class="achievement-card">
+          <span class="achievement-card__number">12</span>
+          <span class="achievement-card__label">Colaboraciones Internacionales</span>
+        </div>
+        <div class="achievement-card">
+          <span class="achievement-card__number">25+</span>
+          <span class="achievement-card__label">Años de Experiencia</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .intro {
+    max-width: 800px;
+    margin: 0 auto var(--space-4xl);
+    text-align: center;
+  }
+
+  .intro p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-gray-600);
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-2xl) 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--color-accent), var(--color-earth));
+    transform: translateX(-50%);
+    border-radius: var(--radius-full);
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-3xl);
+    position: relative;
+  }
+
+  .timeline-item--left {
+    flex-direction: row;
+  }
+
+  .timeline-item--right {
+    flex-direction: row-reverse;
+  }
+
+  .timeline-item__content {
+    width: calc(50% - 40px);
+    background-color: var(--color-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .timeline-item--left .timeline-item__content {
+    text-align: right;
+  }
+
+  .timeline-item__year {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-white);
+    background-color: var(--color-accent);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .timeline-item__title {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .timeline-item__description {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .timeline-item__marker {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .timeline-item__marker span {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-white);
+    border: 4px solid var(--color-primary);
+    border-radius: var(--radius-full);
+  }
+
+  /* Section title */
+  .section-title {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  /* Achievements */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .achievement-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .achievement-card__number {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+  }
+
+  .achievement-card__label {
+    font-size: 0.9375rem;
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 1024px) {
+    .timeline-line {
+      left: 20px;
+    }
+
+    .timeline-item {
+      flex-direction: row !important;
+    }
+
+    .timeline-item__content {
+      width: calc(100% - 60px);
+      margin-left: 60px;
+      text-align: left !important;
+    }
+
+    .timeline-item__marker {
+      left: 20px;
+    }
+
+    .achievements-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .achievements-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
