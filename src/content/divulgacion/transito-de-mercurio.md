@@ -3,7 +3,7 @@ titulo: "Tránsito de Mercurio por el Disco Solar"
 descripcion: "Guía completa sobre el fenómeno astronómico donde Mercurio cruza frente al Sol, sus etapas y cómo observarlo de forma segura."
 autor: "Dr. Mario Rodríguez Martínez"
 fecha: 2016-05-02
-imagen: "transito-mercurio/mercurio.jpg"
+imagen: "/transito-mercurio/mercurio.jpg"
 etiquetas: ["astronomía", "eventos", "magnetosfera", "Mercurio", "observación solar"]
 destacado: true
 ---
