@@ -107,18 +107,61 @@ const imagenesJSON = JSON.stringify(imagenes);
       </button>
     </div>
 
+    <!-- Controles de zoom (desktop) -->
+    <div class="solar-viewer__zoom-controls" id="solarViewerZoomControls">
+      <button
+        class="solar-viewer__zoom-btn"
+        id="solarViewerZoomIn"
+        type="button"
+        aria-label="Acercar"
+        title="Acercar (+)"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <button
+        class="solar-viewer__zoom-btn"
+        id="solarViewerZoomReset"
+        type="button"
+        aria-label="Restablecer zoom"
+        title="Restablecer (0)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </button>
+      <button
+        class="solar-viewer__zoom-btn"
+        id="solarViewerZoomOut"
+        type="button"
+        aria-label="Alejar"
+        title="Alejar (-)"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
     <div class="solar-viewer__content">
       <div class="solar-viewer__main">
         <div
           class="solar-viewer__image-container"
           id="solarViewerImageContainer"
         >
-          <img
-            src=""
-            alt=""
-            class="solar-viewer__image"
-            id="solarViewerImage"
-          />
+          <div class="solar-viewer__image-wrapper" id="solarViewerImageWrapper">
+            <img
+              src=""
+              alt=""
+              class="solar-viewer__image"
+              id="solarViewerImage"
+              draggable="false"
+            />
+          </div>
         </div>
 
         <!-- Toggle para información en móvil -->
@@ -404,6 +447,7 @@ const imagenesJSON = JSON.stringify(imagenes);
 
           setTimeout(() => {
             currentIndex++;
+            resetZoom();
             updateViewer();
             image.classList.remove("slide-out-left");
             image.classList.add("slide-in-right");
@@ -423,6 +467,7 @@ const imagenesJSON = JSON.stringify(imagenes);
 
           setTimeout(() => {
             currentIndex--;
+            resetZoom();
             updateViewer();
             image.classList.remove("slide-out-right");
             image.classList.add("slide-in-left");
@@ -648,6 +693,191 @@ const imagenesJSON = JSON.stringify(imagenes);
         }
       }
 
+      // ========== FUNCIONALIDAD DE ZOOM ==========
+      const imageWrapper = document.getElementById("solarViewerImageWrapper") as HTMLElement;
+      const zoomInBtn = document.getElementById("solarViewerZoomIn") as HTMLButtonElement;
+      const zoomOutBtn = document.getElementById("solarViewerZoomOut") as HTMLButtonElement;
+      const zoomResetBtn = document.getElementById("solarViewerZoomReset") as HTMLButtonElement;
+      const zoomControls = document.getElementById("solarViewerZoomControls") as HTMLElement;
+
+      let scale = 1;
+      let panning = false;
+      let pointX = 0;
+      let pointY = 0;
+      let startX = 0;
+      let startY = 0;
+      const minScale = 1;
+      const maxScale = 5;
+      const zoomStep = 0.3;
+
+      function updateTransform() {
+        if (!imageWrapper) return;
+        imageWrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        
+        // Actualizar estado de botones
+        if (zoomInBtn) zoomInBtn.disabled = scale >= maxScale;
+        if (zoomOutBtn) zoomOutBtn.disabled = scale <= minScale;
+        
+        // Mostrar/ocultar controles de zoom
+        if (zoomControls) {
+          zoomControls.classList.toggle("is-active", scale > 1 || scale < 1);
+        }
+        
+        // Agregar/quitar clase de zoom activo
+        if (imageContainer) {
+          imageContainer.classList.toggle("is-zoomed", scale > 1);
+        }
+      }
+
+      function resetZoom() {
+        scale = 1;
+        pointX = 0;
+        pointY = 0;
+        updateTransform();
+      }
+
+      function zoomIn() {
+        if (scale < maxScale) {
+          scale = Math.min(scale + zoomStep, maxScale);
+          updateTransform();
+        }
+      }
+
+      function zoomOut() {
+        if (scale > minScale) {
+          scale = Math.max(scale - zoomStep, minScale);
+          // Si volvemos a escala 1, resetear posición
+          if (scale === 1) {
+            pointX = 0;
+            pointY = 0;
+          }
+          updateTransform();
+        }
+      }
+
+      // Zoom con rueda del ratón
+      if (imageContainer) {
+        imageContainer.addEventListener(
+          "wheel",
+          (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+            const newScale = Math.max(minScale, Math.min(maxScale, scale + delta));
+            
+            if (newScale !== scale) {
+              scale = newScale;
+              if (scale === 1) {
+                pointX = 0;
+                pointY = 0;
+              }
+              updateTransform();
+            }
+          },
+          { signal, passive: false }
+        );
+      }
+
+      // Botones de zoom
+      if (zoomInBtn) {
+        zoomInBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          zoomIn();
+        }, { signal });
+      }
+
+      if (zoomOutBtn) {
+        zoomOutBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          zoomOut();
+        }, { signal });
+      }
+
+      if (zoomResetBtn) {
+        zoomResetBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          resetZoom();
+        }, { signal });
+      }
+
+      // Pan/Arrastre cuando está zoomed
+      if (imageContainer) {
+        imageContainer.addEventListener(
+          "mousedown",
+          (e) => {
+            if (scale > 1) {
+              e.preventDefault();
+              panning = true;
+              startX = e.clientX - pointX;
+              startY = e.clientY - pointY;
+              imageContainer.classList.add("is-panning");
+            }
+          },
+          { signal }
+        );
+
+        document.addEventListener(
+          "mousemove",
+          (e) => {
+            if (!panning || scale <= 1) return;
+            e.preventDefault();
+            pointX = e.clientX - startX;
+            pointY = e.clientY - startY;
+            updateTransform();
+          },
+          { signal }
+        );
+
+        document.addEventListener(
+          "mouseup",
+          () => {
+            if (panning) {
+              panning = false;
+              imageContainer?.classList.remove("is-panning");
+            }
+          },
+          { signal }
+        );
+
+        // Doble click para zoom
+        imageContainer.addEventListener(
+          "dblclick",
+          (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (scale > 1) {
+              resetZoom();
+            } else {
+              scale = 2.5;
+              updateTransform();
+            }
+          },
+          { signal }
+        );
+      }
+
+      // Teclado para zoom
+      document.addEventListener(
+        "keydown",
+        (e) => {
+          if (!viewer.classList.contains("is-open")) return;
+
+          if (e.key === "0" && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            resetZoom();
+          } else if (e.key === "+" || e.key === "=") {
+            e.preventDefault();
+            zoomIn();
+          } else if (e.key === "-" || e.key === "_") {
+            e.preventDefault();
+            zoomOut();
+          }
+        },
+        { signal }
+      );
+
       // Exponer función global para abrir el visor
       (window as any).openSolarViewer = openViewer;
 
@@ -865,6 +1095,22 @@ const imagenesJSON = JSON.stringify(imagenes);
     overflow: hidden;
     width: 100%;
     max-height: calc(100vh - 160px);
+    cursor: grab;
+    position: relative;
+  }
+
+  .solar-viewer__image-container.is-panning {
+    cursor: grabbing;
+  }
+
+  .solar-viewer__image-container.is-zoomed {
+    cursor: grab;
+  }
+
+  .solar-viewer__image-wrapper {
+    transform-origin: center center;
+    transition: transform 0.1s ease-out;
+    will-change: transform;
   }
 
   .solar-viewer__image {
@@ -875,6 +1121,87 @@ const imagenesJSON = JSON.stringify(imagenes);
     transition:
       opacity 0.15s ease,
       transform 0.15s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Controles de zoom */
+  .solar-viewer__zoom-controls {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100010;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .solar-viewer__zoom-controls.is-active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .solar-viewer.is-visible .solar-viewer__zoom-controls {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    transition: opacity 0.3s ease 0.2s, transform 0.3s ease 0.2s;
+  }
+
+  .solar-viewer__zoom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-full);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(4px);
+  }
+
+  .solar-viewer__zoom-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  .solar-viewer__zoom-btn:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .solar-viewer__zoom-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Indicador de zoom */
+  .solar-viewer__zoom-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .solar-viewer__image-container.is-zoomed .solar-viewer__zoom-indicator {
+    opacity: 1;
   }
 
   /* Animaciones de navegación entre imágenes */
@@ -1016,8 +1343,33 @@ const imagenesJSON = JSON.stringify(imagenes);
   @media (max-width: 900px) {
     /* Ocultar controles desktop */
     .solar-viewer__close,
-    .solar-viewer__nav {
+    .solar-viewer__nav,
+    .solar-viewer__zoom-controls {
       display: none;
+    }
+
+    /* Controles de zoom para móvil */
+    .solar-viewer__zoom-controls {
+      position: fixed;
+      bottom: 80px;
+      right: 12px;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 100020;
+    }
+
+    .solar-viewer__zoom-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 20, 50, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .solar-viewer.is-visible .solar-viewer__zoom-controls {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
     }
 
     /* Header del visor - posicionado debajo del header del sitio */
