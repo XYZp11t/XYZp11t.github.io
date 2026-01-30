@@ -3,8 +3,11 @@ import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 
-const becasDisponibles = [
-  {
+const becasDisponibles = [];
+
+/*Ejemplos de becas, seguir el mismo formato para agregar nuevas becas
+[
+{
     tipo: 'Licenciatura',
     nombre: 'Beca de Investigación para Estudiantes de Licenciatura',
     descripcion: 'Apoyo económico para estudiantes que deseen realizar su servicio social o tesis en el laboratorio.',
@@ -60,7 +63,7 @@ const becasDisponibles = [
     ],
     estado: 'Por convocatoria'
   }
-];
+];*/
 
 const procesoAplicacion = [
   { paso: 1, titulo: 'Revisa requisitos', descripcion: 'Verifica que cumples con los requisitos de la beca de tu interés.' },
@@ -90,42 +93,59 @@ const procesoAplicacion = [
         descripcion="Explora las diferentes opciones de financiamiento según tu nivel académico."
       />
       
-      <div class="scholarships-grid">
-        {becasDisponibles.map((beca) => (
-          <article class="scholarship-card">
-            <div class="scholarship-card__header">
-              <span class="scholarship-card__type">{beca.tipo}</span>
-              <span class={`scholarship-card__status ${beca.estado === 'Abierta' ? 'scholarship-card__status--open' : ''}`}>
-                {beca.estado}
-              </span>
-            </div>
-            <h3 class="scholarship-card__title">{beca.nombre}</h3>
-            <p class="scholarship-card__description">{beca.descripcion}</p>
-            
-            <div class="scholarship-card__details">
-              <div class="detail">
-                <span class="detail__label">Duración</span>
-                <span class="detail__value">{beca.duracion}</span>
+      {becasDisponibles.length > 0 ? (
+        <div class="scholarships-grid">
+          {becasDisponibles.map((beca) => (
+            <article class="scholarship-card">
+              <div class="scholarship-card__header">
+                <span class="scholarship-card__type">{beca.tipo}</span>
+                <span class={`scholarship-card__status ${beca.estado === 'Abierta' ? 'scholarship-card__status--open' : ''}`}>
+                  {beca.estado}
+                </span>
               </div>
-              <div class="detail">
-                <span class="detail__label">Monto</span>
-                <span class="detail__value">{beca.monto}</span>
+              <h3 class="scholarship-card__title">{beca.nombre}</h3>
+              <p class="scholarship-card__description">{beca.descripcion}</p>
+              
+              <div class="scholarship-card__details">
+                <div class="detail">
+                  <span class="detail__label">Duración</span>
+                  <span class="detail__value">{beca.duracion}</span>
+                </div>
+                <div class="detail">
+                  <span class="detail__label">Monto</span>
+                  <span class="detail__value">{beca.monto}</span>
+                </div>
               </div>
-            </div>
-            
-            <div class="scholarship-card__requirements">
-              <h4>Requisitos</h4>
-              <ul>
-                {beca.requisitos.map((req) => (
-                  <li>{req}</li>
-                ))}
-              </ul>
-            </div>
-            
-            <a href="/contacto" class="btn btn--primary">Solicitar Información</a>
-          </article>
-        ))}
-      </div>
+              
+              <div class="scholarship-card__requirements">
+                <h4>Requisitos</h4>
+                <ul>
+                  {beca.requisitos.map((req) => (
+                    <li>{req}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <a href="/contacto" class="btn btn--primary">Solicitar Información</a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="no-becas-aviso">
+          <div class="no-becas-aviso__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <h3 class="no-becas-aviso__titulo">No hay becas disponibles en este momento</h3>
+          <p class="no-becas-aviso__texto">
+            En la actualidad no tenemos convocatorias abiertas. Te invitamos a revisar esta página más adelante 
+            o <a href="/contacto">contactarnos</a> para recibir información sobre futuras oportunidades.
+          </p>
+        </div>
+      )}
     </div>
   </section>
 
@@ -216,7 +236,7 @@ const procesoAplicacion = [
         </p>
         <div class="cta-buttons">
           <a href="/contacto" class="btn btn--accent">Contactar</a>
-          <a href="mailto:becas@lacige.edu" class="btn btn--secondary btn--light">becas@lacige.edu</a>
+
         </div>
       </div>
     </div>
@@ -340,6 +360,44 @@ const procesoAplicacion = [
     position: absolute;
     left: 0;
     color: var(--color-accent);
+  }
+
+  /* Aviso cuando no hay becas */
+  .no-becas-aviso {
+    text-align: center;
+    padding: var(--space-2xl) var(--space-xl);
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--color-gray-300);
+  }
+
+  .no-becas-aviso__icon {
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-md);
+  }
+
+  .no-becas-aviso__titulo {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .no-becas-aviso__texto {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    line-height: 1.6;
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+
+  .no-becas-aviso__texto a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .no-becas-aviso__texto a:hover {
+    color: var(--color-primary-dark);
   }
 
   /* Process */
