@@ -68,12 +68,6 @@ const areasInvestigacion = [
   }
 ];
 
-const estadisticas = [
-  { numero: '25+', etiqueta: 'Años de experiencia' },
-  { numero: '150+', etiqueta: 'Publicaciones científicas' },
-  { numero: '45', etiqueta: 'Investigadores' },
-  { numero: '12', etiqueta: 'Colaboraciones internacionales' }
-];
 ---
 
 <Layout>
@@ -165,6 +159,44 @@ const estadisticas = [
     </div>
   </section>
 
+  <!-- Sección Acerca del LACIGE -->
+  <section class="about-lacige-section">
+    <div class="container">
+      <div class="about-lacige-content">
+        <SectionHeader 
+          subtitulo="Acerca del LACIGE"
+          titulo="Laboratorio de Ciencias Geoespaciales"
+          centrado={true}
+        />
+        <div class="about-lacige-text">
+          <p>
+            El </strong>Laboratorio de Ciencias Geoespaciales (LACIGE)</strong> fue creado durante el segundo semestre del 2015 
+            en el campus Morelia de la Universidad Nacional Autónoma de México (<strong>UNAM</strong>). La infraestructura, 
+            equipo de cómputo, software e instrumentos de observación, provienen de fondos directos de la UNAM 
+            otorgados a la Escuela Nacional de Estudios Superiores unidad Morelia (<strong>ENES</strong>) y de la 
+            Secretaría de Ciencia, Humanidades, Tecnología e Innovación (<strong>SECIHTI</strong> )a través del 
+            proyecto de infraestructura INFR: 253691 aprobado en ese mismo año.
+          </p>
+          <p>
+            Aquí se desarrollan proyectos de investigación básica en el campo de las Ciencias Espaciales, 
+            la Astrofísica y el Cómputo en apoyo a las Geociencias, destacando los siguientes:
+          </p>
+          <ul class="about-lacige-list">
+            <li>Estudio de perturbaciones ionosféricas (PI).</li>
+            <li>Cálculo del contenido de electrones (TEC) en la ionosfera terrestre.</li>
+            <li>Análisis de imágenes solares con telescopios especiales del LACIGE.</li>
+            <li>Estudios de objetos cercanos a la Tierra (NEOs).</li>
+            <li>Estudios de plasmas astrofísicos.</li>
+            <li>Estudios de ondas e inestabilidades en plasmas espaciales.</li>
+          </ul>
+          <p class="about-lacige-responsible">
+            <strong>Responsable del LACIGE:</strong> Dr. Mario Rodríguez Martínez
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Sección de Áreas de Investigación -->
   <section class="section section--gray">
     <div class="container">
@@ -183,19 +215,7 @@ const estadisticas = [
   </section>
 
   <!-- Sección de Estadísticas -->
-  <section class="stats-section">
-    <div class="stats-background"></div>
-    <div class="container">
-      <div class="stats-grid">
-        {estadisticas.map((stat, index) => (
-          <div class="stat-item" style={`--delay: ${index * 0.1}s`}>
-            <span class="stat-number">{stat.numero}</span>
-            <span class="stat-label">{stat.etiqueta}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+
 
   <!-- Sección de Divulgación -->
   <section class="section">
@@ -272,7 +292,7 @@ const estadisticas = [
   <section class="cta-section">
     <div class="container">
       <div class="cta-content">
-        <h2 class="cta-title">¿Interesado en formar parte de LACIGE?</h2>
+        <h2 class="cta-title">¿Te interesa formar parte del LACIGE?</h2>
         <p class="cta-description">
           Ofrecemos oportunidades de becas y colaboración para estudiantes e investigadores 
           apasionados por las ciencias geoespaciales.
@@ -462,6 +482,82 @@ const estadisticas = [
     .solar-daily__image-wrapper {
       max-width: 500px;
       margin: 0 auto;
+    }
+  }
+
+  /* Sección Acerca del LACIGE */
+  .about-lacige-section {
+    padding: var(--space-4xl) 0;
+    background: linear-gradient(180deg, var(--color-off-white) 0%, var(--color-white) 100%);
+  }
+
+  .about-lacige-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .about-lacige-text {
+    margin-top: var(--space-xl);
+    text-align: left;
+  }
+
+  .about-lacige-text p {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-md);
+  }
+
+  .about-lacige-text strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .about-lacige-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-lg) 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm) var(--space-xl);
+  }
+
+  .about-lacige-list li {
+    position: relative;
+    padding-left: var(--space-lg);
+    font-size: 1rem;
+    color: var(--color-gray-600);
+    line-height: 1.6;
+  }
+
+  .about-lacige-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+  }
+
+  .about-lacige-responsible {
+    margin-top: var(--space-xl);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-gray-100);
+    border-left: 4px solid var(--color-accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    text-align: left;
+  }
+
+  .about-lacige-responsible strong {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .about-lacige-list {
+      grid-template-columns: 1fr;
     }
   }
 

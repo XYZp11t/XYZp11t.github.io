@@ -23,13 +23,7 @@ const todasEtiquetas = [...new Set(articulos.flatMap(a => a.data.etiquetas))];
 
   <section class="section">
     <div class="container">
-      <!-- Filtros -->
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">Todos</button>
-        {todasEtiquetas.slice(0, 6).map((etiqueta) => (
-          <button class="filter-btn" data-filter={etiqueta}>{etiqueta}</button>
-        ))}
-      </div>
+
 
       <!-- Grid de artículos -->
       <div class="articles-grid">
@@ -59,54 +53,11 @@ const todasEtiquetas = [...new Set(articulos.flatMap(a => a.data.etiquetas))];
     </div>
   </section>
 
-  <!-- Newsletter -->
-  <section class="newsletter-section">
-    <div class="container">
-      <div class="newsletter-content">
-        <div class="newsletter-text">
-          <h2>Mantente Informado</h2>
-          <p>Suscríbete a nuestro boletín para recibir las últimas noticias sobre ciencias geoespaciales.</p>
-        </div>
-        <form class="newsletter-form">
-          <input type="email" placeholder="tu@email.com" required />
-          <button type="submit" class="btn btn--accent">Suscribirse</button>
-        </form>
-      </div>
-    </div>
-  </section>
+
 </Layout>
 
 <style>
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-2xl);
-    justify-content: center;
-  }
 
-  .filter-btn {
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-gray-600);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-full);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-  }
-
-  .filter-btn:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
-
-  .filter-btn.active {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-white);
-  }
 
   .articles-grid {
     display: grid;
@@ -150,84 +101,7 @@ const todasEtiquetas = [...new Set(articulos.flatMap(a => a.data.etiquetas))];
     color: var(--color-gray-500);
   }
 
-  /* Newsletter */
-  .newsletter-section {
-    padding: var(--space-4xl) 0;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  }
 
-  .newsletter-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2xl);
-    flex-wrap: wrap;
-  }
-
-  .newsletter-text {
-    flex: 1;
-    min-width: 280px;
-  }
-
-  .newsletter-text h2 {
-    font-size: 1.75rem;
-    color: var(--color-white);
-    margin-bottom: var(--space-sm);
-  }
-
-  .newsletter-text p {
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-  }
-
-  .newsletter-form {
-    display: flex;
-    gap: var(--space-md);
-    flex: 1;
-    max-width: 480px;
-  }
-
-  .newsletter-form input {
-    flex: 1;
-    padding: var(--space-md) var(--space-lg);
-    font-size: 1rem;
-    border: none;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-white);
-  }
-
-  .newsletter-form input::placeholder {
-    color: var(--color-gray-400);
-  }
-
-  @media (max-width: 768px) {
-    .newsletter-content {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .newsletter-form {
-      width: 100%;
-      max-width: none;
-      flex-direction: column;
-    }
-  }
 </style>
 
-<script>
-  // Filtrado de artículos
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const articles = document.querySelectorAll('.articles-grid > *');
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filter = btn.getAttribute('data-filter');
-      
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Por ahora, simplemente muestra todos
-      // La funcionalidad de filtrado real se implementaría con JavaScript
-    });
-  });
-</script>

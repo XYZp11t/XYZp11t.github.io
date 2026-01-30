@@ -52,8 +52,27 @@ const colaboradoresInternos: GrupoInvestigadores[] = [
           email: 'sinhue.haro@lacige.unam.mx'
         }
       },
-      { nombre: 'Dr. Orlando Hernández Cristóbal', perfil: { cargo: 'Técnico Académico T. C.' } },
-      { nombre: 'Dra. Yesenia Arredondo León', perfil: { cargo: 'Profesor-Investigador T. C.' } },
+      
+      { nombre: 'Dr. José Juan González Avilés ', 
+      imagen: '/colaboradores/DrJoseJuan.png',
+      perfil: { 
+        cargo: 'Profesor Asociado “C” de Tiempo Completo',
+        email: 'jgonzaleza@enesmorelia.unam.mx'
+       }
+        
+      },
+
+      { 
+      nombre: 'Dr. Orlando Hernández Cristóbal',
+      imagen: '', 
+      perfil: {
+          cargo: 'Técnico Académico T. C.', 
+          email: ''
+        } 
+      },
+      
+      
+      
       { nombre: 'Dr. Antonio Pola Villaseñor',
       imagen: '/colaboradores/DrPola.jpg',
       perfil: { cargo: 'Profesor-Investigador T. C.' } 
@@ -393,25 +412,7 @@ const redesAcademicas = [
     </div>
   </section>
 
-  <!-- Redes Académicas -->
-  <section class="section section--gray">
-    <div class="container">
-      <SectionHeader 
-        subtitulo="Membresías"
-        titulo="Redes Académicas"
-        descripcion="Participamos activamente en las principales organizaciones científicas internacionales."
-      />
-      
-      <div class="networks-grid">
-        {redesAcademicas.map((red) => (
-          <div class="network-card">
-            <span class="network-card__acronym">{red.nombre}</span>
-            <p class="network-card__fullname">{red.descripcion}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+
 
   <!-- Llamado a colaborar -->
   <section class="section section--primary">
@@ -666,41 +667,7 @@ const redesAcademicas = [
     color: var(--color-accent);
   }
 
-  /* Networks */
-  .networks-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-lg);
-  }
 
-  .network-card {
-    background-color: var(--color-white);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-md);
-    text-align: center;
-    border-top: 4px solid var(--color-accent);
-    transition: transform var(--transition-base);
-  }
-
-  .network-card:hover {
-    transform: translateY(-4px);
-  }
-
-  .network-card__acronym {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: var(--space-sm);
-  }
-
-  .network-card__fullname {
-    font-size: 0.8125rem;
-    color: var(--color-gray-500);
-    margin: 0;
-  }
 
   /* CTA */
   .cta-content {
@@ -721,9 +688,7 @@ const redesAcademicas = [
 
   /* Responsive */
   @media (max-width: 1024px) {
-    .networks-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+
 
     .researchers-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -752,9 +717,7 @@ const redesAcademicas = [
   }
 
   @media (max-width: 640px) {
-    .networks-grid {
-      grid-template-columns: 1fr;
-    }
+
 
     .institution-header {
       flex-direction: column;

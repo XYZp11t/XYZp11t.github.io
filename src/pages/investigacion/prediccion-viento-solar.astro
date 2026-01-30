@@ -95,7 +95,29 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
         <p class="video-info__description" id="video-description"> 
           Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D, con base en los datos de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.
         </p>
-        
+      </div>
+
+      <!-- Instituciones colaboradoras -->
+      <div class="video-collaborators">
+        <span class="video-collaborators__label" id="collaborators-label">Instituciones colaboradoras:</span>
+        <div class="video-collaborators__logos">
+          <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Predictive Science Inc">
+            <img src="/predictive-science-logo.svg" alt="Predictive Science Inc" loading="lazy" class="logo-predsci" />
+            <span>Predictive Science Inc</span>
+          </a>
+          <a href="https://www.unam.mx/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Universidad Nacional Autónoma de México">
+            <img src="/logo-unam.png" alt="UNAM" loading="lazy" class="logo-unam" />
+            
+          </a>
+          <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener" class="video-collaborator-logo" title="ENES Morelia">
+            <img src="/logo-enes.png" alt="ENES Morelia" loading="lazy" class="logo-enes" />
+            
+          </a>
+          <a href="/" class="video-collaborator-logo" title="LACIGE">
+            <img src="/LACIGE_LOGO_FINAL_NEGRO.png" alt="LACIGE" loading="lazy" class="logo-lacige" />
+            
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -156,19 +178,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     </div>
   </section>
 
-  <!-- Instituciones colaboradoras -->
-  <section class="collaborators-section">
-    <div class="container">
-      <div class="collaborators">
-        <span class="collaborators__label" id="collaborators-label">Instituciones colaboradoras:</span>
-        <div class="collaborators__links">
-          <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener">ENES Morelia</a>
-          <a href="https://www.unam.mx/" target="_blank" rel="noopener">UNAM</a>
-          <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>
-        </div>
-      </div>
-    </div>
-  </section>
+
 </Layout>
 
 <script is:inline>
@@ -178,7 +188,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       sectionLabel: 'Investigación',
       pageTitle: 'Predicción del Viento Solar',
       updated: 'Actualizado el:',
-      description: 'Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D para los próximos siete días. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.',
+      description: `Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D, con base en los datos de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.`,
       whatIsTitle: '¿Qué es el Viento Solar?',
       whatIsDescription: 'El viento solar es un flujo continuo de partículas cargadas (principalmente protones y electrones) que emana de la corona solar y se propaga por todo el Sistema Solar. Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos en el entorno espacial terrestre.',
       predictionImportance: 'La predicción precisa del viento solar es fundamental para:',
@@ -192,7 +202,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       sectionLabel: 'Research',
       pageTitle: 'Solar Wind Forecast',
       updated: 'Updated:',
-      description: 'This visualization summarizes the projected solar wind speed and density from the SunRunner3D model for the next seven days. Lighter tones indicate faster streams, while darker tones highlight regions of lower intensity. Use full screen to examine fine details.',
+      description: `This visualization summarizes the projected solar wind speed and density from the SunRunner3D model, based on data from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Lighter tones indicate faster streams, while darker tones highlight regions of lower intensity. Use full screen to examine fine details.`,
       whatIsTitle: 'What is the Solar Wind?',
       whatIsDescription: 'The solar wind is a continuous flow of charged particles (mainly protons and electrons) emanating from the solar corona and propagating throughout the solar system. Its typical velocity ranges between 300 and 800 km/s, and it can cause significant effects on Earth\'s space environment.',
       predictionImportance: 'Accurate solar wind prediction is essential for:',
@@ -233,12 +243,17 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     if (el) el.textContent = value; 
   }
 
+  function setHTML(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = value;
+  }
+
   function applyLanguage(lang) {
     const t = i18n[lang] || i18n.es;
     setText('section-label', t.sectionLabel);
     setText('page-title', t.pageTitle);
     setText('timestamp-label', t.updated);
-    setText('video-description', t.description);
+    setHTML('video-description', t.description); // Cambiado a setHTML
     setText('what-is-title', t.whatIsTitle);
     setText('what-is-description', t.whatIsDescription);
     setText('prediction-importance', t.predictionImportance);
@@ -667,43 +682,93 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
   }
   
 
-  /* Seccion de colaboradores */
-  .collaborators-section {
-    padding: var(--space-xl) 0;
-    background-color: var(--color-gray-100);
+  /* Colaboradores en sección de video */
+  .video-collaborators {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
     border-top: 1px solid var(--color-gray-200);
+    text-align: center;
   }
 
-  .collaborators {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-  }
-
-  .collaborators__label {
+  .video-collaborators__label {
+    display: block;
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-gray-500);
+    margin-bottom: var(--space-lg);
   }
 
-  .collaborators__links {
+  .video-collaborators__logos {
     display: flex;
+    align-items: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
-    gap: var(--space-lg);
+    gap: var(--space-2xl);
   }
 
-  .collaborators__links a {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-primary);
+  .video-collaborator-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
     text-decoration: none;
-    transition: color var(--transition-fast);
+    transition: all var(--transition-fast);
+    opacity: 0.9;
   }
 
-  .collaborators__links a:hover {
-    color: var(--color-accent);
+  .video-collaborator-logo:hover {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+
+  .video-collaborator-logo span {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-gray-600);
+    transition: color var(--transition-fast);
+    text-align: center;
+  }
+
+  .video-collaborator-logo:hover span {
+    color: var(--color-primary);
+  }
+
+  .video-collaborator-logo img {
+    width: auto;
+    object-fit: contain;
+    transition: all var(--transition-fast);
+  }
+
+  /* Tamaños específicos para cada logo - ahora más grandes */
+  .logo-predsci {
+    height: 56px;
+    filter: grayscale(20%);
+  }
+
+  .logo-unam {
+    height: 64px;
+    /* Aplicar color azul UNAM #003D79 */
+    filter: brightness(0) saturate(100%) invert(16%) sepia(95%) saturate(2466%) hue-rotate(195deg) brightness(96%) contrast(101%);
+  }
+
+  .logo-enes {
+    height: 64px;
+    filter: grayscale(20%);
+  }
+
+  .logo-lacige {
+    height: 72px;
+    filter: grayscale(20%);
+  }
+
+  .video-collaborator-logo:hover .logo-predsci,
+  .video-collaborator-logo:hover .logo-enes,
+  .video-collaborator-logo:hover .logo-lacige {
+    filter: grayscale(0%);
+  }
+
+  .video-collaborator-logo:hover .logo-unam {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(2000%) hue-rotate(195deg) brightness(110%) contrast(110%);
   }
 
   /* Responsive */
@@ -740,9 +805,24 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       gap: var(--space-sm);
     }
 
-    .collaborators {
-      flex-direction: column;
-      text-align: center;
+    .video-collaborators__logos {
+      gap: var(--space-xl);
+    }
+
+    .logo-predsci {
+      height: 48px;
+    }
+
+    .logo-unam {
+      height: 52px;
+    }
+
+    .logo-enes {
+      height: 52px;
+    }
+
+    .logo-lacige {
+      height: 56px;
     }
   }
 </style>

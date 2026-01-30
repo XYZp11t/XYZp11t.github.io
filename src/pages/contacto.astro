@@ -25,7 +25,7 @@ const infoContacto = [
   {
     tipo: 'Horario de Atención',
     icono: 'horario',
-    valor: 'Lunes a Viernes: 9:00 - 18:00',
+    valor: 'Lunes a Viernes: 9:00 - 17:00',
     enlace: null
   }
 ];
@@ -53,16 +53,29 @@ const iconos: Record<string, string> = {
         <!-- Formulario -->
         <div class="contact-form-wrapper">
           <h2>Envíanos un Mensaje</h2>
-          <form class="contact-form" id="contactForm">
+          <form 
+            class="contact-form" 
+            id="contactForm"
+            action="https://docs.google.com/forms/d/e/1FAIpQLSfQgXZ6b2l_1vbqfGlF8YuBcbZTaE0L5QlVQUb-N2RNgmjdYw/formResponse"
+            method="POST"
+            target="_blank"
+          >
+            <!-- Campo honeypot para detectar bots (oculto) -->
+            <div class="form-group form-group--honeypot" aria-hidden="true">
+              <label for="website">No llenar este campo</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+            </div>
+
             <div class="form-group">
               <label for="nombre">Nombre completo *</label>
-              <input type="text" id="nombre" name="nombre" required />
+              <input type="text" id="nombre" name="entry.1258781161" required />
             </div>
             
             <div class="form-row">
               <div class="form-group">
                 <label for="email">Correo electrónico *</label>
-                <input type="email" id="email" name="email" required />
+                <input type="email" id="email" name="entry.735313291" required />
+                <span class="form-error" id="email-error"></span>
               </div>
               <div class="form-group">
                 <label for="telefono">Teléfono</label>
@@ -74,26 +87,27 @@ const iconos: Record<string, string> = {
               <label for="asunto">Asunto *</label>
               <select id="asunto" name="asunto" required>
                 <option value="">Selecciona una opción</option>
-                <option value="informacion">Información general</option>
-                <option value="colaboracion">Propuesta de colaboración</option>
-                <option value="becas">Becas y oportunidades</option>
-                <option value="visita">Solicitud de visita</option>
-                <option value="prensa">Prensa y medios</option>
-                <option value="otro">Otro</option>
+                <option value="Información general">Información general</option>
+                <option value="Propuesta de colaboración">Propuesta de colaboración</option>
+                <option value="Becas y oportunidades">Becas y oportunidades</option>
+                <option value="Solicitud de visita">Solicitud de visita</option>
+                <option value="Prensa y medios">Prensa y medios</option>
+                <option value="Otro">Otro</option>
               </select>
             </div>
             
             <div class="form-group">
               <label for="mensaje">Mensaje *</label>
-              <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+              <textarea id="mensaje" name="entry.2025781092" rows="5" required></textarea>
             </div>
             
+            <!--
             <div class="form-group form-group--checkbox">
               <input type="checkbox" id="privacidad" name="privacidad" required />
               <label for="privacidad">
                 He leído y acepto la <a href="/privacidad">política de privacidad</a>
               </label>
-            </div>
+            </div> -->
             
             <button type="submit" class="btn btn--primary btn--full">
               Enviar Mensaje
@@ -127,19 +141,21 @@ const iconos: Record<string, string> = {
             ))}
           </div>
 
-          <!-- Mapa placeholder -->
+          <!-- Mapa -->
           <div class="contact-map">
-            <div class="map-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span>Ciudad Universitaria</span>
-              <p>Ver en Google Maps</p>
-            </div>
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3163.766477006448!2d-101.22119373928291!3d19.649393387706027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842d0c599c256431%3A0xda01b64116d303ac!2sObservatorio%20Solar%20ENES%20Morelia%20UNAM!5e1!3m2!1ses-419!2smx!4v1769761925906!5m2!1ses-419!2smx"
+              width="100%" 
+              height="250" 
+              style="border:0; border-radius: var(--radius-lg);" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Ubicación del Observatorio Solar ENES Morelia UNAM"
+            ></iframe>
           </div>
 
-          <!-- Redes sociales -->
+          <!-- Redes sociales 
           <div class="contact-social">
             <h3>Síguenos</h3>
             <div class="social-links">
@@ -167,7 +183,7 @@ const iconos: Record<string, string> = {
                 </svg>
               </a>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -306,6 +322,32 @@ const iconos: Record<string, string> = {
     text-decoration: underline;
   }
 
+  /* Campo honeypot - oculto para humanos, visible para bots */
+  .form-group--honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .form-error {
+    display: none;
+    font-size: 0.875rem;
+    color: #dc2626;
+    margin-top: var(--space-xs);
+  }
+
+  .form-error.is-visible {
+    display: block;
+  }
+
+  .form-group input.is-invalid {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
   .btn--full {
     width: 100%;
   }
@@ -380,33 +422,17 @@ const iconos: Record<string, string> = {
     margin-bottom: var(--space-xl);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    box-shadow: var(--shadow-md);
   }
 
-  .map-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);
-    color: var(--color-gray-500);
-    text-align: center;
+  .contact-map iframe {
+    display: block;
+    filter: grayscale(20%);
+    transition: filter var(--transition-fast);
   }
 
-  .map-placeholder svg {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--space-sm);
-  }
-
-  .map-placeholder span {
-    font-weight: 600;
-    color: var(--color-primary);
-  }
-
-  .map-placeholder p {
-    font-size: 0.875rem;
-    margin: var(--space-sm) 0 0;
+  .contact-map:hover iframe {
+    filter: grayscale(0%);
   }
 
   /* Social */
@@ -508,10 +534,110 @@ const iconos: Record<string, string> = {
 </style>
 
 <script>
+  // Lista de dominios de correo temporales/spam comunes
+  const blockedDomains = [
+    'tempmail.com', '10minutemail.com', 'guerrillamail.com', 'throwawaymail.com',
+    'yopmail.com', 'mailinator.com', 'sharklasers.com', 'getairmail.com',
+    'temp-mail.ru', 'fakeemail.net', 'tempmailaddress.com', 'burnermail.io',
+    'tempail.com', 'emailtemporanea.net', 'tempmailo.com', 'tmpmail.org',
+    'disposableemail.com', 'tempinbox.com', 'mailnesia.com', 'tempmailbox.com',
+    'sharklasers.com', 'spam4.me', 'trashmail.com', 'mytrashmail.com'
+  ];
+
   const form = document.getElementById('contactForm') as HTMLFormElement;
+  const mensajeField = document.getElementById('mensaje') as HTMLTextAreaElement;
+  const asuntoField = document.getElementById('asunto') as HTMLSelectElement;
+  const telefonoField = document.getElementById('telefono') as HTMLInputElement;
+  const emailField = document.getElementById('email') as HTMLInputElement;
+  const honeypotField = document.getElementById('website') as HTMLInputElement;
+  const emailError = document.getElementById('email-error') as HTMLSpanElement;
+
+  // Función para validar email
+  function isValidEmail(email: string): boolean {
+    // Regex para validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return false;
+
+    // Verificar que no sea un dominio bloqueado
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (domain && blockedDomains.includes(domain)) return false;
+
+    return true;
+  }
+
+  // Función para mostrar error
+  function showEmailError(message: string) {
+    if (emailError) {
+      emailError.textContent = message;
+      emailError.classList.add('is-visible');
+    }
+    if (emailField) {
+      emailField.classList.add('is-invalid');
+    }
+  }
+
+  // Función para limpiar error
+  function clearEmailError() {
+    if (emailError) {
+      emailError.textContent = '';
+      emailError.classList.remove('is-visible');
+    }
+    if (emailField) {
+      emailField.classList.remove('is-invalid');
+    }
+  }
+
+  // Limpiar error al escribir
+  emailField?.addEventListener('input', clearEmailError);
+
   form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert('¡Gracias por tu mensaje! Te contactaremos pronto.');
-    form.reset();
+    // 1. Validar honeypot (si está lleno, es un bot)
+    if (honeypotField?.value) {
+      e.preventDefault();
+      console.log('Bot detectado - honeypot llenado');
+      return;
+    }
+
+    // 2. Validar correo electrónico
+    const email = emailField?.value || '';
+    if (!isValidEmail(email)) {
+      e.preventDefault();
+      const domain = email.split('@')[1]?.toLowerCase();
+      if (domain && blockedDomains.includes(domain)) {
+        showEmailError('Por favor utiliza un correo electrónico válido (no se aceptan correos temporales).');
+      } else {
+        showEmailError('Por favor introduce un correo electrónico válido.');
+      }
+      emailField?.focus();
+      return;
+    }
+
+    // 3. Combinar asunto y teléfono con el mensaje
+    const asunto = asuntoField?.value || '';
+    const telefono = telefonoField?.value || '';
+    const mensajeOriginal = mensajeField?.value || '';
+    
+    let mensajeCompleto = '';
+    
+    if (asunto) {
+      mensajeCompleto += `[Asunto: ${asunto}]\n\n`;
+    }
+    
+    if (telefono) {
+      mensajeCompleto += `[Teléfono: ${telefono}]\n\n`;
+    }
+    
+    mensajeCompleto += mensajeOriginal;
+    
+    // Actualizar el campo de mensaje con la información combinada
+    if (mensajeField) {
+      mensajeField.value = mensajeCompleto;
+    }
+    
+    // Mostrar mensaje de confirmación
+    setTimeout(() => {
+      alert('¡Gracias por tu mensaje! Te contactaremos pronto.');
+      form.reset();
+    }, 500);
   });
 </script>

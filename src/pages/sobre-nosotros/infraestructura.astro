@@ -3,49 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 
-const instalaciones = [
-  {
-    nombre: 'Observatorio Solar',
-    descripcion: 'Instalación equipada con telescopios solares de última generación para el monitoreo continuo del Sol.',
-    caracteristicas: [
-      'Telescopio refractor de 150mm con filtro H-alpha',
-      'Coronógrafo para observación de la corona solar',
-      'Sistema de seguimiento automático',
-      'Cámara CCD científica de alta resolución'
-    ],
-    imagen: '/12-01-2025.jpg'
-  },
-  {
-    nombre: 'Laboratorio de Procesamiento',
-    descripcion: 'Centro de cómputo de alto rendimiento para análisis de datos y modelado numérico.',
-    caracteristicas: [
-      'Cluster de cómputo con 128 núcleos',
-      'Almacenamiento de 100TB para datos científicos',
-      'Software especializado en física solar',
-      'Conexión de alta velocidad a redes académicas'
-    ],
-    imagen: '/16-01-2025.jpg'
-  },
-  {
-    nombre: 'Estación de Monitoreo Geomagnético',
-    descripcion: 'Sistema de sensores para medición continua de las variaciones del campo magnético terrestre.',
-    caracteristicas: [
-      'Magnetómetros fluxgate triaxiales',
-      'Sistemas de adquisición de datos 24/7',
-      'Sincronización GPS de alta precisión',
-      'Transmisión de datos en tiempo real'
-    ],
-    imagen: '/12-01-2025.jpg'
-  }
-];
+
 
 const equipamiento = [
-  { nombre: 'Telescopio Solar H-alpha', cantidad: 2 },
-  { nombre: 'Coronógrafo LACIGE-1', cantidad: 1 },
-  { nombre: 'Magnetómetros', cantidad: 5 },
-  { nombre: 'Servidores de cómputo', cantidad: 8 },
-  { nombre: 'Estaciones meteorológicas', cantidad: 3 },
-  { nombre: 'Cámaras CCD científicas', cantidad: 4 }
+  { nombre: 'Telescopio Solar H-alpha', cantidad: 0},
+  { nombre: 'Coronógrafo LACIGE-1', cantidad: 0 },
+  { nombre: 'Servidores de cómputo', cantidad: 0 },
+  { nombre: 'Estaciones meteorológicas', cantidad: 0 },
+  { nombre: 'Cámaras CCD científicas', cantidad: 0 }
 ];
 ---
 
@@ -58,43 +23,32 @@ const equipamiento = [
     subtitulo="Sobre Nosotros"
   />
 
-  <!-- Instalaciones principales -->
-  <section class="section">
+
+
+  <!-- Video Institucional -->
+  <section class="section section--gray">
     <div class="container">
       <SectionHeader 
-        subtitulo="Instalaciones"
-        titulo="Nuestras Facilidades"
-        descripcion="Espacios diseñados para la investigación científica de excelencia."
+        subtitulo="Video"
+        titulo="Conoce Nuestras Instalaciones"
+        descripcion="Un recorrido visual por las instalaciones del Laboratorio de Ciencias Geoespaciales."
       />
       
-      <div class="facilities-list">
-        {instalaciones.map((instalacion, index) => (
-          <div class={`facility-item ${index % 2 === 1 ? 'facility-item--reverse' : ''}`}>
-            <div class="facility-item__image">
-              <img src={instalacion.imagen} alt={instalacion.nombre} loading="lazy" />
-            </div>
-            <div class="facility-item__content">
-              <h3>{instalacion.nombre}</h3>
-              <p class="facility-item__description">{instalacion.descripcion}</p>
-              <ul class="facility-item__features">
-                {instalacion.caracteristicas.map((caracteristica) => (
-                  <li>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    {caracteristica}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
+      <div class="video-wrapper">
+        <iframe 
+          src="https://www.youtube.com/embed/ey6vey7uwls?si=7_E9-nYMgbUELKAe" 
+          title="YouTube video player" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          referrerpolicy="strict-origin-when-cross-origin" 
+          allowfullscreen
+        ></iframe>
       </div>
     </div>
   </section>
 
   <!-- Equipamiento -->
-  <section class="section section--gray">
+  <section class="section">
     <div class="container">
       <SectionHeader 
         subtitulo="Recursos"
@@ -118,30 +72,33 @@ const equipamiento = [
       <SectionHeader 
         subtitulo="Ubicación"
         titulo="Encuéntranos"
-        descripcion="Nuestras instalaciones se encuentran en el campus universitario principal."
+        
       />
       
       <div class="location-card">
         <div class="location-card__map">
-          <div class="map-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span>Ciudad Universitaria</span>
-          </div>
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3163.766477006448!2d-101.22119373928291!3d19.649393387706027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842d0c599c256431%3A0xda01b64116d303ac!2sObservatorio%20Solar%20ENES%20Morelia%20UNAM!5e1!3m2!1ses-419!2smx!4v1769761925906!5m2!1ses-419!2smx"
+            width="100%" 
+            height="100%" 
+            style="border:0; min-height: 350px;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Ubicación del Observatorio Solar ENES Morelia UNAM"
+          ></iframe>
         </div>
         <div class="location-card__info">
           <h3>Dirección</h3>
           <p>
-            Edificio de Investigación Científica<br />
-            Ciudad Universitaria, CP 04510<br />
-            México, D.F.
+            ENES Unidad Morelia, Edificio de Investigación I.<br />
+             Antigua Carretera a Pátzcuaro No.8701. <br />
+            Col. Ex-Hacienda de Sán José de la Huerta. 
+            <br />C. P.58190 Morelia, Michoacán, México.
           </p>
           <h4>Horario de atención</h4>
           <p>
-            Lunes a Viernes: 9:00 - 18:00<br />
-            Sábados: 9:00 - 14:00
+            Lunes a Viernes: 9:00 - 17:00<br />
           </p>
           <a href="/contacto" class="btn btn--primary">Contactar</a>
         </div>
@@ -151,69 +108,7 @@ const equipamiento = [
 </Layout>
 
 <style>
-  .facilities-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4xl);
-  }
 
-  .facility-item {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3xl);
-    align-items: center;
-  }
-
-  .facility-item--reverse {
-    direction: rtl;
-  }
-
-  .facility-item--reverse > * {
-    direction: ltr;
-  }
-
-  .facility-item__image {
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-xl);
-  }
-
-  .facility-item__image img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-  }
-
-  .facility-item__content h3 {
-    font-size: 1.75rem;
-    color: var(--color-primary);
-    margin-bottom: var(--space-md);
-  }
-
-  .facility-item__description {
-    font-size: 1.0625rem;
-    color: var(--color-gray-600);
-    line-height: 1.7;
-    margin-bottom: var(--space-lg);
-  }
-
-  .facility-item__features {
-    list-style: none;
-  }
-
-  .facility-item__features li {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) 0;
-    font-size: 0.9375rem;
-    color: var(--color-gray-600);
-  }
-
-  .facility-item__features svg {
-    flex-shrink: 0;
-    color: var(--color-accent);
-  }
 
   /* Equipment */
   .equipment-grid {
@@ -259,23 +154,18 @@ const equipamiento = [
   }
 
   .location-card__map {
-    min-height: 300px;
+    min-height: 350px;
+    overflow: hidden;
   }
 
-  .map-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);
-    color: var(--color-gray-500);
+  .location-card__map iframe {
+    display: block;
+    filter: grayscale(20%);
+    transition: filter var(--transition-fast);
   }
 
-  .map-placeholder svg {
-    width: 48px;
-    height: 48px;
-    margin-bottom: var(--space-md);
+  .location-card__map:hover iframe {
+    filter: grayscale(0%);
   }
 
   .location-card__info {
@@ -305,14 +195,28 @@ const equipamiento = [
     margin-top: var(--space-xl);
   }
 
-  @media (max-width: 1024px) {
-    .facility-item {
-      grid-template-columns: 1fr;
-    }
+  /* Video */
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
 
-    .facility-item--reverse {
-      direction: ltr;
-    }
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  @media (max-width: 1024px) {
 
     .location-card {
       grid-template-columns: 1fr;

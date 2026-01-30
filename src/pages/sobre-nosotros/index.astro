@@ -14,56 +14,43 @@ import FeatureCard from '../../components/FeatureCard.astro';
     subtitulo="LACIGE"
   />
 
-  <!-- Misión y Visión -->
-  <section class="section">
+  <section class="about-lacige-section">
     <div class="container">
-      <div class="mission-grid">
-        <div class="mission-card">
-          <div class="mission-card__icon">
-            <svg viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2"/>
-              <path d="M24 12v12l8 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Misión</h3>
+      <div class="about-lacige-content">
+        <SectionHeader 
+          subtitulo="Acerca del LACIGE"
+          titulo="Laboratorio de Ciencias Geoespaciales"
+          centrado={true}
+        />
+        <div class="about-lacige-text">
           <p>
-            Realizar investigación científica de excelencia en ciencias geoespaciales, formando 
-            recursos humanos especializados y contribuyendo al desarrollo tecnológico del país 
-            mediante el estudio del Sol y su interacción con el entorno terrestre.
+            El </strong>Laboratorio de Ciencias Geoespaciales (LACIGE)</strong> fue creado durante el segundo semestre del 2015 
+            en el campus Morelia de la Universidad Nacional Autónoma de México (<strong>UNAM</strong>). La infraestructura, 
+            equipo de cómputo, software e instrumentos de observación, provienen de fondos directos de la UNAM 
+            otorgados a la Escuela Nacional de Estudios Superiores unidad Morelia (<strong>ENES</strong>) y de la 
+            Secretaría de Ciencia, Humanidades, Tecnología e Innovación (<strong>SECIHTI</strong> )a través del 
+            proyecto de infraestructura INFR: 253691 aprobado en ese mismo año.
           </p>
-        </div>
-        
-        <div class="mission-card">
-          <div class="mission-card__icon">
-            <svg viewBox="0 0 48 48" fill="none">
-              <path d="M24 4l6 18h18l-15 10 6 18-15-12-15 12 6-18L0 22h18z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3>Visión</h3>
           <p>
-            Ser reconocidos como un centro de investigación líder en América Latina en el estudio 
-            del clima espacial y las ciencias geoespaciales, con impacto global en la comprensión 
-            de los fenómenos solares y sus efectos en la Tierra.
+            Aquí se desarrollan proyectos de investigación básica en el campo de las Ciencias Espaciales, 
+            la Astrofísica y el Cómputo en apoyo a las Geociencias, destacando los siguientes:
           </p>
-        </div>
-        
-        <div class="mission-card">
-          <div class="mission-card__icon">
-            <svg viewBox="0 0 48 48" fill="none">
-              <path d="M24 4v8M12 12l6 6M4 24h8M12 36l6-6M24 44v-8M36 36l-6-6M44 24h-8M36 12l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="24" cy="24" r="8" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </div>
-          <h3>Valores</h3>
-          <p>
-            Excelencia científica, integridad académica, colaboración interdisciplinaria, 
-            responsabilidad social y compromiso con la divulgación del conocimiento científico 
-            para el beneficio de la sociedad.
+          <ul class="about-lacige-list">
+            <li>Estudio de perturbaciones ionosféricas (PI).</li>
+            <li>Cálculo del contenido de electrones (TEC) en la ionosfera terrestre.</li>
+            <li>Análisis de imágenes solares con telescopios especiales del LACIGE.</li>
+            <li>Estudios de objetos cercanos a la Tierra (NEOs).</li>
+            <li>Estudios de plasmas astrofísicos.</li>
+            <li>Estudios de ondas e inestabilidades en plasmas espaciales.</li>
+          </ul>
+          <p class="about-lacige-responsible">
+            <strong>Responsable del LACIGE:</strong> Dr. Mario Rodríguez Martínez
           </p>
         </div>
       </div>
     </div>
   </section>
+
 
   <!-- Secciones -->
   <section class="section section--gray">
@@ -90,66 +77,7 @@ import FeatureCard from '../../components/FeatureCard.astro';
     </div>
   </section>
 
-  <!-- Equipo -->
-  <section class="section">
-    <div class="container">
-      <SectionHeader 
-        subtitulo="Nuestro Equipo"
-        titulo="Investigadores y Personal"
-        descripcion="Un equipo multidisciplinario comprometido con la excelencia científica."
-      />
-      
-      <div class="team-grid">
-        <div class="team-member">
-          <div class="team-member__image">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
-          <h4 class="team-member__name">Dra. María González</h4>
-          <span class="team-member__role">Directora</span>
-          <p class="team-member__bio">Especialista en física solar y clima espacial con más de 20 años de experiencia.</p>
-        </div>
-        
-        <div class="team-member">
-          <div class="team-member__image">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
-          <h4 class="team-member__name">Dr. Carlos Hernández</h4>
-          <span class="team-member__role">Investigador Principal</span>
-          <p class="team-member__bio">Experto en modelado del viento solar y predicción del clima espacial.</p>
-        </div>
-        
-        <div class="team-member">
-          <div class="team-member__image">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
-          <h4 class="team-member__name">Dra. Ana López</h4>
-          <span class="team-member__role">Investigadora</span>
-          <p class="team-member__bio">Especialista en teledetección y sistemas de información geográfica.</p>
-        </div>
-        
-        <div class="team-member">
-          <div class="team-member__image">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
-          <h4 class="team-member__name">Dr. Roberto Silva</h4>
-          <span class="team-member__role">Investigador</span>
-          <p class="team-member__bio">Experto en instrumentación solar y técnicas observacionales.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+
 </Layout>
 
 <style>
@@ -202,69 +130,80 @@ import FeatureCard from '../../components/FeatureCard.astro';
     margin: 0;
   }
 
-  /* Equipo */
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-xl);
+
+
+    /* Sección Acerca del LACIGE */
+    .about-lacige-section {
+    padding: var(--space-4xl) 0;
+    background: linear-gradient(180deg, var(--color-off-white) 0%, var(--color-white) 100%);
   }
 
-  .team-member {
+  .about-lacige-content {
+    max-width: 900px;
+    margin: 0 auto;
     text-align: center;
   }
 
-  .team-member__image {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto var(--space-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-gray-200) 0%, var(--color-gray-300) 100%);
-    color: var(--color-gray-500);
-    border-radius: var(--radius-full);
+  .about-lacige-text {
+    margin-top: var(--space-xl);
+    text-align: left;
   }
 
-  .team-member__image svg {
-    width: 48px;
-    height: 48px;
-  }
-
-  .team-member__name {
+  .about-lacige-text p {
     font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-md);
+  }
+
+  .about-lacige-text strong {
     color: var(--color-primary);
-    margin-bottom: var(--space-xs);
-  }
-
-  .team-member__role {
-    display: block;
-    font-size: 0.8125rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-accent);
-    margin-bottom: var(--space-sm);
   }
 
-  .team-member__bio {
-    font-size: 0.875rem;
-    color: var(--color-gray-500);
+  .about-lacige-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-lg) 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm) var(--space-xl);
+  }
+
+  .about-lacige-list li {
+    position: relative;
+    padding-left: var(--space-lg);
+    font-size: 1rem;
+    color: var(--color-gray-600);
     line-height: 1.6;
-    margin: 0;
   }
 
-  @media (max-width: 1024px) {
-    .mission-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .team-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .about-lacige-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
   }
 
-  @media (max-width: 640px) {
-    .team-grid {
+  .about-lacige-responsible {
+    margin-top: var(--space-xl);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-gray-100);
+    border-left: 4px solid var(--color-accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    text-align: left;
+  }
+
+  .about-lacige-responsible strong {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .about-lacige-list {
       grid-template-columns: 1fr;
     }
   }
