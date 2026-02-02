@@ -310,6 +310,9 @@ const imagenesJSON = JSON.stringify(imagenes);
       // Elementos del visor
       const viewer = document.getElementById("solarViewer");
       const backdrop = document.getElementById("solarViewerBackdrop");
+      const wrapper = document.querySelector(".solar-viewer__wrapper");
+      const main = document.querySelector(".solar-viewer__main");
+      const meta = document.querySelector(".solar-viewer__meta");
       const closeBtn = document.getElementById("solarViewerClose");
       const closeBtnMobile = document.getElementById("solarViewerCloseMobile");
       const prevBtn = document.getElementById(
@@ -622,6 +625,32 @@ const imagenesJSON = JSON.stringify(imagenes);
             e.preventDefault();
             e.stopPropagation();
             goToNewer();
+          },
+          { signal },
+        );
+      }
+
+      // Cerrar visor al hacer clic fuera de la imagen o la tarjeta de descripción
+      if (wrapper) {
+        wrapper.addEventListener(
+          "click",
+          (e) => {
+            const target = e.target as HTMLElement;
+            
+            // Si el clic fue en el wrapper directamente, cerrar
+            if (target === wrapper) {
+              closeViewer();
+              return;
+            }
+            
+            // Verificar si el clic fue dentro de la imagen o la tarjeta de descripción
+            const isInsideImage = main?.contains(target);
+            const isInsideMeta = meta?.contains(target);
+            
+            // Si no está dentro de la imagen ni de la tarjeta, cerrar
+            if (!isInsideImage && !isInsideMeta) {
+              closeViewer();
+            }
           },
           { signal },
         );
