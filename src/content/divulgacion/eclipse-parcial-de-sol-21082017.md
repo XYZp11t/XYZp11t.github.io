@@ -14,11 +14,9 @@ destacado: true
 
 <p class="autor-info"><strong>Por:</strong> Dr. Mario Rodríguez Martínez</p>
 
-<p>El próximo <strong>21 de agosto</strong> se observará un eclipse parcial de Sol en todo el territorio mexicano. Particularmente en la ciudad de Morelia, éste se podrá apreciar desde el <strong>Observatorio Solar de la ENES-UNAM unidad Morelia</strong>, que forma parte de este laboratorio y que hará uso de un telescopio que opera con un filtro especial en la línea de emisión de <strong>hidrógeno-Alpha</strong> de la serie de Balmer (H-Alpha, 6562.8 Å). El eclipse también será transmitido a través del vínculo siguiente:</p>
+<p>El próximo <strong>21 de agosto</strong> se observará un eclipse parcial de Sol en todo el territorio mexicano. Particularmente en la ciudad de Morelia, éste se podrá apreciar desde el <strong>Observatorio Solar de la ENES-UNAM unidad Morelia</strong>, que forma parte de este laboratorio y que hará uso de un telescopio que opera con un filtro especial en la línea de emisión de <strong>hidrógeno-Alpha</strong> de la serie de Balmer (H-Alpha, 6562.8 Å). 
 
-<p><em>Eclipse Parcial de Sol, ENES-UNAM Morelia por Webcast UNAM</em></p>
-
-<p>Cabe mencionar que este evento en la UNAM campus Morelia, cuenta además con la colaboración directa del <strong>Instituto de Geofísica unidad Michoacán (IGUM)</strong> a través del <strong>Laboratorio Nacional del Clima Espacial (LANCE)</strong> y el <strong>Instituto de Radioastronomía y Astrofísica</strong>, donde se tendrán pláticas impartidas por especialistas y observaciones con equipos e instrumentos adecuados para observar el Sol.</p>
+<p>Cabe mencionar que este evento en la UNAM campus Morelia, cuenta además con la colaboración directa del <strong>Instituto de Geofísica unidad Michoacán (IGUM)</strong> a través del <strong>Laboratorio Nacional del Clima Espacial (LANCE)</strong> y el <strong>Instituto de Radioastronomía y Astrofísica (IRyA)</strong>, donde se tendrán pláticas impartidas por especialistas y observaciones con equipos e instrumentos adecuados para observar el Sol.</p>
 
 <h2>Desarrollo del evento</h2>
 

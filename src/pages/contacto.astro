@@ -8,25 +8,29 @@ const infoContacto = [
     tipo: 'Dirección',
     icono: 'ubicacion',
     valor: 'ENES Unidad Morelia, Edificio de Investigación I. Antigua Carretera a Pátzcuaro No.8701. Col. Ex-Hacienda de Sán José de la Huerta. C. P.58190 Morelia, Michoacán, México.',
-    enlace: null
+    enlace: 'https://maps.app.goo.gl/gHVdUQRfWwv34iuJ8', 
+    nueva_ventana: "_blank"
   },
   {
     tipo: 'Correo Electrónico',
     icono: 'email',
-    valor: 'por definir',
-    enlace: 'mailto:lacige@universidad.edu'
+    valor: 'osolar@enesmorelia.unam.mx',
+    enlace: 'mailto:osolar@enesmorelia.unam.mx',
+    nueva_ventana: null
   },
   {
     tipo: 'Teléfono',
     icono: 'telefono',
     valor: ' +52 (443) 689 35 00. Desde el D.F. 5623 73 00. Ext.-UNAM: 80557.',
-    enlace: 'tel:+524436893500'
+    enlace: 'tel:+524436893500',
+    nueva_ventana: null
   },
   {
     tipo: 'Horario de Atención',
     icono: 'horario',
     valor: 'Lunes a Viernes: 9:00 - 17:00',
-    enlace: null
+    enlace: null,
+    nueva_ventana: null
   }
 ];
 
@@ -132,7 +136,7 @@ const iconos: Record<string, string> = {
                 <div class="contact-item__content">
                   <span class="contact-item__label">{info.tipo}</span>
                   {info.enlace ? (
-                    <a href={info.enlace} class="contact-item__value">{info.valor}</a>
+                    <a href={info.enlace} target={info.nueva_ventana} class="contact-item__value">{info.valor}</a>
                   ) : (
                     <span class="contact-item__value">{info.valor}</span>
                   )}
