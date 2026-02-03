@@ -32,4 +32,62 @@ const publicaciones = defineCollection({
   }),
 });
 
-export const collections = { divulgacion, publicaciones };
+// Schema para el perfil de un investigador
+const perfilInvestigadorSchema = z.object({
+  cargo: z.string().default(''),
+  areaEstudio: z.string().default(''),
+  oficina: z.string().default(''),
+  telefono: z.string().default(''),
+  email: z.string().default(''),
+});
+
+// Schema base para un investigador
+const investigadorSchema = z.object({
+  nombre: z.string(),
+  imagen: z.string().default(''),
+  perfil: perfilInvestigadorSchema.default({
+    cargo: '',
+    areaEstudio: '',
+    oficina: '',
+    telefono: '',
+    email: '',
+  }),
+  esEncargado: z.boolean().default(false),
+  orden: z.number().default(999),
+});
+
+// Schema para grupos de investigadores
+const grupoInvestigadoresSchema = z.object({
+  institucion: z.string(),
+  siglas: z.string(),
+  tipo: z.enum(['interno', 'externo']),
+  orden: z.number().default(999),
+});
+
+const colaboradoresInternos = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/colaboradores/internos" }),
+  schema: investigadorSchema,
+});
+
+// Schema para colaboradores externos (con grupo explícito)
+const investigadorExternoSchema = investigadorSchema.extend({
+  grupoSiglas: z.string(), // Siglas del grupo al que pertenece (ej: "IGUM", "IRYA")
+});
+
+const colaboradoresExternos = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/colaboradores/externos" }),
+  schema: investigadorExternoSchema,
+});
+
+const gruposColaboradores = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/colaboradores/grupos" }),
+  schema: grupoInvestigadoresSchema,
+});
+
+export const collections = { 
+  divulgacion, 
+  publicaciones, 
+  colaboradoresInternos, 
+  colaboradoresExternos,
+  gruposColaboradores,
+};

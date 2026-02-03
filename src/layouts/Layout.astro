@@ -44,6 +44,54 @@ const {
     
     <!-- View Transitions con prefetch habilitado -->
     <ViewTransitions />
+    
+    <!-- Variables CSS globales -->
+    <style is:inline>
+      :root {
+        --color-primary: #003D79;
+        --color-primary-dark: #002a54;
+        --color-primary-light: #0056a8;
+        --color-accent: #D59F0F;
+        --color-accent-dark: #b8890d;
+        --color-accent-light: #e8b52a;
+        --color-earth: #84754E;
+        --color-earth-dark: #6a5d3e;
+        --color-earth-light: #a39468;
+        --color-white: #FFFFFF;
+        --color-off-white: #F8F6F3;
+        --color-gray-100: #F1EDE8;
+        --color-gray-200: #E3DDD4;
+        --color-gray-300: #C9C1B4;
+        --color-gray-400: #9E9588;
+        --color-gray-500: #73695C;
+        --color-gray-600: #4D4538;
+        --color-gray-700: #2D2820;
+        --color-black: #1A1612;
+        --font-display: 'Playfair Display', Georgia, serif;
+        --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+        --space-3xl: 4rem;
+        --space-4xl: 6rem;
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --radius-full: 9999px;
+        --shadow-sm: 0 1px 3px rgba(0, 61, 121, 0.08);
+        --shadow-md: 0 4px 12px rgba(0, 61, 121, 0.1);
+        --shadow-lg: 0 8px 24px rgba(0, 61, 121, 0.12);
+        --shadow-xl: 0 16px 48px rgba(0, 61, 121, 0.16);
+        --transition-fast: 150ms ease;
+        --transition-base: 250ms ease;
+        --transition-slow: 400ms ease;
+        --container-max: 1280px;
+        --container-narrow: 800px;
+      }
+    </style>
   </head>
   <body>
     <Header />
@@ -61,6 +109,66 @@ const {
 </style>
 
 <style is:global>
+  /* Variables CSS globales */
+  :root {
+    /* Colores principales */
+    --color-primary: #003D79;
+    --color-primary-dark: #002a54;
+    --color-primary-light: #0056a8;
+    --color-accent: #D59F0F;
+    --color-accent-dark: #b8890d;
+    --color-accent-light: #e8b52a;
+    --color-earth: #84754E;
+    --color-earth-dark: #6a5d3e;
+    --color-earth-light: #a39468;
+    
+    /* Neutros */
+    --color-white: #FFFFFF;
+    --color-off-white: #F8F6F3;
+    --color-gray-100: #F1EDE8;
+    --color-gray-200: #E3DDD4;
+    --color-gray-300: #C9C1B4;
+    --color-gray-400: #9E9588;
+    --color-gray-500: #73695C;
+    --color-gray-600: #4D4538;
+    --color-gray-700: #2D2820;
+    --color-black: #1A1612;
+    
+    /* Tipografía */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Espaciado */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    --space-4xl: 6rem;
+    
+    /* Bordes y sombras */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    
+    --shadow-sm: 0 1px 3px rgba(0, 61, 121, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 61, 121, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 61, 121, 0.12);
+    --shadow-xl: 0 16px 48px rgba(0, 61, 121, 0.16);
+    
+    /* Transiciones */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms ease;
+    
+    /* Contenedor */
+    --container-max: 1280px;
+    --container-narrow: 800px;
+  }
+
   /* Transiciones instantaneas */
   ::view-transition-old(root),
   ::view-transition-new(root) {

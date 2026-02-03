@@ -2,275 +2,90 @@
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import SectionHeader from '../components/SectionHeader.astro';
+import { getCollection } from 'astro:content';
 
-type PerfilInvestigador = {
-  cargo?: string;
-  areaEstudio?: string;
-  oficina?: string;
-  telefono?: string;
-  email?: string;
-};
+// Cargar colecciones de contenido
+const gruposData = await getCollection('gruposColaboradores');
+const internosData = await getCollection('colaboradoresInternos');
+const externosData = await getCollection('colaboradoresExternos');
 
-type Investigador = {
-  nombre: string;
-  imagen?: string | null;
-  perfil?: PerfilInvestigador;
-  esEncargado?: boolean; // Marca al responsable del laboratorio
-};
+// Mapear datos de investigadores
+const mapInvestigador = (item: any) => ({
+  nombre: item.data.nombre,
+  imagen: item.data.imagen ?? '',
+  perfil: {
+    cargo: item.data.perfil?.cargo ?? '',
+    areaEstudio: item.data.perfil?.areaEstudio ?? '',
+    oficina: item.data.perfil?.oficina ?? '',
+    telefono: item.data.perfil?.telefono ?? '',
+    email: item.data.perfil?.email ?? '',
+  },
+  esEncargado: item.data.esEncargado ?? false,
+  orden: item.data.orden ?? 999,
+});
 
-type GrupoInvestigadores = {
-  institucion: string;
-  siglas: string;
-  investigadores: Investigador[];
-};
+// ========== COLABORADORES INTERNOS ==========
+// Se separan automáticamente por cargo: Académicos vs Posdoctorantes
+const investigadoresInternosMapeados = internosData.map(mapInvestigador);
 
-// Estructura de colaboradores internos agrupados por área.
-// Para agregar datos, completa el objeto `perfil` en cada investigador.
-// Usa `esEncargado: true` para marcar al responsable del laboratorio.
-const colaboradoresInternos: GrupoInvestigadores[] = [
-  {
+const academicos = investigadoresInternosMapeados
+  .filter(inv => !inv.perfil.cargo.includes('posdoctorado'))
+  .sort((a, b) => {
+    if (a.esEncargado) return -1;
+    if (b.esEncargado) return 1;
+    return a.orden - b.orden;
+  });
+
+const posdoctorantes = investigadoresInternosMapeados
+  .filter(inv => inv.perfil.cargo.includes('posdoctorado'))
+  .sort((a, b) => a.orden - b.orden);
+
+const colaboradoresInternos = [];
+if (academicos.length > 0) {
+  colaboradoresInternos.push({
     institucion: 'Académicos',
     siglas: 'LACIGE',
-    investigadores: [
-      {
-        nombre: 'Dr. Mario Rodríguez Martínez',
-        imagen: '/colaboradores/DrMarioRod.jpg',
-        esEncargado: true,
-        perfil: {
-          cargo: 'Responsable del Laboratorio',
-          email: 'mrodriguez@enesmorelia.unam.mx'
-        }
-      },
-      {
-        nombre: 'Dr. Sinhué A. R. Haro Corzo',
-        imagen: '/colaboradores/DrSinhue.jpg',
-        perfil: {
-          cargo: 'Técnico Académico T. C.',
-          areaEstudio: 'Instrumentación espacial y análisis de datos del entorno heliosférico.',
-          oficina: 'Edificio A, Oficina 102',
-          telefono: '+52 (443) 000-0000',
-          email: 'sinhue.haro@lacige.unam.mx'
-        }
-      },
-      
-      { nombre: 'Dr. José Juan González Avilés ', 
-      imagen: '/colaboradores/DrJoseJuan.png',
-      perfil: { 
-        cargo: 'Profesor Asociado “C” de Tiempo Completo',
-        email: 'jgonzaleza@enesmorelia.unam.mx'
-       }
-        
-      },
+    tipo: 'interno',
+    orden: 1,
+    investigadores: academicos,
+  });
+}
+if (posdoctorantes.length > 0) {
+  colaboradoresInternos.push({
+    institucion: 'Posdoctorantes',
+    siglas: 'LACIGE',
+    tipo: 'interno',
+    orden: 2,
+    investigadores: posdoctorantes,
+  });
+}
 
-      { 
-        nombre: 'Dr. Orlando Hernández Cristóbal',
-        imagen: '', 
-        perfil: {
-          cargo: 'Técnico Académico T. C.', 
-          email: ''
-        } 
-      },
-            
-      { 
-        nombre: 'Dr. Antonio Pola Villaseñor',
-        imagen: '/colaboradores/DrPola.jpg',
-        perfil: {
-          cargo: 'Profesor-Investigador T. C.' } 
-      },
-      { nombre: 'Dr. Victor de la Luz Rodríguez',
-        perfil: {
-          cargo: '',
-          areaEstudio: ''
-        }
-       },      
-      
-      { nombre: 'Ing. Froylán Hernández Rendón',
-        perfil: { 
-          cargo: 'Técnico Académico T. C.' }
-      },
-      
-      { 
-        nombre: 'Ing. Pablo Alfonso García Cruz',
-        perfil: {
-          cargo: 'Técnico Académico T. C.' 
-          } 
-      },
-      
-      { 
-        nombre: 'Lic. Gustavo Cano Salazar',
-        perfil: {
-          cargo: 'Técnico Académico T. C.' 
-        } 
-      }
-    ]
-  }
-];
+// ========== COLABORADORES EXTERNOS ==========
+// Cada colaborador tiene un campo 'grupoSiglas' que indica su institución
+const externosConGrupo = externosData.map(item => ({
+  ...mapInvestigador(item),
+  grupoSiglas: item.data.grupoSiglas,
+}));
 
-// Estructura de colaboradores externos agrupados por institución.
-// Para agregar datos, completa el objeto `perfil` en cada investigador.
-const colaboradoresExternos: GrupoInvestigadores[] = [
-  {
-    institucion: 'Instituto de Geofísica unidad Michoacán',
-    siglas: 'IGUM',
-    investigadores: [
-      {
-        nombre: 'Dr. Américo González Esparza',
-        perfil: {
-          areaEstudio: 'Física Solar y Clima Espacial',
-          oficina: 'Edificio Principal, Oficina 201',
-          telefono: '+52 (443) 123-4567',
-          email: 'agonsalez@igeofisica.unam.mx'
-        }
-      },
-      { nombre: 'Dr. Ernesto Aguilar Rodríguez',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-      },
-      { nombre: 'Dr. Armando Carrillo Vargas',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-       },
-      { nombre: 'Dra. Maria Sergeeva',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-       },
-      { nombre: 'Dra. Esmeralda Romero',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-       },
-      { nombre: 'Mtro. Pablo Villanueva Hernández',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-       },
-      { nombre: 'Ing. Ernesto Andrade Mascote',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''}
-       },
-      
-      { nombre: 'Dr. Pedro Corona Romero' },
-      { nombre: 'Dr. Julio Mejía Ambriz' },
-      { nombre: 'Dr. Luis Xavier González' }
-    ]
-  },
-  {
-    institucion: 'Instituto de Geofísica',
-    siglas: 'IG',
-    investigadores: [
-      { nombre: 'Dra. Xóchitl Blanco Cano',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''
-        }
-       },
-      { nombre: 'Dr. Héctor Pérez de Tejada',
-        perfil: {
-          areaEstudio: '',
-          oficina: '',
-          telefono: '',
-          email: ''
-        }
-       }
-    ]
-  },
+const gruposExternos = gruposData
+  .filter(g => g.data.tipo === 'externo')
+  .sort((a, b) => (a.data.orden ?? 999) - (b.data.orden ?? 999));
 
-  {
-    institucion: 'Centro de Alta Tecnología',
-    siglas: 'CAT',
-    investigadores: [
-      { nombre: 'Dr. Saúl Daniel Santillán Gutíerrez' },
-      { nombre: 'Dr. Jorge A. Ferrer Pérez' },
-      { nombre: 'Dr. Carlos Romo Fuentes' }
-    ]
-  },
-  {
-    institucion: 'Instituto de Radioastronomía y Astrofísica',
-    siglas: 'IRYA',
-    investigadores: [
-      { nombre: 'Dr. Stanley Kurtz' },
-      { nombre: 'Dr. Luis Alberto Zapata González',
-        imagen: '/colaboradores/DrLuisZapata.jpg',
-        perfil: {
-        areaEstudio: 'Astronomía Milimétrica y Submilimétrica',
-        oficina: '223',
-        telefono: '44332 22795',
-        email: 'l.zapata@irya.unam.mx'
-        }
-      }
-    ]
-  },
-  {
-    institucion: 'Instituto de Ciencias Nucleares',
-    siglas: 'ICN',
-    investigadores: [
-      { nombre: 'Dr. Alejandro Raga' },
-      { nombre: 'Dr. Pablo Velázquez' },
-      { nombre: 'Dr. Fabio de Cole' }
-    ]
-  },
-  {
-    institucion: 'Institute of Geophysics and Planetary Physics',
-    siglas: 'IGPP',
-    investigadores: [
-      { nombre: 'Dr. Cristopher T. Russell' }
-    ]
-  },
-  {
-    institucion: 'Universidad de Sonora',
-    siglas: 'UNISON',
-    investigadores: [
-      { nombre: 'Dr. Lorenzo Olguín Ruíz' }
-    ]
-  },
-  {
-    institucion: 'Instituto de Astronomía - Ensenada, B.C.',
-    siglas: 'IA-ENS',
-    investigadores: [
-      { nombre: 'Dr. Mauricio Tapia Ibarguengoitia' },
-      { nombre: 'Dr. Roberto Vázquez Meza' }
-    ]
-  },
-  {
-    institucion: 'Universidad de Monterrey, Nuevo León',
-    siglas: 'UDEM',
-    investigadores: [
-      { nombre: 'Dr. Pedro Valdés Sada' }
-    ]
-  },
-  {
-    institucion: 'Instituto Nacional de Astrofísica, Óptica y Electrónica, Puebla',
-    siglas: 'INAOE',
-    investigadores: [
-      { nombre: 'Dr. José Ramón Valdés' }
-    ]
-  }
-];
+const colaboradoresExternos = gruposExternos.map(grupo => {
+  const investigadoresDelGrupo = externosConGrupo
+    .filter(inv => inv.grupoSiglas === grupo.data.siglas)
+    .sort((a, b) => a.orden - b.orden);
+  
+  return {
+    institucion: grupo.data.institucion,
+    siglas: grupo.data.siglas,
+    tipo: 'externo',
+    orden: grupo.data.orden ?? 999,
+    investigadores: investigadoresDelGrupo,
+  };
+}).filter(g => g.investigadores.length > 0);
 
-const redesAcademicas = [
-  { nombre: 'SCOSTEP', descripcion: 'Scientific Committee on Solar-Terrestrial Physics' },
-  { nombre: 'IAU', descripcion: 'International Astronomical Union' },
-  { nombre: 'AGU', descripcion: 'American Geophysical Union' },
-  { nombre: 'COSPAR', descripcion: 'Committee on Space Research' }
-];
+
 ---
 
 <Layout 
@@ -301,9 +116,7 @@ const redesAcademicas = [
             
             <div class="researchers-grid">
               {grupo.investigadores.map((investigador) => {
-                const perfil: PerfilInvestigador = investigador.perfil ?? {};
-                const { cargo, areaEstudio, oficina, telefono, email } = perfil;
-
+                const { cargo, areaEstudio, oficina, telefono, email } = investigador.perfil;
                 return (
                   <article class={`researcher-card ${investigador.esEncargado ? 'researcher-card--leader' : ''}`}>
                     <div class="researcher-card__image">
@@ -398,9 +211,7 @@ const redesAcademicas = [
             
             <div class="researchers-grid">
               {grupo.investigadores.map((investigador) => {
-                const perfil: PerfilInvestigador = investigador.perfil ?? {};
-                const { cargo, areaEstudio, oficina, telefono, email } = perfil;
-
+                const { cargo, areaEstudio, oficina, telefono, email } = investigador.perfil;
                 return (
                   <article class="researcher-card">
                     <div class="researcher-card__image">
@@ -468,8 +279,6 @@ const redesAcademicas = [
     </div>
   </section>
 
-
-
   <!-- Llamado a colaborar -->
   <section class="section section--primary">
     <div class="container">
@@ -486,6 +295,10 @@ const redesAcademicas = [
 </Layout>
 
 <style>
+  .container {
+    margin-top: -2.5rem;
+  }
+
   /* Institutions Wrapper */
   .institutions-wrapper {
     display: flex;
@@ -723,8 +536,6 @@ const redesAcademicas = [
     color: var(--color-accent);
   }
 
-
-
   /* CTA */
   .cta-content {
     text-align: center;
@@ -744,8 +555,6 @@ const redesAcademicas = [
 
   /* Responsive */
   @media (max-width: 1024px) {
-
-
     .researchers-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -773,8 +582,6 @@ const redesAcademicas = [
   }
 
   @media (max-width: 640px) {
-
-
     .institution-header {
       flex-direction: column;
       align-items: flex-start;

@@ -12,6 +12,7 @@ Esta carpeta contiene la documentación completa del sitio web del LACIGE. A con
 6. **[06-GALERIA-SOLAR.md](./06-GALERIA-SOLAR.md)** - Sistema de imágenes solares y visor
 7. **[07-ESTILOS-Y-DISENO.md](./07-ESTILOS-Y-DISENO.md)** - Guía de estilos, colores y CSS
 8. **[08-CONFIGURACION.md](./08-CONFIGURACION.md)** - Configuración de Astro y build
+9. **[09-COLABORADORES.md](./09-COLABORADORES.md)** - Gestión de investigadores y colaboradores
 
 ---
 
@@ -27,7 +28,10 @@ Esta carpeta contiene la documentación completa del sitio web del LACIGE. A con
 ```
 src/
 ├── components/     # Componentes reutilizables (Astro)
-├── content/        # Contenido Markdown (artículos y publicaciones)
+├── content/        # Contenido Markdown (artículos, publicaciones, colaboradores)
+│   ├── colaboradores/   # Investigadores internos y externos
+│   ├── divulgacion/     # Artículos de divulgación
+│   └── publicaciones/   # Publicaciones científicas
 ├── layouts/        # Layouts de página
 ├── pages/          # Rutas del sitio
 ├── styles/         # Estilos CSS globales

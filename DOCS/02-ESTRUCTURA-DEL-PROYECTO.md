@@ -13,6 +13,10 @@ web_lacige/
 │   ├── assets/               # Recursos internos (imágenes, fuentes)
 │   ├── components/           # Componentes reutilizables
 │   ├── content/              # Contenido en Markdown
+│   │   ├── colaboradores/   # Investigadores (internos y externos)
+│   │   │   ├── grupos/      # Instituciones/Grupos
+│   │   │   ├── internos/    # Colaboradores internos (LACIGE)
+│   │   │   └── externos/    # Colaboradores externos
 │   │   ├── divulgacion/     # Artículos de divulgación
 │   │   └── publicaciones/   # Publicaciones científicas
 │   ├── layouts/              # Layouts de página
@@ -71,6 +75,31 @@ Componentes reutilizables que pueden usarse en múltiples páginas:
 ## Carpeta `src/content/`
 
 Contenido en formato Markdown organizado en colecciones:
+
+### `src/content/colaboradores/`
+
+Gestión de investigadores y colaboradores del LACIGE:
+
+```
+colaboradores/
+├── grupos/                    # Instituciones/Grupos de investigación
+│   ├── academicos.md         # Académicos LACIGE
+│   ├── posdoctorantes.md     # Posdoctorantes
+│   ├── igum.md               # Instituto de Geofísica U. Michoacán
+│   ├── irya.md               # Instituto de Radioastronomía y Astrofísica
+│   └── ...
+├── internos/                  # Colaboradores internos (LACIGE)
+│   ├── dr-mario-rodriguez-martinez.md
+│   ├── dr-sinhue-haro-corzo.md
+│   └── ...
+├── externos/                  # Colaboradores externos
+│   ├── dr-americo-gonzalez-esparza.md
+│   └── ...
+├── README.md                  # Documentación rápida
+└── TEMPLATE.md                # Template base
+```
+
+**Ver también:** [09-COLABORADORES.md](./09-COLABORADORES.md) para gestión detallada.
 
 ### `src/content/divulgacion/`
 
@@ -209,6 +238,9 @@ Define las colecciones de contenido y sus esquemas:
 
 - Colección `divulgacion` - Artículos de divulgación
 - Colección `publicaciones` - Publicaciones científicas
+- Colección `colaboradoresInternos` - Investigadores del LACIGE
+- Colección `colaboradoresExternos` - Colaboradores de otras instituciones
+- Colección `gruposColaboradores` - Instituciones y grupos de investigación
 
 ### `package.json`
 
@@ -257,3 +289,4 @@ Dependencias y scripts:
 - [03-COMPONENTES.md](./03-COMPONENTES.md) - Documentación detallada de componentes
 - [04-ARTICULOS-DIVULGACION.md](./04-ARTICULOS-DIVULGACION.md) - Crear artículos
 - [05-PUBLICACIONES-CIENTIFICAS.md](./05-PUBLICACIONES-CIENTIFICAS.md) - Agregar publicaciones
+- [09-COLABORADORES.md](./09-COLABORADORES.md) - Gestionar colaboradores
