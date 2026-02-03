@@ -105,7 +105,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
         <div class="video-collaborators__logos">
           <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Predictive Science Inc">
             <img src="/predictive-science-logo.svg" alt="Predictive Science Inc" loading="lazy" class="logo-predsci" />
-            <span>Predictive Science Inc</span>
+            <span class="collaborator-name">Predictive Science Inc</span>
           </a>
           <a href="https://www.unam.mx/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Universidad Nacional Autónoma de México">
             <img src="/logo-unam.png" alt="UNAM" loading="lazy" class="logo-unam" />
@@ -751,7 +751,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     transition: all var(--transition-fast);
   }
 
-  /* Tamaños específicos para cada logo - ahora más grandes */
+  /* Tamaños específicos para cada logo */
   .logo-predsci {
     height: 56px;
     filter: grayscale(20%);
@@ -835,6 +835,10 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
 
     .logo-lacige {
       height: 56px;
+    }
+
+    .collaborator-name {
+      display: none;
     }
   }
 </style>
