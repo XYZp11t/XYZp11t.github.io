@@ -107,7 +107,7 @@ tipo: "tesis"
 institucion: "Universidad o Institución"
 director: "Dr. Nombre del Director"
 directorInstitucion: "Institución del director"  # Opcional
-enlace: "https://repositorio.unam.mx/..."  # Opcional
+enlace: "/tesis/archivo.pdf" | enlace # Opcional
 ---
 
 Texto opcional con información adicional.
@@ -267,7 +267,7 @@ Las publicaciones se muestran en tres páginas:
 
 ### 3. Página de Tesis (`/investigacion/publicaciones/tesis`)
 
-- Solo tesis de posgrado
+- Solo tesis
 - Agrupadas por año
 - Muestra información del director y la institución
 

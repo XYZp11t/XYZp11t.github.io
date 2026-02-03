@@ -19,7 +19,8 @@ src/content/colaboradores/
 ├── externos/                  # Colaboradores externos
 │   ├── dr-americo-gonzalez.md
 │   └── ...
-└── README.md                  # Este archivo
+├── README.md                  # Este archivo
+└── TEMPLATE.md                # Template base
 ```
 
 ## Cómo Agregar un Nuevo Colaborador
@@ -80,14 +81,25 @@ perfil:
   email: "correo@institucion.unam.mx"
 esEncargado: false
 orden: 1
+grupoSiglas: "IGUM"                         # ← Siglas de la institución
 ---
 ```
 
-**Importante:** El nombre del archivo debe contener palabras clave que permitan asociarlo a su institución. Por ejemplo:
-- `dr-americo-gonzalez.md` → se asocia automáticamente a IGUM
-- `dr-luis-zapata.md` → se asocia automáticamente a IRYA
+**El campo `grupoSiglas` determina a qué institución pertenece el colaborador.** Debe coincidir con las siglas definidas en `src/content/colaboradores/grupos/`.
 
-Las palabras clave de asociación están definidas en `src/pages/colaboradores.astro`.
+**Siglas disponibles:**
+
+| Institución | Siglas |
+|-------------|--------|
+| Instituto de Geofísica U. Michoacán | `IGUM` |
+| Instituto de Radioastronomía y Astrofísica | `IRYA` |
+| Instituto de Geofísica | `IG` |
+| Centro de Alta Tecnología | `CAT` |
+| Instituto de Ciencias Nucleares | `ICN` |
+| Universidad de Sonora | `UNISON` |
+| Instituto de Astronomía - Ensenada | `IA-ENS` |
+| Universidad Autónoma de Nuevo León | `UANL` |
+| INAOE | `INAOE` |
 
 ### 3. Nueva Institución/Grupo
 
@@ -102,13 +114,14 @@ orden: 10              # Orden de aparición
 ---
 ```
 
-Luego actualiza el mapeo en `src/pages/colaboradores.astro` para asociar investigadores a este nuevo grupo:
+Luego, al crear colaboradores para esta institución, usa el campo `grupoSiglas` con las siglas definidas:
 
-```typescript
-const mapeoInstituciones: Record<string, string[]> = {
-  // ... grupos existentes ...
-  'SIGLAS': ['palabra-clave-1', 'palabra-clave-2'],
-};
+```yaml
+---
+nombre: "Dr. Nuevo Investigador"
+# ... otros campos ...
+grupoSiglas: "SIGLAS"  # ← Usa las siglas del nuevo grupo
+---
 ```
 
 ## Campos del Schema
@@ -126,6 +139,7 @@ const mapeoInstituciones: Record<string, string[]> = {
 | `perfil.email` | string | | Correo electrónico |
 | `esEncargado` | boolean | | `true` si es el responsable del laboratorio |
 | `orden` | number | | Posición en la lista (menor = primero) |
+| `grupoSiglas` | string | Solo externos | Siglas de la institución (ej: `"IGUM"`, `"IRYA"`) |
 
 ### Grupo
 
@@ -135,6 +149,43 @@ const mapeoInstituciones: Record<string, string[]> = {
 | `siglas` | string | ✅ | Siglas o abreviatura |
 | `tipo` | enum | ✅ | `"interno"` o `"externo"` |
 | `orden` | number | | Posición en la lista |
+
+## Templates
+
+### Template Colaborador Interno
+
+```yaml
+---
+nombre: "Dr. [Nombre Completo]"
+imagen: ""
+perfil:
+  cargo: "Técnico Académico T. C."
+  areaEstudio: ""
+  oficina: ""
+  telefono: ""
+  email: ""
+esEncargado: false
+orden: 999
+---
+```
+
+### Template Colaborador Externo
+
+```yaml
+---
+nombre: "Dr. [Nombre Completo]"
+imagen: ""
+perfil:
+  cargo: ""
+  areaEstudio: ""
+  oficina: ""
+  telefono: ""
+  email: ""
+esEncargado: false
+orden: 999
+grupoSiglas: "IGUM"  # Cambia por las siglas de la institución
+---
+```
 
 ## Consejos
 
@@ -151,10 +202,15 @@ const mapeoInstituciones: Record<string, string[]> = {
 - Asegúrate de que no haya errores de sintaxis YAML
 
 ### Un investigador no aparece en el grupo correcto
-- Verifica que el nombre del archivo contenga alguna de las palabras clave definidas en el mapeo
-- Revisa que el grupo tenga el `tipo` correcto ("interno" o "externo")
+
+**Internos:** Verifica que el campo `cargo` contenga el texto correcto:
+- `"posdoctorado"` → Grupo Posdoctorantes
+- Cualquier otro → Grupo Académicos
+
+**Externos:** Verifica que el campo `grupoSiglas` coincida exactamente con las siglas definidas en el archivo del grupo (en `src/content/colaboradores/grupos/`).
 
 ### Error de validación
 - Todos los campos en `perfil` deben ser strings (usar `''` para vacío)
 - `esEncargado` debe ser `true` o `false` (sin comillas)
 - `orden` debe ser un número
+- `grupoSiglas` debe coincidir exactamente con las siglas del grupo
