@@ -42,22 +42,32 @@ function isActive(href: string): boolean {
 
 <header class="header">
   <div class="header__container">
-    <a href="/" class="header__logo">
-      <div class="logo">
+    <div class="header__logos">
+      <a href="/" class="header__logo">
         <img 
           src="/LACIGE_LOGO_NEGRO_VECT.svg" 
           alt="LACIGE" 
           class="logo__img"
           loading="lazy"
         />
+      </a>
+      <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener noreferrer" class="header__enes-logo">
         <img 
-          src="/LETRAS_BG_NEGRO.svg" 
-          alt="Laboratorio de Ciencias Geoespaciales" 
-          class="logo__text"
+          src="/logo-enes.png" 
+          alt="ENES Morelia" 
+          class="logo__enes"
           loading="lazy"
         />
-      </div>
-    </a>
+      </a>
+      <a href="https://www.unam.mx/" target="_blank" rel="noopener noreferrer" class="header__unam-logo">
+        <img 
+          src="/Escudo-UNAM-azul.svg" 
+          alt="UNAM" 
+          class="logo__unam"
+          loading="lazy"
+        />
+      </a>
+    </div>
 
     <button class="header__toggle" aria-label="Menú" aria-expanded="false">
       <span></span>
@@ -66,23 +76,46 @@ function isActive(href: string): boolean {
     </button>
 
     <nav class="header__nav">
-      <!-- Logo para menú móvil -->
-      <a href="/" class="header__logo--mobile">
-        <div class="logo">
+      <!-- Logos para menú móvil -->
+      <div class="header__mobile-logos">
+        <a href="/" class="header__logo--mobile">
           <img 
             src="/LACIGE_LOGO_NEGRO_VECT.svg" 
             alt="LACIGE" 
             class="logo__img"
             loading="lazy"
           />
+        </a>
+        <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener noreferrer" class="header__enes-logo--mobile">
           <img 
-            src="/LETRAS_BG_NEGRO.svg" 
-            alt="Laboratorio de Ciencias Geoespaciales" 
-            class="logo__text"
+            src="/logo-enes.png" 
+            alt="ENES Morelia" 
+            class="logo__enes"
             loading="lazy"
           />
-        </div>
-      </a>
+        </a>
+        <a href="https://www.unam.mx/" target="_blank" rel="noopener noreferrer" class="header__unam-logo--mobile">
+          <img 
+            src="/Escudo-UNAM-azul.svg" 
+            alt="UNAM" 
+            class="logo__unam"
+            loading="lazy"
+          />
+        </a>
+        <a 
+          href="https://secihti.mx/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="header__secihti-logo--mobile"
+        >
+          <img 
+            src="/SECIHTI_logo.svg" 
+            alt="SECIHTI" 
+            class="secihti-logo__img"
+            loading="lazy"
+          />
+        </a>
+      </div>
       <ul class="nav">
         {menuItems.map((item) => (
           <li class={`nav__item ${item.children ? 'has-dropdown' : ''}`}>
@@ -130,6 +163,22 @@ function isActive(href: string): boolean {
         ))}
       </ul>
     </nav>
+
+    <!-- Logo SECIHTI -->
+    <a 
+      href="https://secihti.mx/" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      class="header__secihti-logo"
+      aria-label="SECIHTI - Secretaría de Ciencia, Humanidades, Tecnología e Innovación"
+    >
+      <img 
+        src="/SECIHTI_logo.svg" 
+        alt="SECIHTI" 
+        class="secihti-logo__img"
+        loading="lazy"
+      />
+    </a>
   </div>
 </header>
 
@@ -145,41 +194,106 @@ function isActive(href: string): boolean {
   .header__container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: var(--space-md);
     max-width: var(--container-max);
     margin: 0 auto;
     padding: var(--space-sm) var(--space-lg);
+  }
+
+  .header__logos {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-shrink: 0;
+    margin-right: auto;
   }
 
   .header__logo {
     text-decoration: none;
   }
 
-  .logo {
+  .header__enes-logo {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .header__enes-logo:hover {
+    opacity: 0.8;
+  }
+
+  .header__unam-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .header__unam-logo:hover {
+    opacity: 0.8;
+  }
+
+  .header__nav {
+    margin-left: auto;
+  }
+
+  .header__secihti-logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    margin-left: var(--space-sm);
+    transition: opacity var(--transition-fast);
+  }
+
+  .header__secihti-logo:hover {
+    opacity: 0.8;
+  }
+
+  .secihti-logo__img {
+    height: 52px;
+    width: auto;
+    display: block;
   }
 
   .logo__img {
-    height: 48px;
+    height: 65px;
     width: auto;
     display: block;
   }
 
-  .logo__text {
-    height: 40px;
+  .logo__enes {
+    height: 58px;
     width: auto;
     display: block;
+    padding-left: 0.9rem;
   }
 
-  /* Logo en menú móvil - oculto por defecto */
-  .header__logo--mobile {
+  .logo__unam {
+    height: 58px;
+    width: auto;
+    display: block;
+    padding-left: 1rem;
+  }
+
+  /* Logos en menú móvil - ocultos por defecto */
+  .header__mobile-logos {
     display: none;
-    text-decoration: none;
+    align-items: center;
+    gap: var(--space-md);
     margin-bottom: var(--space-lg);
     padding-bottom: var(--space-md);
     border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .header__logo--mobile,
+  .header__enes-logo--mobile,
+  .header__unam-logo--mobile,
+  .header__secihti-logo--mobile {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
   }
 
   .header__toggle {
@@ -348,8 +462,44 @@ function isActive(href: string): boolean {
 
   /* Responsive */
   @media (max-width: 1024px) {
+    .header__container {
+      justify-content: flex-start;
+    }
+
+    .header__logos {
+      order: 1;
+      margin-right: 0;
+      gap: var(--space-sm);
+    }
+
+    .header__secihti-logo {
+      display: flex;
+      margin-left: auto;
+      margin-right: var(--space-sm);
+      order: 2;
+    }
+
+    .secihti-logo__img {
+      height: 40px;
+      padding-right: 0.5rem;
+    }
+    .logo__img {
+      height: 40px;
+    }
+    .logo__enes {
+      height: 42px;
+      padding-left: 0.3rem;
+    }
+
+    .logo__unam {
+      height: 42px;
+      padding-left: 0.3rem;
+    }
+
     .header__toggle {
       display: flex;
+      order: 3;
+      margin-left: 0;
     }
 
     .header__nav {
@@ -368,9 +518,25 @@ function isActive(href: string): boolean {
       flex-direction: column;
     }
 
-    .header__logo--mobile {
-      display: block;
+    .header__mobile-logos {
+      display: flex;
       margin-top: 2px;
+    }
+
+    .header__mobile-logos .logo__img {
+      height: 42px;
+    }
+
+    .header__mobile-logos .logo__enes {
+      height: 42px;
+    }
+
+    .header__mobile-logos .logo__unam {
+      height: 42px;
+    }
+
+    .header__mobile-logos .secihti-logo__img {
+      height: 40px;
     }
 
     .header__nav.is-open {

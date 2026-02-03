@@ -179,6 +179,7 @@ const imagenesJSON = JSON.stringify(imagenes);
             fill="none"
             stroke="currentColor"
             stroke-width="2"
+            style="padding-top: 1.3rem;"
           >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -972,7 +973,7 @@ const imagenesJSON = JSON.stringify(imagenes);
   /* Botón cerrar - fijo en esquina superior derecha, debajo del header */
   .solar-viewer__close {
     position: fixed;
-    top: 80px;
+    top: 88px;
     right: 20px;
     display: flex;
     align-items: center;
@@ -1544,7 +1545,7 @@ const imagenesJSON = JSON.stringify(imagenes);
       width: 100%;
       padding: var(--space-sm);
       margin-top: var(--space-sm);
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(31, 107, 179, 0.788);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: var(--radius-md);
       color: var(--color-white);
@@ -1568,13 +1569,13 @@ const imagenesJSON = JSON.stringify(imagenes);
 
     /* Cuando el panel está expandido - el toggle se fija encima del panel */
     .solar-viewer__content.info-expanded .solar-viewer__meta-toggle {
-      position: fixed;
-      bottom: calc(72px + 45vh + var(--space-sm)); /* Nav bar + panel height + spacing */
+      position: auto;
+       /* Nav bar + panel height + spacing */
       left: var(--space-md);
       right: var(--space-md);
       z-index: 100016;
       margin: 0;
-      background: rgba(0, 20, 50, 0.95);
+      background: rgba(37, 90, 170, 0.95);
       backdrop-filter: blur(10px);
     }
 
@@ -1644,6 +1645,7 @@ const imagenesJSON = JSON.stringify(imagenes);
       left: var(--space-sm);
       right: var(--space-sm);
       padding: var(--space-md);
+      margin-bottom: 2.5rem;
     }
 
     .solar-viewer__details {
