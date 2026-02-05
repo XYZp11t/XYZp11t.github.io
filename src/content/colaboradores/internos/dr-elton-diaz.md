@@ -5,7 +5,7 @@ perfil:
   cargo: "Estudiante de posdoctorado"
   areaEstudio: ""
   oficina: "ENES Unidad Morelia, Universidad Nacional Autónoma de México, Edificio A"
-  telefono: ""
+  telefono: "552 669 2110"
   email: "elton.dzfg@outlook.com"
 esEncargado: false
 orden: 2
