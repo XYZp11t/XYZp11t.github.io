@@ -10,26 +10,34 @@ const internosData = await getCollection('colaboradoresInternos');
 const externosData = await getCollection('colaboradoresExternos');
 
 // Mapear datos de investigadores
-const mapInvestigador = (item: any) => ({
-  nombre: item.data.nombre,
-  imagen: item.data.imagen ?? '',
-  perfil: {
-    cargo: item.data.perfil?.cargo ?? '',
-    areaEstudio: item.data.perfil?.areaEstudio ?? '',
-    oficina: item.data.perfil?.oficina ?? '',
-    telefono: item.data.perfil?.telefono ?? '',
-    email: item.data.perfil?.email ?? '',
-  },
-  esEncargado: item.data.esEncargado ?? false,
-  orden: item.data.orden ?? 999,
-});
+const mapInvestigador = (item: any) => {
+  // Verificar si tiene biografía (contenido después del frontmatter)
+  const tieneBiografia = item.body && item.body.trim().length > 10;
+  
+  return {
+    id: item.id,
+    slug: item.id,
+    nombre: item.data.nombre,
+    imagen: item.data.imagen ?? '',
+    perfil: {
+      cargo: item.data.perfil?.cargo ?? '',
+      areaEstudio: item.data.perfil?.areaEstudio ?? '',
+      oficina: item.data.perfil?.oficina ?? '',
+      telefono: item.data.perfil?.telefono ?? '',
+      email: item.data.perfil?.email ?? '',
+    },
+    esEncargado: item.data.esEncargado ?? false,
+    orden: item.data.orden ?? 999,
+    tieneBiografia,
+  };
+};
 
 // ========== COLABORADORES INTERNOS ==========
 // Se separan automáticamente por cargo: Académicos vs Posdoctorantes
 const investigadoresInternosMapeados = internosData.map(mapInvestigador);
 
 const academicos = investigadoresInternosMapeados
-  .filter(inv => !inv.perfil.cargo.includes('posdoctorado'))
+  .filter(inv => !inv.perfil.cargo.toLowerCase().includes('posdoctorado'))
   .sort((a, b) => {
     if (a.esEncargado) return -1;
     if (b.esEncargado) return 1;
@@ -37,7 +45,7 @@ const academicos = investigadoresInternosMapeados
   });
 
 const posdoctorantes = investigadoresInternosMapeados
-  .filter(inv => inv.perfil.cargo.includes('posdoctorado'))
+  .filter(inv => inv.perfil.cargo.toLowerCase().includes('posdoctorado'))
   .sort((a, b) => a.orden - b.orden);
 
 const colaboradoresInternos = [];
@@ -84,8 +92,6 @@ const colaboradoresExternos = gruposExternos.map(grupo => {
     investigadores: investigadoresDelGrupo,
   };
 }).filter(g => g.investigadores.length > 0);
-
-
 ---
 
 <Layout 
@@ -181,6 +187,26 @@ const colaboradoresExternos = gruposExternos.map(grupo => {
                           )}
                         </div>
                       )}
+                      
+                      <!-- Botón de biografía alineado al final -->
+                      {investigador.tieneBiografia && (
+                        <div class="researcher-card__actions">
+                          <a 
+                            href={`/colaborador/${investigador.slug}`}
+                            class="researcher-card__bio-btn"
+                            aria-label={`Ver biografía de ${investigador.nombre}`}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                              <line x1="16" y1="13" x2="8" y2="13"/>
+                              <line x1="16" y1="17" x2="8" y2="17"/>
+                              <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                            Ver biografía
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </article>
                 );
@@ -266,6 +292,26 @@ const colaboradoresExternos = gruposExternos.map(grupo => {
                               {email}
                             </a>
                           )}
+                        </div>
+                      )}
+                      
+                      <!-- Botón de biografía alineado al final -->
+                      {investigador.tieneBiografia && (
+                        <div class="researcher-card__actions">
+                          <a 
+                            href={`/colaborador/${investigador.slug}`}
+                            class="researcher-card__bio-btn"
+                            aria-label={`Ver biografía de ${investigador.nombre}`}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                              <line x1="16" y1="13" x2="8" y2="13"/>
+                              <line x1="16" y1="17" x2="8" y2="17"/>
+                              <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                            Ver biografía
+                          </a>
                         </div>
                       )}
                     </div>
@@ -534,6 +580,42 @@ const colaboradoresExternos = gruposExternos.map(grupo => {
 
   .researcher-card__info--link:hover {
     color: var(--color-accent);
+  }
+
+  /* Botón de biografía - siempre al final */
+  .researcher-card__actions {
+    margin-top: auto;
+    padding-top: var(--space-sm);
+  }
+
+  .researcher-card__bio-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .researcher-card__bio-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+  }
+
+  .researcher-card__bio-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
   }
 
   /* CTA */

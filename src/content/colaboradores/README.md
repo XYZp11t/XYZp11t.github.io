@@ -43,26 +43,41 @@ esEncargado: false                           # true solo para el responsable del
 orden: 10                                    # Orden de aparición (menor = primero)
 ---
 
-Descripción opcional del investigador (aparece como contenido del markdown).
-```
+Escribe aquí la biografía del colaborador. Párrafos simples con la información
+relevante sobre su trayectoria, formación, investigación, etc.
 
-**Ejemplo completo:**
+## Líneas de Investigación
 
-```yaml
----
-nombre: "Dr. Mario Rodríguez Martínez"
-imagen: "/colaboradores/DrMarioRod.jpg"
-perfil:
-  cargo: "Responsable del Laboratorio"
-  areaEstudio: ""
-  oficina: ""
-  telefono: ""
-  email: "mrodriguez@enesmorelia.unam.mx"
-esEncargado: true
-orden: 1
----
+Descipción de las líneas de investigación (opcional).
 
-Responsable del Laboratorio LACIGE.
+<div class="research-areas">
+  <span class="research-tag">Área 1</span>
+  <span class="research-tag">Área 2</span>
+</div>
+
+## Publicaciones Selectas
+
+<div class="publication-list">
+  <div class="publication-item">
+    <span class="pub-number">1</span>
+    <div class="pub-content">
+      <span class="pub-title">Título del paper</span>
+      <span class="pub-authors">Autores</span>
+      <span class="pub-journal">Revista, Año</span>
+      <a class="pub-link" href="https://doi.org/...">DOI: ...</a>
+    </div>
+  </div>
+</div>
+
+## Proyectos
+
+<div class="project-list">
+  <div class="project-item">
+    <span class="project-period">2020 – Actualidad</span>
+    <p>Título del proyecto</p>
+    <p class="project-funding">Descripción o financiamiento...</p>
+  </div>
+</div>
 ```
 
 ### 2. Colaborador Externo
@@ -83,6 +98,8 @@ esEncargado: false
 orden: 1
 grupoSiglas: "IGUM"                         # ← Siglas de la institución
 ---
+
+Contenido de la biografía...
 ```
 
 **El campo `grupoSiglas` determina a qué institución pertenece el colaborador.** Debe coincidir con las siglas definidas en `src/content/colaboradores/grupos/`.
@@ -114,15 +131,7 @@ orden: 10              # Orden de aparición
 ---
 ```
 
-Luego, al crear colaboradores para esta institución, usa el campo `grupoSiglas` con las siglas definidas:
-
-```yaml
----
-nombre: "Dr. Nuevo Investigador"
-# ... otros campos ...
-grupoSiglas: "SIGLAS"  # ← Usa las siglas del nuevo grupo
----
-```
+Luego, al crear colaboradores para esta institución, usa el campo `grupoSiglas` con las siglas definidas.
 
 ## Campos del Schema
 
@@ -150,49 +159,109 @@ grupoSiglas: "SIGLAS"  # ← Usa las siglas del nuevo grupo
 | `tipo` | enum | ✅ | `"interno"` o `"externo"` |
 | `orden` | number | | Posición en la lista |
 
-## Templates
+## Página de Biografía
 
-### Template Colaborador Interno
+Si el archivo markdown contiene contenido después del frontmatter (más de 10 caracteres), se mostrará automáticamente:
+
+1. Un botón **"Ver biografía"** en la tarjeta del colaborador
+2. Una **página dedicada** accesible en `/colaborador/[nombre-del-archivo]`
+
+### Estructura HTML recomendada:
+
+#### Biografía
+Escribe párrafos normales de texto. No uses estilos especiales de introducción.
+
+```markdown
+Escribe la biografía directamente, sin divs especiales. Párrafos simples
+con la información relevante.
+```
+
+#### Líneas de investigación (tags separados por puntos):
+```html
+<div class="research-areas">
+  <span class="research-tag">Física Solar</span>
+  <span class="research-tag">Clima Espacial</span>
+</div>
+```
+
+#### Lista de publicaciones (numeradas):
+```html
+<div class="publication-list">
+  <div class="publication-item">
+    <span class="pub-number">1</span>
+    <div class="pub-content">
+      <span class="pub-title">Título del paper</span>
+      <span class="pub-authors">Lista de autores</span>
+      <span class="pub-journal">Revista, Volumen, Año</span>
+      <a class="pub-link" href="https://doi.org/...">DOI: ...</a>
+    </div>
+  </div>
+</div>
+```
+
+#### Proyectos (compactos, sin cajas grandes):
+```html
+<div class="project-list">
+  <div class="project-item">
+    <span class="project-period">2020 – Actualidad</span>
+    <p>Título del proyecto</p>
+    <p class="project-funding">Información de financiamiento...</p>
+  </div>
+</div>
+```
+
+## Clases CSS Disponibles
+
+| Clase | Uso |
+|-------|-----|
+| `.bio-section` | Contenedor de sección de biografía (opcional) |
+| `.research-areas` | Contenedor de tags de líneas de investigación |
+| `.research-tag` | Tag individual de línea de investigación |
+| `.publication-list` | Contenedor de lista de publicaciones |
+| `.publication-item` | Item individual de publicación |
+| `.pub-number` | Número de publicación |
+| `.pub-content` | Contenedor de contenido de publicación |
+| `.pub-title` | Título del paper |
+| `.pub-authors` | Lista de autores |
+| `.pub-journal` | Nombre de la revista |
+| `.pub-link` | Enlace al DOI |
+| `.project-list` | Contenedor de lista de proyectos |
+| `.project-item` | Item individual de proyecto |
+| `.project-period` | Período del proyecto |
+| `.project-funding` | Información de financiamiento |
+
+## Currículum Vitae (CV)
+
+Si deseas agregar un CV para un colaborador:
+
+1. Guarda el archivo PDF en la carpeta `/public/CVs/`
+2. En el frontmatter del archivo `.md`, agrega el campo `cv` con la ruta al archivo:
 
 ```yaml
 ---
-nombre: "Dr. [Nombre Completo]"
-imagen: ""
+nombre: "Dr. Mario Rodríguez Martínez"
+imagen: "/colaboradores/DrMarioRod.jpg"
+cv: "/CVs/cv_MRM_ENESM.pdf"  # ← Agrega esta línea
 perfil:
-  cargo: "Técnico Académico T. C."
-  areaEstudio: ""
-  oficina: ""
-  telefono: ""
-  email: ""
-esEncargado: false
-orden: 999
+  cargo: "Responsable del Laboratorio"
+  ...
 ---
 ```
 
-### Template Colaborador Externo
-
-```yaml
----
-nombre: "Dr. [Nombre Completo]"
-imagen: ""
-perfil:
-  cargo: ""
-  areaEstudio: ""
-  oficina: ""
-  telefono: ""
-  email: ""
-esEncargado: false
-orden: 999
-grupoSiglas: "IGUM"  # Cambia por las siglas de la institución
----
-```
+3. Si el campo `cv` está vacío (`""`) o no existe, no se mostrará el botón "Ver CV"
+4. El CV se abre en una pestaña nueva del navegador
 
 ## Consejos
 
 1. **Imágenes**: Guarda las imágenes en `/public/colaboradores/` con nombres descriptivos.
-2. **Orden**: Usa `orden: 1` para el responsable, `orden: 2-10` para académicos principales, etc.
-3. **Campos vacíos**: Todos los campos pueden estar vacíos (`''`), pero deben existir en el archivo.
-4. **Desarrollo**: En modo desarrollo (`npm run dev`), los cambios se reflejan inmediatamente sin necesidad de rebuild.
+2. **CVs**: Guarda los archivos PDF en `/public/CVs/` para que aparezca el enlace de descarga.
+3. **Orden**: Usa `orden: 1` para el responsable, `orden: 2-10` para académicos principales, etc.
+4. **Campos vacíos**: Todos los campos pueden estar vacíos (`''`), pero deben existir en el archivo.
+5. **Biografía**: Si agregas contenido markdown después del frontmatter, aparecerá el botón "Ver biografía" y se creará la página dedicada.
+6. **Información de contacto**: No repitas el email o teléfono en el body del markdown, ya que se muestra automáticamente en la tarjeta del colaborador y en el sidebar de la página de biografía.
+7. **URLs amigables**: La página de biografía tendrá la URL `/colaborador/nombre-del-archivo` (sin la extensión `.md`).
+8. **No inventes contenido**: Solo agrega información que realmente tengas del colaborador.
+9. **Diseño limpio**: Evita cajas grandes y estilos llamativos. Prefiere diseños compactos y profesionales.
 
 ## Solución de Problemas
 
@@ -201,13 +270,21 @@ grupoSiglas: "IGUM"  # Cambia por las siglas de la institución
 - Revisa que el frontmatter (entre `---`) esté bien formado
 - Asegúrate de que no haya errores de sintaxis YAML
 
+### El botón "Ver biografía" no aparece
+- El contenido debe tener al menos 10 caracteres
+- Verifica que haya contenido después del segundo `---`
+
+### La página de biografía no se genera
+- Verifica que el archivo no tenga errores de sintaxis
+- Asegúrate de que el `id` del archivo sea único
+
 ### Un investigador no aparece en el grupo correcto
 
 **Internos:** Verifica que el campo `cargo` contenga el texto correcto:
 - `"posdoctorado"` → Grupo Posdoctorantes
 - Cualquier otro → Grupo Académicos
 
-**Externos:** Verifica que el campo `grupoSiglas` coincida exactamente con las siglas definidas en el archivo del grupo (en `src/content/colaboradores/grupos/`).
+**Externos:** Verifica que el campo `grupoSiglas` coincida exactamente con las siglas definidas en el archivo del grupo.
 
 ### Error de validación
 - Todos los campos en `perfil` deben ser strings (usar `''` para vacío)

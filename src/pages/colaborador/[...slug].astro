@@ -1,0 +1,601 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { getCollection, render } from 'astro:content';
+
+// Generar rutas estáticas para todos los colaboradores con biografía
+export async function getStaticPaths() {
+  const internos = await getCollection('colaboradoresInternos');
+  const externos = await getCollection('colaboradoresExternos');
+  
+  const todos = [...internos, ...externos];
+  
+  return todos.map(item => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const { nombre, imagen, cv, perfil, esEncargado } = item.data;
+const { cargo, areaEstudio, oficina, telefono, email } = perfil || {};
+
+// Verificar si hay contenido de biografía
+const tieneBiografia = item.body && item.body.trim().length > 10;
+
+// El CV se obtiene directamente del frontmatter (campo 'cv')
+---
+
+<Layout 
+  title={`${nombre} | Colaboradores | LACIGE`}
+  description={`Biografía y perfil de ${nombre} - Colaborador del Laboratorio de Ciencias Geoespaciales.`}
+>
+  <PageHeader 
+    titulo={nombre}
+    subtitulo={cargo || 'Colaborador'}
+  />
+
+  <section class="section section--gray">
+    <div class="container">
+      <!-- Link de retorno simple -->
+      <div class="back-link-wrapper">
+        <a href="/colaboradores" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver a colaboradores
+        </a>
+      </div>
+
+      <div class="bio-layout">
+        <!-- Sidebar con información del investigador -->
+        <aside class="bio-sidebar">
+          <div class="bio-sidebar__card">
+            <!-- Foto -->
+            <div class="bio-sidebar__image-wrapper">
+              {imagen ? (
+                <img src={imagen} alt={nombre} class="bio-sidebar__image" />
+              ) : (
+                <div class="bio-sidebar__placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                  </svg>
+                </div>
+              )}
+              
+              <!-- Badge de encargado eliminado en página dedicada -->
+            </div>
+
+            <!-- Información básica -->
+            <div class="bio-sidebar__info">
+              <h1 class="bio-sidebar__name">{nombre}</h1>
+              {cargo && <p class="bio-sidebar__role">{cargo}</p>}
+              {areaEstudio && <p class="bio-sidebar__area">{areaEstudio}</p>}
+            </div>
+
+            <!-- Información de contacto -->
+            {(oficina || telefono || email || cv) && (
+              <div class="bio-sidebar__contact">
+                <h3 class="bio-sidebar__section-title">Contacto</h3>
+                
+                {oficina && (
+                  <div class="bio-sidebar__contact-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/>
+                    </svg>
+                    <span>{oficina}</span>
+                  </div>
+                )}
+                
+                {telefono && (
+                  <div class="bio-sidebar__contact-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                    </svg>
+                    <span>{telefono}</span>
+                  </div>
+                )}
+                
+                {email && (
+                  <div class="bio-sidebar__contact-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <a href={`mailto:${email}`} class="bio-sidebar__email">{email}</a>
+                  </div>
+                )}
+
+                <!-- Enlace al CV si existe -->
+                {cv && cv.trim() !== '' && (
+                  <div class="bio-sidebar__contact-item bio-sidebar__contact-item--cv">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <path d="M12 18v-6"/>
+                      <path d="M9 15l3 3 3-3"/>
+                    </svg>
+                    <a href={cv} class="bio-sidebar__cv-link" target="_blank" rel="noopener">
+                      Ver CV
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <!-- Contenido principal de la biografía -->
+        <main class="bio-content">
+          {tieneBiografia ? (
+            <div class="bio-content__wrapper">
+              <Content />
+            </div>
+          ) : (
+            <div class="bio-content__empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <p>Biografía no disponible.</p>
+              <a href="/colaboradores" class="btn btn--primary">Volver a colaboradores</a>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .container {
+    margin-top: -2.5rem;
+  }
+
+  /* Link de retorno simple */
+  .back-link-wrapper {
+    margin-bottom: var(--space-lg);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.9375rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-accent-dark);
+  }
+
+  .back-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Layout principal */
+  .bio-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  @media (max-width: 968px) {
+    .bio-layout {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+  }
+
+  /* Sidebar */
+  .bio-sidebar {
+    position: sticky;
+    top: calc(var(--header-height, 70px) + var(--space-lg));
+  }
+
+  @media (max-width: 968px) {
+    .bio-sidebar {
+      position: static;
+    }
+  }
+
+  .bio-sidebar__card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .bio-sidebar__image-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);
+  }
+
+  .bio-sidebar__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .bio-sidebar__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--color-gray-400);
+  }
+
+  .bio-sidebar__placeholder svg {
+    width: 40%;
+    height: 40%;
+  }
+
+  .bio-sidebar__badge {
+    position: absolute;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+    color: var(--color-primary-dark);
+    border-radius: var(--radius-md);
+  }
+
+  .bio-sidebar__info {
+    padding: var(--space-lg);
+    text-align: center;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .bio-sidebar__name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 var(--space-xs);
+    line-height: 1.3;
+  }
+
+  .bio-sidebar__role {
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .bio-sidebar__area {
+    font-size: 0.8125rem;
+    color: var(--color-earth);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .bio-sidebar__contact {
+    padding: var(--space-lg);
+  }
+
+  .bio-sidebar__section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gray-500);
+    margin: 0 0 var(--space-md);
+  }
+
+  .bio-sidebar__contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    font-size: 0.8125rem;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
+  }
+
+  .bio-sidebar__contact-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .bio-sidebar__contact-item svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-400);
+    margin-top: 1px;
+  }
+
+  /* Estilo especial para el CV */
+  .bio-sidebar__contact-item--cv {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-gray-200);
+  }
+
+  .bio-sidebar__contact-item--cv svg {
+    color: var(--color-accent-dark);
+  }
+
+  .bio-sidebar__email {
+    color: var(--color-primary);
+    text-decoration: none;
+    word-break: break-word;
+    transition: color 0.2s ease;
+  }
+
+  .bio-sidebar__email:hover {
+    color: var(--color-accent-dark);
+    text-decoration: underline;
+  }
+
+  .bio-sidebar__cv-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 6px 12px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+  }
+
+  .bio-sidebar__cv-link:hover {
+    background: var(--color-accent);
+    color: var(--color-primary-dark);
+    text-decoration: none;
+  }
+
+  /* Contenido principal */
+  .bio-content {
+    min-width: 0;
+  }
+
+  .bio-content__wrapper {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-xl);
+  }
+
+  .bio-content__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-3xl);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+  }
+
+  .bio-content__empty svg {
+    width: 48px;
+    height: 48px;
+    color: var(--color-gray-400);
+  }
+
+  .bio-content__empty p {
+    font-size: 1rem;
+    color: var(--color-gray-600);
+    margin: 0;
+  }
+
+  /* Estilos para el contenido HTML renderizado */
+  .bio-content :global(h2) {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: var(--space-lg) 0 var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--color-gray-200);
+  }
+
+  .bio-content :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .bio-content :global(h3) {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin: var(--space-md) 0 var(--space-sm);
+  }
+
+  .bio-content :global(p) {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-md);
+  }
+
+  .bio-content :global(ul),
+  .bio-content :global(ol) {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-lg);
+  }
+
+  .bio-content :global(li) {
+    margin-bottom: var(--space-sm);
+    line-height: 1.6;
+    font-size: 0.9375rem;
+    color: var(--color-gray-700);
+  }
+
+  /* Bio section - sin estilos especiales de intro */
+  .bio-content :global(.bio-section) {
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Publication list - diseño compacto */
+  .bio-content :global(.publication-list) {
+    margin: var(--space-md) 0;
+  }
+
+  .bio-content :global(.publication-item) {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .bio-content :global(.publication-item:last-child) {
+    border-bottom: none;
+  }
+
+  .bio-content :global(.pub-number) {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-gray-400);
+    min-width: 24px;
+  }
+
+  .bio-content :global(.pub-content) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .bio-content :global(.pub-title) {
+    font-weight: 600;
+    color: var(--color-gray-800);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .bio-content :global(.pub-authors) {
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+  }
+
+  .bio-content :global(.pub-journal) {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    font-style: italic;
+  }
+
+  .bio-content :global(.pub-link) {
+    font-size: 0.8125rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    margin-top: 2px;
+  }
+
+  .bio-content :global(.pub-link:hover) {
+    text-decoration: underline;
+  }
+
+  /* Project item - diseño compacto en línea */
+  .bio-content :global(.project-list) {
+    margin: var(--space-md) 0;
+  }
+
+  .bio-content :global(.project-item) {
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .bio-content :global(.project-item:last-child) {
+    border-bottom: none;
+  }
+
+  .bio-content :global(.project-period) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-accent-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .bio-content :global(.project-item > p:first-of-type) {
+    font-weight: 500;
+    color: var(--color-gray-800);
+    margin: 2px 0;
+    font-size: 0.9375rem;
+  }
+
+  .bio-content :global(.project-funding) {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    margin: 0;
+  }
+
+  /* Research areas - diseño compacto */
+  .bio-content :global(.research-areas) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin: var(--space-md) 0 var(--space-lg);
+    padding: var(--space-md);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+  }
+
+  .bio-content :global(.research-tag) {
+    font-size: 0.8125rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .bio-content :global(.research-tag:not(:last-child))::after {
+    content: "•";
+    margin-left: var(--space-sm);
+    color: var(--color-gray-400);
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .bio-content__wrapper {
+      padding: var(--space-lg);
+    }
+
+    .bio-content :global(h2) {
+      font-size: 1.125rem;
+    }
+
+    .bio-content :global(.publication-item) {
+      gap: var(--space-sm);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .bio-content__wrapper {
+      padding: var(--space-md);
+    }
+
+    .bio-sidebar__name {
+      font-size: 1rem;
+    }
+
+    .bio-sidebar__role,
+    .bio-sidebar__area {
+      font-size: 0.8125rem;
+    }
+
+    .back-link {
+      font-size: 0.875rem;
+    }
+  }
+</style>

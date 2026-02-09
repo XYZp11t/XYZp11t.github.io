@@ -5,6 +5,36 @@ import { getCollection } from 'astro:content';
 
 const publicaciones = await getCollection('publicaciones');
 const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => b.data.anio - a.data.anio);
+
+// Agrupar tesis por año
+const tesisPorAnio = tesis.reduce((acc, t) => {
+  const anio = t.data.anio;
+  if (!acc[anio]) acc[anio] = [];
+  acc[anio].push(t);
+  return acc;
+}, {} as Record<number, typeof tesis>);
+
+const anios = Object.keys(tesisPorAnio).map(Number).sort((a, b) => b - a);
+
+// Función para obtener etiqueta de nivel
+const getNivelLabel = (nivel: string | undefined) => {
+  switch (nivel) {
+    case 'licenciatura': return 'Licenciatura';
+    case 'maestria': return 'Maestría';
+    case 'doctorado': return 'Doctorado';
+    default: return 'Tesis';
+  }
+};
+
+// Función para obtener clase de nivel
+const getNivelClass = (nivel: string | undefined) => {
+  switch (nivel) {
+    case 'licenciatura': return 'thesis-tag--lic';
+    case 'maestria': return 'thesis-tag--mast';
+    case 'doctorado': return 'thesis-tag--doc';
+    default: return 'thesis-tag';
+  }
+};
 ---
 
 <Layout 
@@ -26,40 +56,106 @@ const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => 
         <span>Tesis</span>
       </div>
 
-      <div class="thesis-list">
-        {tesis.length > 0 ? (
-          tesis.map((t) => (
-            <article class="thesis-item">
-              <div class="thesis-item__badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                </svg>
+      {anios.length > 0 ? (
+        <div class="thesis-timeline">
+          {anios.map((anio) => (
+            <div class="thesis-year-group">
+              <div class="thesis-year-badge">
+                <span class="thesis-year-number">{anio}</span>
+                <span class="thesis-year-count">{tesisPorAnio[anio].length} tesis</span>
               </div>
-              <div class="thesis-item__content">
-                <span class="thesis-item__year">{t.data.anio}</span>
-                <h3 class="thesis-item__title">{t.data.titulo}</h3>
-                <p class="thesis-item__author">
-                  <strong>Autor:</strong> {t.data.autores.join(', ')}
-                </p>
-                <p class="thesis-item__abstract">{t.data.resumen}</p>
-                {t.data.enlace && (
-                  <a href={t.data.enlace} class="thesis-item__link" target="_blank" rel="noopener">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7 10 12 15 17 10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Descargar PDF
-                  </a>
-                )}
+              
+              <div class="thesis-grid">
+                {tesisPorAnio[anio].map((t, index) => {
+                  const abstractId = `abstract-${anio}-${index}`;
+                  return (
+                    <article class="thesis-card">
+                      <div class="thesis-card__header">
+                        <div class="thesis-card__tags">
+                          {t.data.nivel && (
+                            <span class={`thesis-tag ${getNivelClass(t.data.nivel)}`}>
+                              {getNivelLabel(t.data.nivel)}
+                            </span>
+                          )}
+                        </div>
+                        <h3 class="thesis-card__title">{t.data.titulo}</h3>
+                      </div>
+                      
+                      <div class="thesis-card__body">
+                        <div class="thesis-card__meta">
+                          <span class="thesis-card__author">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                              <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            {t.data.autores.join(', ')}
+                          </span>
+                          
+                          {t.data.director && (
+                            <span class="thesis-card__director">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                              </svg>
+                              Dir: {t.data.director}
+                            </span>
+                          )}
+                          
+                          {t.data.institucion && (
+                            <span class="thesis-card__institution">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                              </svg>
+                              {t.data.institucion}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div class="thesis-card__abstract-wrapper">
+                          <p 
+                            id={abstractId}
+                            class="thesis-card__abstract thesis-card__abstract--collapsible"
+                            data-collapsible="true"
+                          >
+                            {t.data.resumen}
+                          </p>
+                          <button 
+                            class="thesis-card__expand-btn"
+                            data-target={abstractId}
+                            aria-expanded="false"
+                            hidden
+                          >
+                            <span class="expand-text">Ver más</span>
+                            <span class="collapse-text">Ver menos</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {t.data.enlace && (
+                        <div class="thesis-card__footer">
+                          <a href={t.data.enlace} class="thesis-card__link" target="_blank" rel="noopener">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                              <polyline points="7 10 12 15 17 10"/>
+                              <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Descargar PDF
+                          </a>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
               </div>
-            </article>
-          ))
-        ) : (
-          <p class="no-content">No hay tesis publicadas aún.</p>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="no-content">No hay tesis publicadas aún.</p>
+      )}
     </div>
   </section>
 </Layout>
@@ -86,97 +182,268 @@ const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => 
     color: var(--color-gray-400);
   }
 
-  .thesis-list {
+  /* Timeline layout */
+  .thesis-timeline {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: var(--space-2xl);
   }
 
-  .thesis-item {
+  .thesis-year-group {
     display: flex;
     gap: var(--space-xl);
-    padding: var(--space-xl);
+    align-items: flex-start;
+  }
+
+  .thesis-year-badge {
+    flex-shrink: 0;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-md);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: var(--radius-lg);
+    color: var(--color-white);
+    text-align: center;
+    position: sticky;
+    top: 100px;
+  }
+
+  .thesis-year-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .thesis-year-count {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+
+  /* Grid de tesis */
+  .thesis-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+    gap: var(--space-lg);
+  }
+
+  @media (min-width: 1024px) {
+    .thesis-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Tarjeta de tesis */
+  .thesis-card {
+    display: flex;
+    flex-direction: column;
     background-color: var(--color-white);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border-left: 4px solid var(--color-accent);
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    border-left: 3px solid var(--color-accent);
+    transition: all var(--transition-fast);
+    overflow: hidden;
   }
 
-  .thesis-item:hover {
+  .thesis-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--color-primary);
   }
 
-  .thesis-item__badge {
-    flex-shrink: 0;
-    width: 64px;
-    height: 64px;
+  .thesis-card__header {
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-white) 100%);
+    border-bottom: 1px solid var(--color-gray-100);
+  }
+
+  .thesis-card__tags {
     display: flex;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .thesis-tag {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-earth) 100%);
-    color: var(--color-white);
-    border-radius: var(--radius-md);
+    padding: 2px 8px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-radius: var(--radius-sm);
   }
 
-  .thesis-item__badge svg {
-    width: 32px;
-    height: 32px;
+  .thesis-tag--lic {
+    background-color: #e8f5e9;
+    color: #2e7d32;
   }
 
-  .thesis-item__content {
-    flex-grow: 1;
+  .thesis-tag--mast {
+    background-color: #e3f2fd;
+    color: #1565c0;
   }
 
-  .thesis-item__year {
-    display: inline-block;
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.75rem;
+  .thesis-tag--doc {
+    background-color: #fff3e0;
+    color: #e65100;
+  }
+
+  .thesis-card__title {
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--color-primary);
-    background-color: var(--color-gray-100);
-    border-radius: var(--radius-sm);
-    margin-bottom: var(--space-sm);
-  }
-
-  .thesis-item__title {
-    font-size: 1.25rem;
-    color: var(--color-primary);
-    margin-bottom: var(--space-sm);
+    margin: 0;
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .thesis-item__author {
-    font-size: 0.9375rem;
+  .thesis-card__body {
+    padding: var(--space-sm) var(--space-md);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .thesis-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+  }
+
+  .thesis-card__meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     color: var(--color-gray-600);
-    margin-bottom: var(--space-md);
   }
 
-  .thesis-item__abstract {
-    font-size: 0.9375rem;
+  .thesis-card__meta svg {
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .thesis-card__author {
+    font-weight: 500;
+    color: var(--color-gray-700) !important;
+  }
+
+  .thesis-card__director {
+    color: var(--color-primary) !important;
+    font-weight: 500;
+  }
+
+  .thesis-card__institution {
+    color: var(--color-gray-500) !important;
+    font-style: italic;
+  }
+
+  /* Abstract con expand/collapse */
+  .thesis-card__abstract-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .thesis-card__abstract {
+    font-size: 0.8125rem;
     color: var(--color-gray-500);
-    line-height: 1.7;
-    margin-bottom: var(--space-lg);
+    line-height: 1.5;
+    margin: 0;
   }
 
-  .thesis-item__link {
+  .thesis-card__abstract--collapsible {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .thesis-card__abstract--collapsible.is-expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  .thesis-card__abstract--collapsible:not(.is-truncated) + .thesis-card__expand-btn {
+    display: none;
+  }
+
+  .thesis-card__expand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+  }
+
+  .thesis-card__expand-btn:hover {
+    background-color: var(--color-gray-100);
+  }
+
+  .thesis-card__expand-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .thesis-card__expand-btn[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .thesis-card__expand-btn .collapse-text {
+    display: none;
+  }
+
+  .thesis-card__expand-btn[aria-expanded="true"] .expand-text {
+    display: none;
+  }
+
+  .thesis-card__expand-btn[aria-expanded="true"] .collapse-text {
+    display: inline;
+  }
+
+  .thesis-card__footer {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+    border-top: 1px solid var(--color-gray-100);
+  }
+
+  .thesis-card__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.875rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--color-white);
-    background-color: var(--color-primary);
-    border-radius: var(--radius-sm);
+    color: var(--color-primary);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-md);
     text-decoration: none;
-    transition: background-color var(--transition-fast);
+    transition: all var(--transition-fast);
+    border: 1px solid var(--color-gray-200);
   }
 
-  .thesis-item__link:hover {
-    background-color: var(--color-primary-dark);
+  .thesis-card__link:hover {
+    background-color: var(--color-primary);
     color: var(--color-white);
+    border-color: var(--color-primary);
   }
 
   .no-content {
@@ -185,10 +452,61 @@ const tesis = publicaciones.filter(p => p.data.tipo === 'tesis').sort((a, b) => 
     color: var(--color-gray-500);
   }
 
+  /* Responsive */
   @media (max-width: 768px) {
-    .thesis-item {
+    .thesis-year-group {
       flex-direction: column;
       gap: var(--space-md);
     }
+
+    .thesis-year-badge {
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      gap: var(--space-sm);
+      position: static;
+    }
+
+    .thesis-year-count {
+      margin-top: 0;
+    }
+
+    .thesis-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
+
+<script>
+  // Manejar el expandir/colapsar de abstracts
+  document.addEventListener('DOMContentLoaded', () => {
+    const abstracts = document.querySelectorAll('.thesis-card__abstract--collapsible');
+    
+    // Detectar qué abstracts están realmente truncados
+    abstracts.forEach(abstract => {
+      const btn = abstract.parentElement?.querySelector('.thesis-card__expand-btn');
+      if (!btn) return;
+      
+      // Comparar scrollHeight con clientHeight para detectar truncamiento
+      const isTruncated = abstract.scrollHeight > abstract.clientHeight + 2; // +2px de margen de error
+      
+      if (isTruncated) {
+        abstract.classList.add('is-truncated');
+        btn.removeAttribute('hidden');
+      }
+    });
+    
+    // Manejar clicks en los botones
+    const expandBtns = document.querySelectorAll('.thesis-card__expand-btn');
+    expandBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const abstract = document.getElementById(targetId);
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        
+        btn.setAttribute('aria-expanded', (!isExpanded).toString());
+        abstract?.classList.toggle('is-expanded', !isExpanded);
+      });
+    });
+  });
+</script>

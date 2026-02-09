@@ -29,6 +29,7 @@ const publicaciones = defineCollection({
     institucion: z.string().optional(),
     director: z.string().optional(),
     directorInstitucion: z.string().optional(),
+    nivel: z.enum(['licenciatura', 'maestria', 'doctorado']).optional(),
   }),
 });
 
@@ -45,6 +46,7 @@ const perfilInvestigadorSchema = z.object({
 const investigadorSchema = z.object({
   nombre: z.string(),
   imagen: z.string().default(''),
+  cv: z.string().default(''), // Ruta al archivo CV (ej: "/CVs/cv-nombre.pdf")
   perfil: perfilInvestigadorSchema.default({
     cargo: '',
     areaEstudio: '',

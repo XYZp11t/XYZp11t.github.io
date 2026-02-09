@@ -11,4 +11,3 @@ esEncargado: true
 orden: 1
 grupoSiglas: "IGUM"
 ---
-Jefe de la Unidad.
