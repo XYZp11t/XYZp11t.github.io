@@ -6,7 +6,7 @@ perfil:
   cargo: "Responsable del Laboratorio"
   areaEstudio: "Física Espacial, Clima Espacial, Fotografía Científica"
   oficina: "Edificio IA, Laboratorio LACIGE"
-  telefono: ""
+  telefono: "(443) 689 3500 Ext. 80557"
   email: "mrodriguez@enesmorelia.unam.mx"
 esEncargado: true
 orden: 1
