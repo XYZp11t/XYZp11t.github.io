@@ -37,7 +37,7 @@ const mapInvestigador = (item: any) => {
 const investigadoresInternosMapeados = internosData.map(mapInvestigador);
 
 const academicos = investigadoresInternosMapeados
-  .filter(inv => !inv.perfil.cargo.toLowerCase().includes('posdoctorado'))
+  .filter(inv => !inv.perfil.cargo.toLowerCase().includes('posdoctorante'))
   .sort((a, b) => {
     if (a.esEncargado) return -1;
     if (b.esEncargado) return 1;
@@ -45,7 +45,7 @@ const academicos = investigadoresInternosMapeados
   });
 
 const posdoctorantes = investigadoresInternosMapeados
-  .filter(inv => inv.perfil.cargo.toLowerCase().includes('posdoctorado'))
+  .filter(inv => inv.perfil.cargo.toLowerCase().includes('posdoctorante'))
   .sort((a, b) => a.orden - b.orden);
 
 const colaboradoresInternos = [];
@@ -329,7 +329,7 @@ const colaboradoresExternos = gruposExternos.map(grupo => {
   <section class="section section--primary">
     <div class="container">
       <div class="cta-content">
-        <h2>¿Interesado en Colaborar?</h2>
+        <h2>¿Estás interesado(a) en colaborar?</h2>
         <p>
           Estamos abiertos a nuevas colaboraciones con instituciones académicas, 
           centros de investigación y organizaciones interesadas en las ciencias geoespaciales.
