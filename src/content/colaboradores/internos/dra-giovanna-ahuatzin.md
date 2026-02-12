@@ -1,12 +1,11 @@
 ---
 nombre: "Dra. Giovanna Ahuatzin Flores"
 imagen: "/colaboradores/DraGiovanna.jpg"
-cv: 'CVs/CVU -- GAF.pdf'
 perfil:
   cargo: "Estudiante de posdoctorado"
   areaEstudio: ""
   oficina: "ENES Unidad Morelia, Universidad Nacional Autónoma de México, Edificio A"
-  telefono: "442 129 3393"
+  telefono: ""
   email: "gioahflores@gmail.com"
 esEncargado: false
 orden: 1
