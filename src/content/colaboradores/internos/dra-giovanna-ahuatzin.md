@@ -2,13 +2,13 @@
 nombre: "Dra. Giovanna Ahuatzin Flores"
 imagen: "/colaboradores/DraGiovanna.jpg"
 perfil:
-  cargo: "Estudiante de posdoctorado"
+  cargo: "Posdoctorante"
   areaEstudio: ""
   oficina: "ENES Unidad Morelia, Universidad Nacional Autónoma de México, Edificio A"
   telefono: ""
-  email: "gioahflores@gmail.com"
+  email: "gioahflores@enesmorelia.unam.mx"
 esEncargado: false
-orden: 1
+orden: 3
 ---
 
 La Dra. Giovanna Ahuatzin Flores es una apasionada de la exploración espacial, dedicada a comprender los fenómenos que ocurren más allá de nuestro planeta y contribuir a nuevos descubrimientos con impacto en la Tierra. Su trabajo se centra en modelos matemáticos aplicados a la física espacial, programación de soluciones innovadoras y el aprendizaje continuo para transformar el conocimiento en avances tecnológicos reales.
