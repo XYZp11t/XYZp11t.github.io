@@ -37,8 +37,8 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
 ---
 
 <Layout 
-  title="Predicción del Viento Solar | LACIGE"
-  description="Predicción semanal del viento solar generada con el modelo SunRunner3D a partir de magnetogramas solares y simulaciones MHD."
+  title="Simulación MHD del Viento Solar | LACIGE"
+  description="Simulación MHD del viento solar generada con el modelo SunRunner3D a partir de magnetogramas solares."
 >
   <!-- Header minimalista con fecha/hora y selector de idioma -->
   <section class="prediction-header">
@@ -46,7 +46,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       <div class="prediction-header__content">
         <div class="prediction-header__info">
           <span class="prediction-header__label" id="section-label">Investigación</span>
-          <h1 class="prediction-header__title" id="page-title">Predicción del Viento Solar</h1>
+          <h1 class="prediction-header__title" id="page-title">Simulación MHD del Viento Solar</h1>
         </div>
         <div class="prediction-header__controls">
           <div class="datetime" id="datetime" aria-live="polite"></div>
@@ -82,10 +82,10 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
             preload="metadata"
             controls
             playsinline
-            poster="/sw-prediction/cr2302_sw_plots_0001.png"
+            poster="/sw-prediction/cr2306_sw_plots_0001.png"
             data-video>  
             <source
-              src="/sw-prediction/cr2302_sw_prediccion_semanal.mp4"
+              src="/sw-prediction/cr2306_v19.mp4"
               type="video/mp4">
           </video>
         </div>
@@ -124,61 +124,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     </div>
   </section>
 
-  <!-- Seccion informativa: Que es el Viento Solar -->
-  <section class="section section--gray">
-    <div class="container">
-      <div class="intro-grid">
-        <div class="intro-content">
-          <h2 id="what-is-title">¿Qué es el Viento Solar?</h2>
-          <p id="what-is-description">
-            El viento solar es un flujo continuo de partículas cargadas (principalmente protones 
-            y electrones) que emana de la corona solar y se propaga por todo el sistema solar. 
-            Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos 
-            en el entorno espacial terrestre.
-          </p>
-          <p id="prediction-importance">
-            La predicción precisa del viento solar es fundamental para:
-          </p>
-          <ul class="benefits-list">
-            <li id="benefit-1">Proteger satélites y astronautas</li>
-            <li id="benefit-2">Prevenir daños en redes eléctricas</li>
-            <li id="benefit-3">Mantener comunicaciones de radio estables</li>
-            <li id="benefit-4">Asegurar la precisión del GPS</li>
-          </ul>
-        </div>
-        <div class="intro-visual">
-          <div class="solar-wind-diagram">
-            <div class="sun" aria-hidden="true"></div>
-            <div class="particles particles--radial" aria-hidden="true">
-              {radialParticles.map((particle) => (
-                <span
-                  class="particle particle--radial"
-                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
-                ></span>
-              ))}
-            </div>
-            <div class="particles particles--directed" aria-hidden="true">
-              {directedParticles.map((particle) => (
-                <span
-                  class="particle particle--directed"
-                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
-                ></span>
-              ))}
-            </div>
-            <div class="earth" aria-hidden="true">
-              <div class="earth__body"></div>
-              <svg class="magnetosphere" viewBox="0 0 220 140" aria-hidden="true">
-                <!-- Arco frontal (lado día) - sale a 50° desde los polos, radio amplio -->
-                <path class="field-line field-line--front" d="M70 44 C20 8 20 132 70 96" />
-                <!-- Cola (lado noche) - aplanada y extendida como cola real -->
-                <path class="field-line field-line--tail" d="M70 44 C200 55 200 85 70 96" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Seccion de Referencias -->
   <section class="section references-section">
@@ -355,6 +300,61 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     </div>
   </section>
 
+  <!-- Seccion informativa: Que es el Viento Solar -->
+  <section class="section section--gray">
+    <div class="container">
+      <div class="intro-grid">
+        <div class="intro-content">
+          <h2 id="what-is-title">¿Qué es el Viento Solar?</h2>
+          <p id="what-is-description">
+            El viento solar es un flujo continuo de partículas cargadas (principalmente protones 
+            y electrones) que emana de la corona solar y se propaga por todo el sistema solar. 
+            Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos 
+            en el entorno espacial terrestre.
+          </p>
+          <p id="prediction-importance">
+            La simulación MHD del viento solar es fundamental para:
+          </p>
+          <ul class="benefits-list">
+            <li id="benefit-1">Proteger satélites y astronautas</li>
+            <li id="benefit-2">Prevenir daños en redes eléctricas</li>
+            <li id="benefit-3">Mantener comunicaciones de radio estables</li>
+            <li id="benefit-4">Asegurar la precisión del GPS</li>
+          </ul>
+        </div>
+        <div class="intro-visual">
+          <div class="solar-wind-diagram">
+            <div class="sun" aria-hidden="true"></div>
+            <div class="particles particles--radial" aria-hidden="true">
+              {radialParticles.map((particle) => (
+                <span
+                  class="particle particle--radial"
+                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
+                ></span>
+              ))}
+            </div>
+            <div class="particles particles--directed" aria-hidden="true">
+              {directedParticles.map((particle) => (
+                <span
+                  class="particle particle--directed"
+                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
+                ></span>
+              ))}
+            </div>
+            <div class="earth" aria-hidden="true">
+              <div class="earth__body"></div>
+              <svg class="magnetosphere" viewBox="0 0 220 140" aria-hidden="true">
+                <!-- Arco frontal (lado día) - sale a 50° desde los polos, radio amplio -->
+                <path class="field-line field-line--front" d="M70 44 C20 8 20 132 70 96" />
+                <!-- Cola (lado noche) - aplanada y extendida como cola real -->
+                <path class="field-line field-line--tail" d="M70 44 C200 55 200 85 70 96" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <script>
@@ -372,12 +372,12 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
   const i18n = {
     es: {
       sectionLabel: 'Investigación',
-      pageTitle: 'Predicción del Viento Solar',
+      pageTitle: 'Simulación MHD del Viento Solar',
       updated: 'Actualizado el:',
       description: `Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D, con base en los datos de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.`,
       whatIsTitle: '¿Qué es el Viento Solar?',
       whatIsDescription: 'El viento solar es un flujo continuo de partículas cargadas (principalmente protones y electrones) que emana de la corona solar y se propaga por todo el Sistema Solar. Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos en el entorno espacial terrestre.',
-      predictionImportance: 'La predicción precisa del viento solar es fundamental para:',
+      predictionImportance: 'La simulación MHD del viento solar es fundamental para:',
       benefit1: 'Proteger satélites y astronautas',
       benefit2: 'Prevenir daños en redes eléctricas',
       benefit3: 'Mantener comunicaciones de radio estables',
@@ -386,12 +386,12 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     },
     en: {
       sectionLabel: 'Research',
-      pageTitle: 'Solar Wind Forecast',
+      pageTitle: 'Solar Wind MHD Simulation',
       updated: 'Updated:',
       description: `This visualization summarizes the projected solar wind speed and density from the SunRunner3D model, based on data from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Lighter tones indicate faster streams, while darker tones highlight regions of lower intensity. Use full screen to examine fine details.`,
       whatIsTitle: 'What is the Solar Wind?',
       whatIsDescription: 'The solar wind is a continuous flow of charged particles (mainly protons and electrons) emanating from the solar corona and propagating throughout the solar system. Its typical velocity ranges between 300 and 800 km/s, and it can cause significant effects on Earth\'s space environment.',
-      predictionImportance: 'Accurate solar wind prediction is essential for:',
+      predictionImportance: 'MHD solar wind simulation is essential for:',
       benefit1: 'Protecting satellites and astronauts',
       benefit2: 'Preventing damage to power grids',
       benefit3: 'Maintaining stable radio communications',
