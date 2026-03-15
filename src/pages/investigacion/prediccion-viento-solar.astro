@@ -61,7 +61,7 @@ import Layout from '../../layouts/Layout.astro';
           <strong id="timestamp-label">Actualizado el:</strong> 2026-03-14
         </p>
         <p class="video-info__description" id="video-description"> 
-          Esta visualización muestra las corrientes de viento solar simuladas con el modelo sunRunner3D, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.
+          Esta visualización muestra las corrientes de viento solar simuladas con el modelo <a href="https://github.com/predsci/sunRunner3D-manuscript" target="_blank" rel="noopener">sunRunner3D</a>, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.
         </p>
       </div>
 
@@ -90,14 +90,14 @@ import Layout from '../../layouts/Layout.astro';
   <!-- Seccion de Referencias -->
   <section class="section references-section">
     <div class="container">
-      <h2 class="references-title">Referencias</h2>
-      <p class="references-legend">
+      <h2 class="references-title" id="references-title">Referencias</h2>
+      <p class="references-legend" id="references-legend">
         Para detalles técnicos del modelo sunRunner3D y sus aplicaciones, consulte las publicaciones listadas abajo
       </p>
 
       <!-- Artículos Científicos -->
       <div class="references-category">
-        <h3 class="references-category-title">Artículos Científicos</h3>
+        <h3 class="references-category-title" id="references-articles-title">Artículos Científicos</h3>
         <div class="references-list">
           <!-- Artículo 1 -->
           <article class="reference-item">
@@ -218,7 +218,7 @@ import Layout from '../../layouts/Layout.astro';
 
       <!-- Tesis -->
       <div class="references-category">
-        <h3 class="references-category-title">Tesis</h3>
+        <h3 class="references-category-title" id="references-theses-title">Tesis</h3>
         <div class="references-list">
           <!-- Tesis 1 -->
           <article class="reference-item">
@@ -234,12 +234,12 @@ import Layout from '../../layouts/Layout.astro';
               <p class="reference-item__authors">
                 Orozco Plascencia, Ozzy Rigoberto
               </p>
-              <p class="reference-item__journal">
+              <p class="reference-item__journal" id="thesis-1-journal">
                 Tesis de Licenciatura, Facultad de Ciencias Físico Matemáticas, Universidad Michoacana de San Nicolás de Hidalgo
               </p>
-              <a href="/tesis/Tesis_OROP_version_final.pdf" target="_blank" rel="noopener" class="reference-item__download">
+              <a href="/tesis/Tesis_OROP_version_final.pdf" target="_blank" rel="noopener" class="reference-item__download" id="thesis-1-download">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Descargar PDF
+                <span>Descargar PDF</span>
               </a>
             </div>
           </article>
@@ -258,12 +258,12 @@ import Layout from '../../layouts/Layout.astro';
               <p class="reference-item__authors">
                 Medina del Ángel, Marco Antonio Alonso
               </p>
-              <p class="reference-item__journal">
+              <p class="reference-item__journal" id="thesis-2-journal">
                 Tesis de Licenciatura, Escuela Nacional de Estudios Superiores (Unidad Morelia), Universidad Nacional Autónoma de México
               </p>
-              <a href="https://hdl.handle.net/20.500.14330/TES01000853329" target="_blank" rel="noopener" class="reference-item__download">
+              <a href="https://hdl.handle.net/20.500.14330/TES01000853329" target="_blank" rel="noopener" class="reference-item__download" id="thesis-2-download">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Descargar PDF
+                <span>Descargar PDF</span>
               </a>
             </div>
           </article>
@@ -291,15 +291,29 @@ import Layout from '../../layouts/Layout.astro';
       sectionLabel: 'Investigación',
       pageTitle: 'Simulaciones globales MHD de corrientes de viento solar usando sunRunner3D',
       updated: 'Actualizado el:',
-      description: `Esta visualización muestra las corrientes de viento solar simuladas con el modelo sunRunner3D, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.`,
-      collaboratorsLabel: 'Instituciones colaboradoras:'
+      description: `Esta visualización muestra las corrientes de viento solar simuladas con el modelo <a href="https://github.com/predsci/sunRunner3D-manuscript" target="_blank" rel="noopener">sunRunner3D</a>, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.`,
+      collaboratorsLabel: 'Instituciones colaboradoras:',
+      referencesTitle: 'Referencias',
+      referencesLegend: 'Para detalles técnicos del modelo sunRunner3D y sus aplicaciones, consulte las publicaciones listadas abajo',
+      referencesArticlesTitle: 'Artículos Científicos',
+      referencesThesesTitle: 'Tesis',
+      thesis1Journal: 'Tesis de Licenciatura, Facultad de Ciencias Físico Matemáticas, Universidad Michoacana de San Nicolás de Hidalgo',
+      thesis2Journal: 'Tesis de Licenciatura, Escuela Nacional de Estudios Superiores (Unidad Morelia), Universidad Nacional Autónoma de México',
+      downloadPdf: 'Descargar PDF'
     },
     en: {
       sectionLabel: 'Research',
       pageTitle: 'Global MHD Simulations of Solar Wind Streams Using sunRunner3D',
       updated: 'Updated:',
-      description: `This visualization shows solar wind streams simulated with the sunRunner3D model, whose boundary conditions are obtained from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. The animation spans the interval required to reach the solar wind relaxation state (approximately 20–30 hours in physical time). From that relaxed state, time series are constructed for comparison with in situ observations from OMNI and STEREO-A (when data are available); therefore, these series correspond to a steady state and do not represent a temporal evolution of the model. This video will be updated every Carrington rotation, approximately once per month. For better detail, full-screen viewing is recommended.`,
-      collaboratorsLabel: 'Collaborating institutions:'
+      description: `This visualization shows solar wind streams simulated with the <a href="https://github.com/predsci/sunRunner3D-manuscript" target="_blank" rel="noopener">sunRunner3D</a> model, whose boundary conditions are obtained from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. The animation spans the interval required to reach the solar wind relaxation state (approximately 20–30 hours in physical time). From that relaxed state, time series are constructed for comparison with in situ observations from OMNI and STEREO-A (when data are available); therefore, these series correspond to a steady state and do not represent a temporal evolution of the model. This video will be updated every Carrington rotation, approximately once per month. For better detail, full-screen viewing is recommended.`,
+      collaboratorsLabel: 'Collaborating institutions:',
+      referencesTitle: 'References',
+      referencesLegend: 'For technical details on the sunRunner3D model and its applications, see the publications listed below',
+      referencesArticlesTitle: 'Scientific Articles',
+      referencesThesesTitle: 'Theses',
+      thesis1Journal: 'Bachelor\'s Thesis, Faculty of Physical-Mathematical Sciences, Universidad Michoacana de San Nicolás de Hidalgo',
+      thesis2Journal: 'Bachelor\'s Thesis, Escuela Nacional de Estudios Superiores (Morelia Campus), Universidad Nacional Autónoma de México',
+      downloadPdf: 'Download PDF'
     }
   };
 
@@ -344,6 +358,14 @@ import Layout from '../../layouts/Layout.astro';
     setText('timestamp-label', t.updated);
     setHTML('video-description', t.description);
     setText('collaborators-label', t.collaboratorsLabel);
+    setText('references-title', t.referencesTitle);
+    setText('references-legend', t.referencesLegend);
+    setText('references-articles-title', t.referencesArticlesTitle);
+    setText('references-theses-title', t.referencesThesesTitle);
+    setText('thesis-1-journal', t.thesis1Journal);
+    setText('thesis-2-journal', t.thesis2Journal);
+    const downloadBtns = document.querySelectorAll('.reference-item__download span');
+    downloadBtns.forEach(span => { span.textContent = t.downloadPdf; });
     updateDateTime();
   }
 
