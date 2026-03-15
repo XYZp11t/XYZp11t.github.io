@@ -1,44 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-
-// Partículas radiales en todas las direcciones (360°)
-const radialParticles = Array.from({ length: 24 }, (_, i) => {
-  const angleDeg = (360 / 24) * i;
-  const angle = (angleDeg * Math.PI) / 180;
-  const distance = 32 + (i % 5) * 5;
-  const dx = Math.cos(angle) * distance;
-  const dy = Math.sin(angle) * distance;
-  const size = 3 + (i % 4);
-  const duration = 2.2 + (i % 5) * 0.3;
-  const delay = i * 0.12;
-  return {
-    dx: dx.toFixed(2),
-    dy: dy.toFixed(2),
-    size,
-    duration: duration.toFixed(2),
-    delay: delay.toFixed(2),
-  };
-});
-
-const directedParticles = Array.from({ length: 6 }, (_, i) => {
-  const dy = (i - 1.5) * 14.5;
-  const dx = 66 + (i % 2 ? 1.5 : -1.5);
-  const size = 6 + (i % 3);
-  const duration = 3.5 + i * 0.25;
-  const delay = 0.5 + i * 0.45;
-  return {
-    dx: dx.toFixed(2),
-    dy: dy.toFixed(2),
-    size,
-    duration: duration.toFixed(2),
-    delay: delay.toFixed(2),
-  };
-});
 ---
 
 <Layout 
-  title="Simulación MHD del Viento Solar | LACIGE"
-  description="Simulación MHD del viento solar generada con el modelo SunRunner3D a partir de magnetogramas solares."
+  title="Simulaciones globales MHD de corrientes de viento solar usando sunRunner3D | LACIGE"
+  description="Simulaciones globales MHD de corrientes de viento solar generadas con el modelo sunRunner3D a partir de magnetogramas solares."
 >
   <!-- Header minimalista con fecha/hora y selector de idioma -->
   <section class="prediction-header">
@@ -46,7 +12,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       <div class="prediction-header__content">
         <div class="prediction-header__info">
           <span class="prediction-header__label" id="section-label">Investigación</span>
-          <h1 class="prediction-header__title" id="page-title">Simulación MHD del Viento Solar</h1>
+          <h1 class="prediction-header__title" id="page-title">Simulaciones globales MHD de corrientes de viento solar usando sunRunner3D</h1>
         </div>
         <div class="prediction-header__controls">
           <div class="datetime" id="datetime" aria-live="polite"></div>
@@ -85,17 +51,17 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
             poster="/sw-prediction/cr2306_sw_plots_001.png"
             data-video>  
             <source
-              src="/sw-prediction/cr2306_v22.mp4"
+              src="/sw-prediction/cr2307.mp4"
               type="video/mp4">
           </video>
         </div>
       </div>
       <div class="video-info">
         <p class="video-info__timestamp">
-          <strong id="timestamp-label">Actualizado el:</strong> 2025-11-21
+          <strong id="timestamp-label">Actualizado el:</strong> 2026-03-14
         </p>
         <p class="video-info__description" id="video-description"> 
-          Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D, con base en los datos de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.
+          Esta visualización muestra las corrientes de viento solar simuladas con el modelo sunRunner3D, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.
         </p>
       </div>
 
@@ -106,10 +72,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
           <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Predictive Science Inc">
             <img src="/predictive-science-logo.svg" alt="Predictive Science Inc" loading="lazy" class="logo-predsci" />
             <span class="collaborator-name">Predictive Science Inc</span>
-          </a>
-          <a href="https://www.unam.mx/" target="_blank" rel="noopener" class="video-collaborator-logo" title="Universidad Nacional Autónoma de México">
-            <img src="/logo-unam.png" alt="UNAM" loading="lazy" class="logo-unam" />
-            
           </a>
           <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener" class="video-collaborator-logo" title="ENES Morelia">
             <img src="/logo-enes.png" alt="ENES Morelia" loading="lazy" class="logo-enes" />
@@ -130,7 +92,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     <div class="container">
       <h2 class="references-title">Referencias</h2>
       <p class="references-legend">
-        Las siguientes investigaciones han contribuido al desarrollo y validación del modelo SunRunner3D
+        Para detalles técnicos del modelo sunRunner3D y sus aplicaciones, consulte las publicaciones listadas abajo
       </p>
 
       <!-- Artículos Científicos -->
@@ -265,7 +227,9 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
             </div>
             <div class="reference-item__content">
               <h4 class="reference-item__title">
-                Modelado de la estructura magnética interna de las eyecciones de masa coronal usando una cuerda de flujo toroidal
+                <a href="/tesis/Tesis_OROP_version_final.pdf" target="_blank" rel="noopener">
+                  Modelado de la estructura magnética interna de las eyecciones de masa coronal usando una cuerda de flujo toroidal
+                </a>
               </h4>
               <p class="reference-item__authors">
                 Orozco Plascencia, Ozzy Rigoberto
@@ -273,6 +237,10 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
               <p class="reference-item__journal">
                 Tesis de Licenciatura, Facultad de Ciencias Físico Matemáticas, Universidad Michoacana de San Nicolás de Hidalgo
               </p>
+              <a href="/tesis/Tesis_OROP_version_final.pdf" target="_blank" rel="noopener" class="reference-item__download">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar PDF
+              </a>
             </div>
           </article>
 
@@ -293,6 +261,10 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
               <p class="reference-item__journal">
                 Tesis de Licenciatura, Escuela Nacional de Estudios Superiores (Unidad Morelia), Universidad Nacional Autónoma de México
               </p>
+              <a href="https://hdl.handle.net/20.500.14330/TES01000853329" target="_blank" rel="noopener" class="reference-item__download">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar PDF
+              </a>
             </div>
           </article>
         </div>
@@ -300,61 +272,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     </div>
   </section>
 
-  <!-- Seccion informativa: Que es el Viento Solar -->
-  <section class="section section--gray">
-    <div class="container">
-      <div class="intro-grid">
-        <div class="intro-content">
-          <h2 id="what-is-title">¿Qué es el Viento Solar?</h2>
-          <p id="what-is-description">
-            El viento solar es un flujo continuo de partículas cargadas (principalmente protones 
-            y electrones) que emana de la corona solar y se propaga por todo el sistema solar. 
-            Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos 
-            en el entorno espacial terrestre.
-          </p>
-          <p id="prediction-importance">
-            La simulación MHD del viento solar es fundamental para:
-          </p>
-          <ul class="benefits-list">
-            <li id="benefit-1">Proteger satélites y astronautas</li>
-            <li id="benefit-2">Prevenir daños en redes eléctricas</li>
-            <li id="benefit-3">Mantener comunicaciones de radio estables</li>
-            <li id="benefit-4">Asegurar la precisión del GPS</li>
-          </ul>
-        </div>
-        <div class="intro-visual">
-          <div class="solar-wind-diagram">
-            <div class="sun" aria-hidden="true"></div>
-            <div class="particles particles--radial" aria-hidden="true">
-              {radialParticles.map((particle) => (
-                <span
-                  class="particle particle--radial"
-                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
-                ></span>
-              ))}
-            </div>
-            <div class="particles particles--directed" aria-hidden="true">
-              {directedParticles.map((particle) => (
-                <span
-                  class="particle particle--directed"
-                  style={`--delay: ${particle.delay}s; --dx: ${particle.dx}%; --dy: ${particle.dy}%; --size: ${particle.size}px; --duration: ${particle.duration}s;`}
-                ></span>
-              ))}
-            </div>
-            <div class="earth" aria-hidden="true">
-              <div class="earth__body"></div>
-              <svg class="magnetosphere" viewBox="0 0 220 140" aria-hidden="true">
-                <!-- Arco frontal (lado día) - sale a 50° desde los polos, radio amplio -->
-                <path class="field-line field-line--front" d="M70 44 C20 8 20 132 70 96" />
-                <!-- Cola (lado noche) - aplanada y extendida como cola real -->
-                <path class="field-line field-line--tail" d="M70 44 C200 55 200 85 70 96" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 </Layout>
 
 <script>
@@ -372,30 +289,16 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
   const i18n = {
     es: {
       sectionLabel: 'Investigación',
-      pageTitle: 'Simulación MHD del Viento Solar',
+      pageTitle: 'Simulaciones globales MHD de corrientes de viento solar usando sunRunner3D',
       updated: 'Actualizado el:',
-      description: `Esta visualización sintetiza la velocidad y densidad del viento solar proyectadas por el modelo SunRunner3D, con base en los datos de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Los tonos más claros indican corrientes rápidas, mientras que los tonos más oscuros resaltan regiones de menor intensidad. Utilice la función de pantalla completa para apreciar los detalles finos.`,
-      whatIsTitle: '¿Qué es el Viento Solar?',
-      whatIsDescription: 'El viento solar es un flujo continuo de partículas cargadas (principalmente protones y electrones) que emana de la corona solar y se propaga por todo el Sistema Solar. Su velocidad típica oscila entre 300 y 800 km/s y puede causar efectos significativos en el entorno espacial terrestre.',
-      predictionImportance: 'La simulación MHD del viento solar es fundamental para:',
-      benefit1: 'Proteger satélites y astronautas',
-      benefit2: 'Prevenir daños en redes eléctricas',
-      benefit3: 'Mantener comunicaciones de radio estables',
-      benefit4: 'Asegurar la precisión del GPS',
+      description: `Esta visualización muestra las corrientes de viento solar simuladas con el modelo sunRunner3D, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.`,
       collaboratorsLabel: 'Instituciones colaboradoras:'
     },
     en: {
       sectionLabel: 'Research',
-      pageTitle: 'Solar Wind MHD Simulation',
+      pageTitle: 'Global MHD Simulations of Solar Wind Streams Using sunRunner3D',
       updated: 'Updated:',
-      description: `This visualization summarizes the projected solar wind speed and density from the SunRunner3D model, based on data from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. Lighter tones indicate faster streams, while darker tones highlight regions of lower intensity. Use full screen to examine fine details.`,
-      whatIsTitle: 'What is the Solar Wind?',
-      whatIsDescription: 'The solar wind is a continuous flow of charged particles (mainly protons and electrons) emanating from the solar corona and propagating throughout the solar system. Its typical velocity ranges between 300 and 800 km/s, and it can cause significant effects on Earth\'s space environment.',
-      predictionImportance: 'MHD solar wind simulation is essential for:',
-      benefit1: 'Protecting satellites and astronauts',
-      benefit2: 'Preventing damage to power grids',
-      benefit3: 'Maintaining stable radio communications',
-      benefit4: 'Ensuring GPS accuracy',
+      description: `This visualization shows solar wind streams simulated with the sunRunner3D model, whose boundary conditions are obtained from <a href="https://www.predsci.com/" target="_blank" rel="noopener" class="link-style">Predictive Science Inc</a>. The animation spans the interval required to reach the solar wind relaxation state (approximately 20–30 hours in physical time). From that relaxed state, time series are constructed for comparison with in situ observations from OMNI and STEREO-A (when data are available); therefore, these series correspond to a steady state and do not represent a temporal evolution of the model. This video will be updated every Carrington rotation, approximately once per month. For better detail, full-screen viewing is recommended.`,
       collaboratorsLabel: 'Collaborating institutions:'
     }
   };
@@ -439,14 +342,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     setText('section-label', t.sectionLabel);
     setText('page-title', t.pageTitle);
     setText('timestamp-label', t.updated);
-    setHTML('video-description', t.description); // Cambiado a setHTML
-    setText('what-is-title', t.whatIsTitle);
-    setText('what-is-description', t.whatIsDescription);
-    setText('prediction-importance', t.predictionImportance);
-    setText('benefit-1', t.benefit1);
-    setText('benefit-2', t.benefit2);
-    setText('benefit-3', t.benefit3);
-    setText('benefit-4', t.benefit4);
+    setHTML('video-description', t.description);
     setText('collaborators-label', t.collaboratorsLabel);
     updateDateTime();
   }
@@ -623,7 +519,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
 
   /* Seccion del video */
   .video-section {
-    padding: var(--space-2xl) 0 var(--space-3xl);
+    padding: var(--space-2xl) 0 var(--space-xl);
     background-color: var(--color-off-white);
   }
 
@@ -673,200 +569,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     line-height: 1.7;
   }
 
-  /* Seccion informativa */
-  .intro-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-4xl);
-    align-items: center;
-  }
-
-  .intro-content h2 {
-    margin-bottom: var(--space-lg);
-  }
-
-  .intro-content p {
-    font-size: 1.0625rem;
-    line-height: 1.8;
-    color: var(--color-gray-600);
-  }
-
-  .benefits-list {
-    list-style: none;
-    margin-top: var(--space-lg);
-    padding: 0;
-  }
-
-  .benefits-list li {
-    position: relative;
-    padding-left: var(--space-xl);
-    margin-bottom: var(--space-sm);
-    font-size: 1rem;
-    color: var(--color-gray-600);
-  }
-
-  .benefits-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 8px;
-    height: 8px;
-    background-color: var(--color-accent);
-    border-radius: 50%;
-  }
-
-  /* Diagrama animado */
-  .solar-wind-diagram {
-    position: relative;
-    height: 300px;
-    --origin-x: 18%;
-    --origin-y: 50%;
-    --earth-x: 84%;
-    --earth-y: 50%;
-    background: radial-gradient(circle at 18% 50%, rgba(213, 159, 15, 0.3) 0%, rgba(213, 159, 15, 0) 42%),
-      radial-gradient(circle at 70% 50%, rgba(0, 35, 80, 0.35) 0%, rgba(0, 35, 80, 0) 45%),
-      linear-gradient(90deg, rgba(25, 18, 6, 0.18) 0%, rgba(0, 30, 70, 0.38) 100%);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  .sun {
-    position: absolute;
-    left: var(--origin-x);
-    top: var(--origin-y);
-    transform: translate(-50%, -50%);
-    width: 88px;
-    height: 88px;
-    background: radial-gradient(circle, var(--color-accent) 0%, var(--color-accent-dark) 100%);
-    border-radius: 50%;
-    box-shadow: 0 0 40px rgba(213, 159, 15, 0.5);
-  }
-
-  .sun::after {
-    content: '';
-    position: absolute;
-    inset: -18px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(213, 159, 15, 0.35) 0%, rgba(213, 159, 15, 0) 70%);
-    filter: blur(2px);
-  }
-
-  .particles {
-    position: absolute;
-    inset: 0;
-  }
-
-  .particle {
-    position: absolute;
-    left: var(--origin-x);
-    top: var(--origin-y);
-    width: var(--size);
-    height: var(--size);
-    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 236, 180, 0.98) 45%, rgba(255, 176, 76, 0.8) 100%);
-    border-radius: 50%;
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    filter: drop-shadow(0 0 10px rgba(255, 236, 180, 0.9));
-    animation: radialParticle var(--duration) var(--delay) infinite linear;
-  }
-
-  .particle--radial {
-    box-shadow: 0 0 14px rgba(255, 224, 160, 0.85), 0 0 26px rgba(255, 176, 76, 0.7);
-  }
-
-  .particle--directed {
-    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 230, 168, 0.98) 55%, rgba(255, 186, 96, 0.78) 100%);
-    box-shadow: 0 0 18px rgba(255, 230, 168, 0.95), 0 0 32px rgba(255, 186, 96, 0.7);
-    animation-name: directedParticle;
-    animation-timing-function: cubic-bezier(0.2, 0.6, 0.3, 1);
-  }
-
-  @keyframes radialParticle {
-    0% {
-      left: var(--origin-x);
-      top: var(--origin-y);
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
-    }
-    15% {
-      opacity: 0.95;
-    }
-    100% {
-      left: calc(var(--origin-x) + var(--dx));
-      top: calc(var(--origin-y) + var(--dy));
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.1);
-    }
-  }
-
-  @keyframes directedParticle {
-    0% {
-      left: var(--origin-x);
-      top: var(--origin-y);
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.7);
-    }
-    12% {
-      opacity: 1;
-    }
-    85% {
-      opacity: 0.8;
-    }
-    100% {
-      left: calc(var(--origin-x) + var(--dx));
-      top: calc(var(--origin-y) + var(--dy));
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.2);
-    }
-  }
-
-  .earth {
-    position: absolute;
-    left: var(--earth-x);
-    top: var(--earth-y);
-    transform: translate(-50%, -50%);
-    width: 52px;
-    height: 52px;
-    overflow: visible;
-  }
-
-  .earth__body {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(160, 200, 255, 0.9), var(--color-primary) 55%, var(--color-primary-dark) 100%);
-    box-shadow: inset -6px -8px 12px rgba(0, 20, 60, 0.45), 0 0 14px rgba(107, 182, 255, 0.4);
-  }
-
-  .magnetosphere {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 220px;
-    height: 140px;
-    transform: translate(-70px, -70px);
-    overflow: invisible;
-    pointer-events: none;
-    filter: drop-shadow(0 0 8px rgb(0, 238, 255));
-  }
-
-  .field-line {
-    fill: none;
-    stroke: rgba(4 205 255 / 0.88);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-  }
-
-  .field-line--front {
-    stroke: rgba(0 225 255 / 0.88);
-  }
-
-  .field-line--tail {
-    stroke: rgba(0 218 247 / 0.88);
-    stroke-dasharray: 6 6;
-  }
-  
 
   /* Colaboradores en sección de video */
   .video-collaborators {
@@ -931,12 +633,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     filter: grayscale(20%);
   }
 
-  .logo-unam {
-    height: 64px;
-    /* Aplicar color azul UNAM #003D79 */
-    filter: brightness(0) saturate(100%) invert(16%) sepia(95%) saturate(2466%) hue-rotate(195deg) brightness(96%) contrast(101%);
-  }
-
   .logo-enes {
     height: 64px;
     filter: grayscale(20%);
@@ -953,21 +649,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
     filter: grayscale(0%);
   }
 
-  .video-collaborator-logo:hover .logo-unam {
-    filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(2000%) hue-rotate(195deg) brightness(110%) contrast(110%);
-  }
-
   /* Responsive */
-  @media (max-width: 1024px) {
-    .intro-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .intro-visual {
-      order: -1;
-    }
-  }
-
   @media (max-width: 768px) {
     .prediction-header__content {
       flex-direction: column;
@@ -999,10 +681,6 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
       height: 48px;
     }
 
-    .logo-unam {
-      height: 52px;
-    }
-
     .logo-enes {
       height: 52px;
     }
@@ -1018,6 +696,7 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
 
   /* Sección de Referencias */
   .references-section {
+    padding-top: var(--space-xl);
     background-color: var(--color-white);
   }
 
@@ -1142,6 +821,33 @@ const directedParticles = Array.from({ length: 6 }, (_, i) => {
 
   .reference-item__doi a:hover {
     text-decoration: underline;
+  }
+
+  .reference-item__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--space-sm);
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .reference-item__download svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .reference-item__download:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    opacity: 0.9;
   }
 
   @media (max-width: 768px) {
