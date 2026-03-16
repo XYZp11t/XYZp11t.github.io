@@ -275,18 +275,7 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    const video = document.querySelector('video[data-video]');
-    if (!video) return;
-
-    const clone = video.cloneNode(true);
-    video.replaceWith(clone);
-  });
-</script>
-
-<script is:inline>
-  // Sistema de internacionalización
-  const i18n = {
+  const i18n: Record<string, Record<string, string>> = {
     es: {
       sectionLabel: 'Investigación',
       pageTitle: 'Simulaciones globales MHD de corrientes de viento solar usando sunRunner3D',
@@ -311,15 +300,14 @@ import Layout from '../../layouts/Layout.astro';
       referencesLegend: 'For technical details on the sunRunner3D model and its applications, see the publications listed below',
       referencesArticlesTitle: 'Scientific Articles',
       referencesThesesTitle: 'Theses',
-      thesis1Journal: 'Bachelor\'s Thesis, Faculty of Physical-Mathematical Sciences, Universidad Michoacana de San Nicolás de Hidalgo',
-      thesis2Journal: 'Bachelor\'s Thesis, Escuela Nacional de Estudios Superiores (Morelia Campus), Universidad Nacional Autónoma de México',
+      thesis1Journal: "Bachelor's Thesis, Faculty of Physical-Mathematical Sciences, Universidad Michoacana de San Nicolás de Hidalgo",
+      thesis2Journal: "Bachelor's Thesis, Escuela Nacional de Estudios Superiores (Morelia Campus), Universidad Nacional Autónoma de México",
       downloadPdf: 'Download PDF'
     }
   };
 
-  // Formateo de fecha y hora según idioma
-  function formatDateTime(date, lang) {
-    const options = { 
+  function formatDateTime(date: Date, lang: string): string {
+    const options: Intl.DateTimeFormatOptions = { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -333,25 +321,24 @@ import Layout from '../../layouts/Layout.astro';
     return date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', options);
   }
 
-  function updateDateTime() {
+  function updateDateTime(): void {
     const datetimeEl = document.getElementById('datetime');
     if (!datetimeEl) return;
     const lang = localStorage.getItem('prediction-lang') || 'es';
-    const now = new Date();
-    datetimeEl.textContent = formatDateTime(now, lang);
+    datetimeEl.textContent = formatDateTime(new Date(), lang);
   }
 
-  function setText(id, value) { 
+  function setText(id: string, value: string): void { 
     const el = document.getElementById(id); 
     if (el) el.textContent = value; 
   }
 
-  function setHTML(id, value) {
+  function setHTML(id: string, value: string): void {
     const el = document.getElementById(id);
     if (el) el.innerHTML = value;
   }
 
-  function applyLanguage(lang) {
+  function applyLanguage(lang: string): void {
     const t = i18n[lang] || i18n.es;
     setText('section-label', t.sectionLabel);
     setText('page-title', t.pageTitle);
@@ -364,25 +351,43 @@ import Layout from '../../layouts/Layout.astro';
     setText('references-theses-title', t.referencesThesesTitle);
     setText('thesis-1-journal', t.thesis1Journal);
     setText('thesis-2-journal', t.thesis2Journal);
-    const downloadBtns = document.querySelectorAll('.reference-item__download span');
-    downloadBtns.forEach(span => { span.textContent = t.downloadPdf; });
+    document.querySelectorAll('.reference-item__download span').forEach(span => {
+      span.textContent = t.downloadPdf;
+    });
     updateDateTime();
   }
 
-  // Inicialización
-  const savedLang = localStorage.getItem('prediction-lang') || 'es';
-  applyLanguage(savedLang);
-  
-  const langCurrent = document.getElementById('lang-current');
-  if (langCurrent) {
-    langCurrent.textContent = savedLang === 'es' ? 'ES' : 'EN';
-  }
+  let dateInterval: ReturnType<typeof setInterval> | null = null;
+  let abortController: AbortController | null = null;
 
-  // Manejo del dropdown de idioma
-  const langToggle = document.getElementById('lang-toggle');
-  const langDropdown = document.getElementById('lang-dropdown');
-  
-  if (langToggle && langDropdown) {
+  document.addEventListener('astro:page-load', () => {
+    const langToggle = document.getElementById('lang-toggle');
+    const langDropdown = document.getElementById('lang-dropdown');
+    if (!langToggle || !langDropdown) return;
+
+    // Limpiar estado previo (navegaciones anteriores)
+    if (dateInterval) clearInterval(dateInterval);
+    if (abortController) abortController.abort();
+    abortController = new AbortController();
+    const { signal } = abortController;
+
+    // Fix para que el video funcione tras View Transitions
+    const video = document.querySelector('video[data-video]');
+    if (video) {
+      const clone = video.cloneNode(true);
+      video.replaceWith(clone);
+    }
+
+    // Aplicar idioma guardado
+    const savedLang = localStorage.getItem('prediction-lang') || 'es';
+    applyLanguage(savedLang);
+
+    const langCurrent = document.getElementById('lang-current');
+    if (langCurrent) {
+      langCurrent.textContent = savedLang === 'es' ? 'ES' : 'EN';
+    }
+
+    // Toggle del dropdown
     langToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       const isHidden = langDropdown.hasAttribute('hidden');
@@ -393,19 +398,21 @@ import Layout from '../../layouts/Layout.astro';
         langDropdown.setAttribute('hidden', '');
         langToggle.setAttribute('aria-expanded', 'false');
       }
-    });
+    }, { signal });
 
+    // Cerrar al hacer clic fuera
     document.addEventListener('click', (e) => {
-      if (!langToggle.contains(e.target) && !langDropdown.contains(e.target)) {
+      if (!langToggle.contains(e.target as Node) && !langDropdown.contains(e.target as Node)) {
         langDropdown.setAttribute('hidden', '');
         langToggle.setAttribute('aria-expanded', 'false');
       }
-    });
+    }, { signal });
 
+    // Opciones de idioma
     document.querySelectorAll('.lang-option').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const newLang = btn.getAttribute('data-lang');
+        const newLang = btn.getAttribute('data-lang') || 'es';
         localStorage.setItem('prediction-lang', newLang);
         applyLanguage(newLang);
         if (langCurrent) {
@@ -413,13 +420,25 @@ import Layout from '../../layouts/Layout.astro';
         }
         langDropdown.setAttribute('hidden', '');
         langToggle.setAttribute('aria-expanded', 'false');
-      });
+      }, { signal });
     });
-  }
 
-  // Inicializar y actualizar fecha/hora cada segundo
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
+    // Reloj en vivo
+    updateDateTime();
+    dateInterval = setInterval(updateDateTime, 1000);
+  });
+
+  // Limpiar interval al navegar fuera de la página
+  document.addEventListener('astro:before-swap', () => {
+    if (dateInterval) {
+      clearInterval(dateInterval);
+      dateInterval = null;
+    }
+    if (abortController) {
+      abortController.abort();
+      abortController = null;
+    }
+  });
 </script>
 
 <style>
