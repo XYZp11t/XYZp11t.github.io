@@ -20,7 +20,8 @@ const articleUrl = new URL(`/divulgacion/${articulo.id}`, Astro.site).toString()
 const fechaFormateada = new Intl.DateTimeFormat('es-ES', {
   day: 'numeric',
   month: 'long',
-  year: 'numeric'
+  year: 'numeric',
+  timeZone: 'UTC'
 }).format(articulo.data.fecha);
 
 // ID para la transicion de imagen (debe coincidir con ArticleCard)

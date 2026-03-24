@@ -18,6 +18,7 @@
 
 /* Texto justificado para párrafos */
 .article-content p,
+.prose p,
 p.parrafo {
   text-align: justify;
   hyphens: auto;

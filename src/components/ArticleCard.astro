@@ -24,7 +24,8 @@ const {
 const fechaFormateada = new Intl.DateTimeFormat('es-ES', {
   day: 'numeric',
   month: 'long',
-  year: 'numeric'
+  year: 'numeric',
+  timeZone: 'UTC'
 }).format(fecha);
 
 // Generar un ID unico para la transicion basado en la imagen
