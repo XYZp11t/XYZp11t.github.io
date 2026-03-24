@@ -63,6 +63,7 @@ Los metadatos van entre triples guiones `---` al inicio del archivo.
 | `imagen` | `string` | Ruta de imagen destacada | `"/transito-mercurio/mercurio.jpg"` |
 | `etiquetas` | `string[]` | Array de etiquetas | `["astronomía", "eventos"]` |
 | `destacado` | `boolean` | Mostrar en página de inicio | `true` o `false` |
+| `galeria` | `object` | Configuración de galería de imágenes | `{ ruta: "/evento/imagenes", titulo: "Galería" }` |
 
 ### Ejemplo de Frontmatter
 
@@ -248,6 +249,99 @@ imagen: "/transito-mercurio/mercurio.jpg"
 - Proporción 16:10
 - Mínimo 800px de ancho
 - Representativa del contenido
+
+---
+
+## Galería de Imágenes (Carrusel)
+
+Para artículos de eventos o actividades con múltiples fotografías, se puede incluir un carrusel interactivo que muestra las imágenes en grupos de 3 (desktop), 2 (tablet) o 1 (móvil).
+
+### Configuración
+
+Agrega la sección `galeria` al frontmatter:
+
+```yaml
+---
+titulo: "Teacher Training Programme (TTP) 2026"
+descripcion: "Resumen del evento..."
+autor: "Dr. Mario Rodríguez Martínez"
+fecha: 2026-03-24
+imagen: "/TTP2026/IAU_SP.png"
+etiquetas: ["astronomía", "eventos"]
+destacado: true
+galeria:
+  ruta: "/TTP2026/imagenes"
+  titulo: "Galería del Evento TTP 2026"
+---
+```
+
+### Campos de la Galería
+
+| Campo | Tipo | Requerido | Descripción |
+|-------|------|-----------|-------------|
+| `ruta` | `string` | Sí | Ruta a la carpeta con las imágenes (debe estar en `public/`) |
+| `titulo` | `string` | No | Título mostrado sobre el carrusel (default: "Galería de imágenes") |
+
+### Estructura de Carpetas
+
+```
+public/
+└── TTP2026/
+    └── imagenes/
+        ├── _DSC4609.jpg
+        ├── _DSC4619.jpg
+        ├── IMG_2234.JPG
+        └── ... (58 imágenes en total)
+```
+
+### Funcionamiento del Carrusel
+
+#### Visualización
+
+| Dispositivo | Imágenes visibles | Navegación |
+|-------------|-------------------|------------|
+| Desktop (≥1024px) | 3 imágenes | Por páginas de 3 |
+| Tablet (640-1023px) | 2 imágenes | Por páginas de 2 |
+| Móvil (<640px) | 1 imagen | Por páginas de 1 |
+
+#### Controles
+
+- **Flechas laterales (← →)**: Navegar entre páginas
+- **Dots indicadores**: Saltar a una página específica
+- **Botón ▶/⏸**: Pausar/reanudar reproducción automática
+- **Swipe**: Navegar en dispositivos táctiles
+
+#### Autoplay
+
+- Las imágenes cambian automáticamente cada **5 segundos**
+- Se pausa al hacer **hover** con el mouse
+- Se pausa al hacer **clic** en una imagen (abre lightbox)
+- Se reanuda al quitar el mouse
+
+### Visor Lightbox
+
+Al hacer clic en cualquier imagen del carrusel:
+
+- Se abre un visor a **pantalla completa**
+- Navegación **imagen por imagen** (no por páginas)
+- Muestra contador "X / 58"
+- **Teclado**: ← → para navegar, ESC para cerrar
+- **Swipe**: En móviles para cambiar de imagen
+
+### Preparar Imágenes para la Galería
+
+1. **Copiar imágenes** a la carpeta `public/[nombre-evento]/imagenes/`
+2. **Formatos soportados**: `.jpg`, `.jpeg`, `.png`
+3. **Optimización recomendada**:
+   - Tamaño máximo: 1920px de ancho
+   - Peso: menos de 500KB por imagen
+   - Calidad: 80-85% para fotos
+
+### Notas Importantes
+
+- El carrusel se muestra automáticamente al final del contenido del artículo
+- Las imágenes se cargan de forma progresiva (lazy loading)
+- El orden de las imágenes en el carrusel corresponde al orden del array interno `IMAGES_LIST` en el componente
 
 ---
 

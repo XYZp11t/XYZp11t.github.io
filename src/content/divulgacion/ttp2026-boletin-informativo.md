@@ -1,25 +1,26 @@
 ---
 titulo: "Teacher Training Programme (TTP) 2026 en Morelia"
-descripcion: "Morelia será sede del Teacher Training Programme (TTP) 2026 de la Unión Astronómica Internacional"
+descripcion: "Morelia fue sede del Teacher Training Programme (TTP) 2026 de la Unión Astronómica Internacional"
 autor: "Dr. Mario Rodríguez Martínez"
-fecha: 2026-03-18
+fecha: 2026-03-24
 imagen: "/TTP2026/IAU_SP.png"
 etiquetas: ["astronomía", "eventos", "entrenamiento"]
 destacado: true
+galeria:
+  ruta: "/TTP2026/imagenes"
+  titulo: "Galería del Evento TTP 2026"
 ---
 
 <style>
 .ttp-logos {
   display: flex;
-  
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin: 0.5rem 0;
+  margin: 0.2rem 0 1.5rem 0; /* Margen superior reducido */
   padding: 0.5em 0.5rem;
   background: #f8f6f3;
   border-radius: 8px;
-  
 }
 .ttp-logos a {
   display: flex;
@@ -39,6 +40,9 @@ destacado: true
   object-fit: contain;
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+.ttp-title-header {
+  margin-bottom: 0.1rem; /* Reducción de espacio con los logos */
 }
 .ttp-table-wrapper {
   overflow-x: auto;
@@ -128,29 +132,56 @@ destacado: true
 }
 </style>
 
-<p>Morelia, Michoacán a 18 de marzo de 2026</p>
 
-<h3><strong>Morelia será sede del Teacher Training Programme (TTP) 2026 de la Unión Astronómica Internacional</strong></h3>
+<h3 class="ttp-title-header"><strong>Morelia fue sede del Teacher Training Programme (TTP) 2026 de la Unión Astronómica Internacional</strong></h3>
 
-<p>La <strong>Escuela Nacional de Estudios Superiores, Unidad Morelia (ENES Morelia) de la Universidad Nacional Autónoma de México (UNAM)</strong> será sede del <strong>Teacher Training Programme (TTP) 2026</strong>, una iniciativa de la <strong>Unión Astronómica Internacional (IAU)</strong> a través de su Oficina para la Enseñanza para la Astronomía (OAE) orientada a fortalecer la enseñanza de la astronomía en niveles educativos previos a la educación superior. Cabe mencionar que este año México fue apoyado para organizar el TTP en dos sedes, una la ENES Morelia y otra en el INAOE (26-28 de febrero de 2026).</p>
+<div class="ttp-logos">
+  <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener" title="ENES Morelia – UNAM">
+    <img src="/TTP2026/UNAM-ENES.png" alt="ENES Morelia – UNAM">
+  </a>
+  <a href="https://astro4edu.org/" target="_blank" rel="noopener" title="OAE – IAU">
+    <img src="/TTP2026/OAE.png" alt="OAE – IAU">
+  </a>
+  <a href="https://www.irya.unam.mx/web/es/" target="_blank" rel="noopener" title="IRyA – UNAM">
+    <img src="/TTP2026/IRyA.png" alt="IRyA – UNAM">
+  </a>
+  <a href="https://igum.geofisica.unam.mx/" target="_blank" rel="noopener" title="IGUM – UNAM">
+    <img src="/TTP2026/IGUM.png" alt="IGUM – UNAM">
+  </a>
+  <a href="https://www.inaoep.mx/" target="_blank" rel="noopener" title="INAOE">
+    <img src="/TTP2026/INAOE.png" alt="INAOE">
+  </a>
+  <a href="https://icti.michoacan.gob.mx/" target="_blank" rel="noopener" title="ICTI Michoacán">
+    <img src="/TTP2026/ICTI.png" alt="ICTI Michoacán">
+  </a>
+  <a href="https://www.gob.mx/presidencia/documentos/plan-michoacan-por-la-paz-y-la-justicia-palacio-nacional-412391" target="_blank" rel="noopener" title="Plan Michoacán por la Paz y la Justicia">
+    <img src="/TTP2026/PLAN_MICH.png" alt="Plan Michoacán por la Paz y la Justicia">
+  </a>
+  <a href="https://icti.michoacan.gob.mx/convocatoria-comparte-tus-ideas/" target="_blank" rel="noopener" title="Comparte tus ideas">
+    <img src="/TTP2026/IDEAS.png" alt="Comparte tus ideas">
+  </a>
+  
+</div>
 
-<p>Este encuentro académico se llevará a cabo del <strong>19 al 21 de marzo de 2026</strong> y reunirá a docentes, investigadores y especialistas en astronomía y educación científica provenientes de diversas instituciones del país, entre ellas el Instituto de Radioastronomía y Astrofísica (IRyA-UNAM), el Instituto de Geofísica (IGUM-UNAM), el Instituto Nacional de Astrofísica, Óptica y Electrónica (INAOE), así como profesores de educación media superior de distintas regiones de México.</p>
+<p>La <strong>Escuela Nacional de Estudios Superiores, Unidad Morelia (ENES Morelia) de la Universidad Nacional Autónoma de México (UNAM)</strong> fue sede del <strong>Teacher Training Programme (TTP) 2026</strong>, una iniciativa de la <strong>Unión Astronómica Internacional (IAU)</strong> a través de su Oficina para la Enseñanza para la Astronomía (OAE) orientada a fortalecer la enseñanza de la astronomía en niveles educativos previos a la educación superior. Cabe mencionar que este año México contó con el apoyo para organizar el TTP en dos sedes: la ENES Morelia y el INAOE (del 26 al 28 de febrero de 2026).</p>
 
-<p>El TTP forma parte de los esfuerzos internacionales de la IAU para impulsar la formación docente en astronomía, promoviendo el desarrollo de herramientas pedagógicas, el intercambio de experiencias y la vinculación entre la investigación científica y la práctica educativa. En México, esta iniciativa se articula con la creación de la <strong>Red de Docentes por la Enseñanza de la Astronomía</strong>, cuyo objetivo es consolidar una comunidad académica que fortalezca la enseñanza de esta disciplina en el aula.</p>
+<p>Este encuentro académico se llevó a cabo del <strong>19 al 21 de marzo de 2026</strong> y reunió a docentes, investigadores y especialistas en astronomía y educación científica provenientes de diversas instituciones del país, entre ellas el Instituto de Radioastronomía y Astrofísica (IRyA-UNAM), el Instituto de Geofísica (IGUM-UNAM), el Instituto Nacional de Astrofísica, Óptica y Electrónica (INAOE), así como profesores de educación media superior de distintas regiones de México.</p>
 
-<p>Durante los tres días de actividades, el programa contempla una combinación de <strong>sesiones académicas, talleres prácticos y actividades de observación astronómica</strong>, diseñadas para proporcionar a los docentes herramientas conceptuales y didácticas aplicables en sus contextos educativos. Entre los temas que se abordarán se encuentran los fundamentos del Sistema Solar, cosmología, estructura de la galaxia, leyes fundamentales de la física, clima espacial y el uso de datos en ciencias espaciales.</p>
+<p>El TTP formó parte de los esfuerzos internacionales de la IAU para impulsar la formación docente en astronomía, promoviendo el desarrollo de herramientas pedagógicas, el intercambio de experiencias y la vinculación entre la investigación científica y la práctica educativa. En México, esta iniciativa se articuló con la creación de la <strong>Red de Docentes por la Enseñanza de la Astronomía</strong>, cuyo objetivo es consolidar una comunidad académica que fortalezca la enseñanza de esta disciplina en el aula.</p>
 
-<p>Asimismo, el taller incluirá actividades prácticas como la <strong>observación del cielo con telescopios</strong>, el uso de software educativo y el desarrollo de estrategias de enseñanza adaptadas a distintos entornos escolares. Estas experiencias permitirán a los participantes no solo fortalecer sus conocimientos, sino también replicar actividades en sus propias instituciones.</p>
+<p>Durante los tres días de actividades, el programa contempló una combinación de <strong>sesiones académicas, talleres prácticos y actividades de observación astronómica</strong>, diseñadas para proporcionar a los docentes herramientas conceptuales y didácticas aplicables en sus contextos educativos. Entre los temas que se abordaron destacaron los fundamentos del Sistema Solar, cosmología, estructura de la galaxia, leyes fundamentales de la física, clima espacial y el uso de datos en ciencias espaciales.</p>
 
-<p>Un componente central del TTP 2026 es la <strong>interacción entre docentes y especialistas</strong>, fomentando el diálogo entre la investigación astronómica y la práctica educativa. Este enfoque busca generar un impacto a largo plazo mediante la formación de docentes multiplicadores capaces de impulsar vocaciones científicas entre estudiantes de nivel medio superior.</p>
+<p>Asimismo, el taller incluyó actividades prácticas como la <strong>observación del cielo con telescopios</strong>, el uso de software educativo y el desarrollo de estrategias de enseñanza adaptadas a distintos entornos escolares. Estas experiencias permitieron a los participantes no solo fortalecer sus conocimientos, sino también obtener las bases para replicar estas actividades en sus propias instituciones.</p>
 
-<p>En este sentido, la realización de este taller en Michoacán también se alinea con los principios del <strong>Plan Michoacán por la Paz y la Justicia 2025</strong>, al promover la educación científica como una herramienta de transformación social. Iniciativas como el TTP contribuyen a generar entornos educativos más equitativos, fortalecer el pensamiento crítico y ofrecer a las y los jóvenes alternativas de desarrollo académico y profesional, particularmente en contextos donde el acceso a oportunidades educativas especializadas es limitado.</p>
+<p>Un componente central del TTP 2026 fue la <strong>interacción entre docentes y especialistas</strong>, lo cual fomentó el diálogo entre la investigación astronómica y la práctica educativa. Este enfoque buscó generar un impacto a largo plazo mediante la formación de docentes multiplicadores capaces de impulsar vocaciones científicas entre estudiantes de nivel medio superior.</p>
 
-<p>La realización de este evento posiciona a la ENES Morelia como un nodo estratégico para el desarrollo de la educación científica en el país y reafirma el compromiso de la UNAM y de las instituciones participantes con la formación de comunidades educativas sólidas en el ámbito de la astronomía.</p>
+<p>En este sentido, la realización de este taller en Michoacán también se alineó con los principios del <strong>Plan Michoacán por la Paz y la Justicia 2025</strong>, al promover la educación científica como una herramienta de transformación social. Iniciativas como el TTP contribuyeron a generar entornos educativos más equitativos, fortalecer el pensamiento crítico y ofrecer a las y los jóvenes alternativas de desarrollo académico y profesional.</p>
 
-<p>Con iniciativas como el TTP, la Unión Astronómica Internacional y las instituciones mexicanas participantes contribuyen de manera significativa a <strong>acercar la ciencia a las aulas, fortalecer la cultura científica y motivar a nuevas generaciones a explorar el universo</strong>.</p>
+<p>La culminación de este evento posicionó a la ENES Morelia como un nodo estratégico para el desarrollo de la educación científica en el país y reafirmó el compromiso de la UNAM y de las instituciones participantes con la formación de comunidades educativas sólidas en el ámbito de la astronomía.</p>
 
-<h3><strong>PROGRAMA</strong></h3>
+<p>Con el cierre del TTP, la Unión Astronómica Internacional y las instituciones mexicanas participantes contribuyeron de manera significativa a <strong>acercar la ciencia a las aulas, fortalecer la cultura científica y motivar a nuevas generaciones a explorar el universo</strong>.</p>
+
+<h3><strong>PROGRAMA (Resumen de actividades concluidas)</strong></h3>
 
 <div class="ttp-table-wrapper">
 <table class="ttp-table">
@@ -163,112 +194,73 @@ destacado: true
     <th class="th-vie">Viernes 20</th>
     <th class="th-sab">Sábado 21</th>
   </tr>
-  <!-- 8:00–9:00 -->
   <tr>
     <td class="td-hora">8:00 – 9:00</td>
     <td class="td-jue td-llegada" rowspan="3">Llegada</td>
     <td class="td-vie td-break">Desayuno</td>
     <td class="td-sab td-break">Desayuno</td>
   </tr>
-  <!-- 9:00–10:30 -->
   <tr>
     <td class="td-hora">9:00 – 10:30</td>
     <td class="td-vie">Fundamentos del Sistema Solar. Actividad: escalas del Sistema Solar / software aplicado (<strong>Dra. Giovanna, ENESM</strong>)</td>
     <td class="td-sab">Cosmología (<strong>Dr. Erik Aquino Ortiz, IRyA</strong>)</td>
   </tr>
-  <!-- 10:30–12:00 -->
   <tr>
     <td class="td-hora">10:30 – 12:00</td>
     <td class="td-vie">Nuestro sol y visita al telescopio solar (<strong>Dr. Mario Rodríguez, ENESM, Mateo</strong>)</td>
     <td class="td-sab">LSST (<strong>Dra. Rosa Amelia, IRyA</strong>)<br>Introducción a Astroedu y otros recursos en línea (<strong>Diana/Raúl M/Mario/Rogelio, ENESM e INAOE</strong>)</td>
   </tr>
-  <!-- 12:00–12:30 Receso -->
   <tr>
     <td class="td-hora">12:00 – 12:30</td>
     <td class="td-jue td-break">Receso</td>
     <td class="td-vie td-break">Receso</td>
     <td class="td-sab td-break">Receso</td>
   </tr>
-  <!-- 12:30–14:00 -->
   <tr>
     <td class="td-hora">12:30 – 14:00</td>
     <td class="td-jue td-empty"></td>
     <td class="td-vie">Nuestra galaxia y otras galaxias (<strong>Dr. Javier Ballesteros, IRyA</strong>)</td>
     <td class="td-sab">Discusión y acuerdos sobre la Red</td>
   </tr>
-  <!-- 14:00–16:00 Comida -->
   <tr>
     <td class="td-hora">14:00 – 16:00</td>
     <td class="td-jue td-break">Comida</td>
     <td class="td-vie td-break">Comida</td>
     <td class="td-sab td-break">Comida</td>
   </tr>
-  <!-- 16:00–16:30 -->
   <tr>
     <td class="td-hora">16:00 – 16:30</td>
     <td class="td-inaug"><strong>INAUGURACIÓN</strong> (Dra. Yunuen, Tapia, Dir. ENESM, Dra. Alejandra Ochoa, Dir. ICTI, Dr. Luis Zapata, Dir. IRyA)</td>
     <td class="td-vie" rowspan="2">Leyes fundamentales: Leyes de Kepler y Ley de Gravitación Universal / Asteroides (<strong>Dr. Raúl Gutiérrez, IGUM</strong>)</td>
     <td class="td-sab td-regreso" rowspan="2">Regreso a casa</td>
   </tr>
-  <!-- 16:30–18:00 -->
   <tr>
     <td class="td-hora">16:30 – 18:00</td>
     <td class="td-jue">Bienvenida. Introducción a la OAE y los NAECs. Astronomía en los programas educativos en México (<strong>Diana/Raúl M/Mario/Rogelio, INAOE y ENESM</strong>)</td>
   </tr>
-  <!-- 18:00–18:30 Receso -->
   <tr>
     <td class="td-hora">18:00 – 18:30</td>
     <td class="td-jue td-break">Receso</td>
     <td class="td-vie td-break">Receso</td>
     <td class="td-sab td-empty" rowspan="5"></td>
   </tr>
-  <!-- 18:30–20:00 (sesión 1) -->
   <tr>
     <td class="td-hora" rowspan="2">18:30 – 20:00</td>
     <td class="td-jue" rowspan="2">Telescopios de nueva generación (NgVLA) en radioastronomía (<strong>Dr. Eric Jiménez-Andrade, IRyA</strong>)</td>
     <td class="td-vie">Clima Espacial y red e-Callisto: uso de datos en las Ciencias Espaciales (<strong>Dr. Ernesto Aguilar, IGUM</strong>)</td>
   </tr>
-  <!-- 18:30–20:00 (sesión 2) -->
   <tr>
     <td class="td-vie">Modelado numérico del magnetismo solar en el bachillerato: un aprendizaje para otras estrellas (<strong>Dr. José Juan Avilés, ENESM</strong>)</td>
   </tr>
-  <!-- 20:00–21:00 Cena -->
   <tr>
     <td class="td-hora">20:00 – 21:00</td>
     <td class="td-jue td-break">Cena</td>
     <td class="td-vie td-break">Cena</td>
   </tr>
-  <!-- 21:00–23:00 -->
   <tr>
     <td class="td-hora">21:00 – 23:00</td>
     <td class="td-jue">Práctica de observación con telescopios (<strong>LACIGE-ENESM, Mateo/Mario</strong>)</td>
     <td class="td-vie">Sesión actividades (<strong>Profesores bachillerato/Planetarios</strong>)</td>
   </tr>
 </table>
-</div>
-
-<h3><strong>Instituciones organizadoras y colaboradoras</strong></h3>
-
-<div class="ttp-logos">
-  <a href="https://www.enesmorelia.unam.mx/" target="_blank" rel="noopener" title="ENES Morelia – UNAM">
-    <img src="/TTP2026/UNAM-ENES.png" alt="ENES Morelia – UNAM">
-  </a>
-  <a href="https://www.irya.unam.mx/web/es/" target="_blank" rel="noopener" title="IRyA – UNAM">
-    <img src="/TTP2026/IRyA.png" alt="IRyA – UNAM">
-  </a>
-  <a href="https://igum.geofisica.unam.mx/" target="_blank" rel="noopener" title="IGUM – UNAM">
-    <img src="/TTP2026/IGUM.png" alt="IGUM – UNAM">
-  </a>
-  <a href="https://www.inaoep.mx/" target="_blank" rel="noopener" title="INAOE">
-    <img src="/TTP2026/INAOE.png" alt="INAOE">
-  </a>
-  <a href="https://astro4edu.org/" target="_blank" rel="noopener" title="OAE – IAU">
-    <img src="/TTP2026/OAE.png" alt="OAE – IAU">
-  </a>
-  <a href="https://icti.michoacan.gob.mx/" target="_blank" rel="noopener" title="ICTI Michoacán">
-    <img src="/TTP2026/ICTI.png" alt="ICTI Michoacán">
-  </a>
-  <a href="https://www.gob.mx/presidencia/documentos/plan-michoacan-por-la-paz-y-la-justicia-palacio-nacional-412391" target="_blank" rel="noopener" title="Plan Michoacán por la Paz y la Justicia">
-    <img src="/TTP2026/PLAN_MICH.png" alt="Plan Michoacán por la Paz y la Justicia">
-  </a>
 </div>

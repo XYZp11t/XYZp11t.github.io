@@ -11,6 +11,10 @@ const divulgacion = defineCollection({
     imagen: z.string().optional(),
     etiquetas: z.array(z.string()).default([]),
     destacado: z.boolean().default(false),
+    galeria: z.object({
+      ruta: z.string(),
+      titulo: z.string().optional(),
+    }).optional(),
   }),
 });
 

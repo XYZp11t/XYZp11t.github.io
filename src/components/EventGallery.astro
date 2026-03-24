@@ -1,0 +1,701 @@
+---
+// Componente de galería de imágenes con carrusel y visor lightbox
+// para mostrar imágenes de eventos
+
+interface Props {
+  folderPath: string;
+  titulo?: string;
+}
+
+const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
+---
+
+<div class="event-gallery" data-folder={folderPath}>
+  <h3 class="gallery-title">{titulo}</h3>
+  
+  <div class="carousel-wrapper">
+    <button class="carousel-btn carousel-btn--prev" aria-label="Imagen anterior">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    
+    <div class="carousel-viewport">
+      <div class="carousel-track">
+        <div class="carousel-loading">Cargando imágenes...</div>
+      </div>
+    </div>
+    
+    <button class="carousel-btn carousel-btn--next" aria-label="Imagen siguiente">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="carousel-footer">
+    <div class="carousel-indicators"></div>
+    <button class="carousel-play-btn" aria-label="Pausar reproducción" data-playing="true">
+      <svg class="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16"></rect>
+        <rect x="14" y="4" width="4" height="16"></rect>
+      </svg>
+      <svg class="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+    </button>
+  </div>
+  
+  <p class="gallery-hint">Haz clic en cualquier imagen para verla en tamaño completo</p>
+</div>
+
+<!-- Visor Lightbox -->
+<div class="lightbox" id="eventLightbox" aria-hidden="true">
+  <div class="lightbox__backdrop"></div>
+  
+  <button class="lightbox__close" aria-label="Cerrar visor">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+  
+  <button class="lightbox__nav lightbox__nav--prev" aria-label="Imagen anterior">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
+  
+  <button class="lightbox__nav lightbox__nav--next" aria-label="Imagen siguiente">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
+  
+  <div class="lightbox__content">
+    <img src="" alt="" class="lightbox__image" id="lightboxImage">
+    <div class="lightbox__counter">
+      <span id="lightboxCurrent">1</span> / <span id="lightboxTotal">58</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .event-gallery {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f6f3 0%, #f1ede8 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 61, 121, 0.1);
+  }
+
+  .gallery-title {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #003D79;
+    margin-bottom: 1.5rem;
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .carousel-viewport {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 61, 121, 0.12);
+    background: #1a1612;
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+  }
+
+  .carousel-slide {
+    flex: 0 0 33.333% !important;
+    padding: 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .carousel-slide img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #1a1612;
+    border-radius: 4px;
+    display: block;
+  }
+
+  @media (max-width: 1023px) {
+    .carousel-slide {
+      flex: 0 0 50% !important;
+    }
+    .carousel-slide img {
+      height: 180px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .carousel-slide {
+      flex: 0 0 100% !important;
+    }
+    .carousel-slide img {
+      height: 250px;
+    }
+  }
+
+  .carousel-loading {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9E9588;
+    font-style: italic;
+  }
+
+  .carousel-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 2px solid #E3DDD4;
+    border-radius: 9999px;
+    color: #003D79;
+    cursor: pointer;
+    transition: all 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .carousel-btn:hover:not(:disabled) {
+    background: #003D79;
+    border-color: #003D79;
+    color: #FFFFFF;
+  }
+
+  .carousel-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+
+  .carousel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    position: relative;
+  }
+
+  .carousel-indicators {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: #C9C1B4;
+    border: none;
+    cursor: pointer;
+    transition: all 150ms ease;
+    padding: 0;
+  }
+
+  .carousel-indicator:hover {
+    background: #9E9588;
+    transform: scale(1.2);
+  }
+
+  .carousel-indicator.is-active {
+    background: #003D79;
+    transform: scale(1.3);
+  }
+
+  .carousel-play-btn {
+    position: absolute;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 2px solid #E3DDD4;
+    border-radius: 9999px;
+    color: #003D79;
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+
+  .carousel-play-btn:hover {
+    background: #003D79;
+    border-color: #003D79;
+    color: #FFFFFF;
+  }
+
+  .gallery-hint {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #73695C;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: none;
+  }
+
+  .lightbox.is-open {
+    display: block;
+  }
+
+  .lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  .lightbox__close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 150ms ease;
+    z-index: 100010;
+  }
+
+  .lightbox__close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox__nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 150ms ease;
+    z-index: 100010;
+  }
+
+  .lightbox__nav:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .lightbox__nav:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+
+  .lightbox__nav--prev { left: 20px; }
+  .lightbox__nav--next { right: 20px; }
+
+  @media (max-width: 768px) {
+    .lightbox__nav {
+      width: 44px;
+      height: 44px;
+    }
+    .lightbox__nav--prev { left: 10px; }
+    .lightbox__nav--next { right: 10px; }
+  }
+
+  .lightbox__content {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 100px;
+    z-index: 100001;
+  }
+
+  @media (max-width: 768px) {
+    .lightbox__content {
+      padding: 80px 60px;
+    }
+  }
+
+  .lightbox__image {
+    max-width: 100%;
+    max-height: calc(100vh - 160px);
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .lightbox__counter {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    color: #FFFFFF;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  const IMAGES_LIST = [
+    "_DSC4609.jpg", "_DSC4619.jpg", "_DSC4637.jpg", "_DSC4651.jpg", "_DSC4699.jpg",
+    "_DSC4700.jpg", "_DSC4704.jpg", "_DSC4714.jpg", "_DSC4715.jpg", "_DSC4716.jpg",
+    "_DSC4717.jpg", "_DSC4720.jpg", "_DSC4731.jpg", "_DSC4768.jpg", "_DSC4779.jpg",
+    "_DSC4797.jpg", "_DSC4803.jpg", "_DSC4806.jpg", "_DSC4809.jpg", "_DSC4813.jpg",
+    "_DSC5410.jpg", "_DSC5421.jpg", "_DSC5441.jpg", "_DSC5484.jpg", "_DSC5536.jpg",
+    "_DSC5557.jpg", "_DSC5563.jpg", "_DSC5644.jpg", "_DSC5687.jpg", "_DSC5721.jpg",
+    "_DSC5724.jpg", "_DSC5749.jpg", "_DSC5770.jpg", "_DSC5788.jpg", "_DSC5805.jpg",
+    "_DSC5825.jpg", "_DSC5846.jpg", "_DSC5864.jpg", "_DSC5881.jpg", "_DSC5931.jpg",
+    "_DSC5936.jpg", "_DSC5941.jpg", "_DSC5943.jpg", "_DSC5946.jpg", "_DSC5957.jpg",
+    "_DSC5974.jpg", "_DSC5977.jpg", "IMG_2234.JPG", "IMG_2259.JPG", "IMG_2261.JPG",
+    "IMG_2264.JPG", "IMG_2269.JPG", "IMG_2275.JPG", "IMG_2278.JPG", "IMG_2283.JPG",
+    "IMG_2291.JPG", "WhatsApp Image 2026-03-23 at 4.05.14 PM (4).jpeg",
+    "WhatsApp Image 2026-03-23 at 4.05.14 PM.jpeg"
+  ];
+
+  function initGallery() {
+    const gallery = document.querySelector('.event-gallery');
+    if (!gallery) return;
+
+    const folderPath = gallery.dataset.folder || '/TTP2026/imagenes';
+    const track = gallery.querySelector('.carousel-track');
+    const indicators = gallery.querySelector('.carousel-indicators');
+    const prevBtn = gallery.querySelector('.carousel-btn--prev');
+    const nextBtn = gallery.querySelector('.carousel-btn--next');
+    const playBtn = gallery.querySelector('.carousel-play-btn');
+    
+    if (!track || !indicators || !prevBtn || !nextBtn || !playBtn) return;
+    
+    let currentPage = 0;
+    let isPlaying = true;
+    let autoplayInterval = null;
+    
+    function getItemsPerPage() {
+      const width = window.innerWidth;
+      if (width >= 1024) return 3;
+      if (width >= 640) return 2;
+      return 1;
+    }
+    
+    let itemsPerPage = getItemsPerPage();
+    let totalPages = Math.ceil(IMAGES_LIST.length / itemsPerPage);
+
+    function createSlides() {
+      track.innerHTML = '';
+      indicators.innerHTML = '';
+
+      IMAGES_LIST.forEach((filename, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.dataset.index = index;
+        
+        // Aplicar ancho inline para asegurar que funcione
+        slide.style.flex = `0 0 ${100 / itemsPerPage}%`;
+        
+        const img = document.createElement('img');
+        img.src = `${folderPath}/${filename}`;
+        img.alt = `Imagen ${index + 1} del evento`;
+        img.loading = index < 6 ? 'eager' : 'lazy';
+        
+        slide.appendChild(img);
+        track.appendChild(slide);
+      });
+
+      for (let i = 0; i < totalPages; i++) {
+        const indicator = document.createElement('button');
+        indicator.className = 'carousel-indicator';
+        indicator.dataset.page = i;
+        indicator.setAttribute('aria-label', `Página ${i + 1}`);
+        indicator.addEventListener('click', () => goToPage(i));
+        indicators.appendChild(indicator);
+      }
+    }
+
+    function updateCarousel() {
+      const newItemsPerPage = getItemsPerPage();
+      
+      if (newItemsPerPage !== itemsPerPage) {
+        itemsPerPage = newItemsPerPage;
+        totalPages = Math.ceil(IMAGES_LIST.length / itemsPerPage);
+        // Recrear slides con nuevo ancho
+        const slides = track.querySelectorAll('.carousel-slide');
+        slides.forEach(slide => {
+          slide.style.flex = `0 0 ${100 / itemsPerPage}%`;
+        });
+      }
+      
+      if (currentPage >= totalPages) {
+        currentPage = totalPages - 1;
+      }
+      
+      const offsetPercentage = currentPage * 100;
+      track.style.transform = `translateX(-${offsetPercentage}%)`;
+      
+      const indicatorBtns = indicators.querySelectorAll('.carousel-indicator');
+      indicatorBtns.forEach((ind, index) => {
+        ind.classList.toggle('is-active', index === currentPage);
+      });
+
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage >= totalPages - 1;
+    }
+
+    function goToPage(page) {
+      if (page < 0) page = 0;
+      if (page >= totalPages) page = totalPages - 1;
+      currentPage = page;
+      updateCarousel();
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages - 1) {
+        goToPage(currentPage + 1);
+      } else {
+        goToPage(0);
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        goToPage(currentPage - 1);
+      }
+    }
+
+    function startAutoplay() {
+      if (autoplayInterval) clearInterval(autoplayInterval);
+      autoplayInterval = setInterval(nextPage, 5000);
+      isPlaying = true;
+      updatePlayButton();
+    }
+
+    function stopAutoplay() {
+      if (autoplayInterval) {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+      }
+      isPlaying = false;
+      updatePlayButton();
+    }
+
+    function toggleAutoplay() {
+      if (isPlaying) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    }
+
+    function updatePlayButton() {
+      const iconPause = playBtn.querySelector('.icon-pause');
+      const iconPlay = playBtn.querySelector('.icon-play');
+      
+      if (isPlaying) {
+        iconPause.style.display = 'block';
+        iconPlay.style.display = 'none';
+        playBtn.setAttribute('aria-label', 'Pausar reproducción');
+      } else {
+        iconPause.style.display = 'none';
+        iconPlay.style.display = 'block';
+        playBtn.setAttribute('aria-label', 'Reproducir');
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      stopAutoplay();
+      prevPage();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      stopAutoplay();
+      nextPage();
+    });
+
+    playBtn.addEventListener('click', toggleAutoplay);
+
+    track.addEventListener('mouseenter', () => {
+      if (isPlaying && autoplayInterval) {
+        clearInterval(autoplayInterval);
+      }
+    });
+
+    track.addEventListener('mouseleave', () => {
+      if (isPlaying) {
+        startAutoplay();
+      }
+    });
+
+    let touchStartX = 0;
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        stopAutoplay();
+        if (diff > 0) {
+          nextPage();
+        } else {
+          prevPage();
+        }
+      }
+    }, { passive: true });
+
+    // Lightbox
+    const lightbox = document.getElementById('eventLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const lightboxCurrent = document.getElementById('lightboxCurrent');
+    const lightboxTotal = document.getElementById('lightboxTotal');
+    const lightboxClose = lightbox.querySelector('.lightbox__close');
+    const lightboxPrev = lightbox.querySelector('.lightbox__nav--prev');
+    const lightboxNext = lightbox.querySelector('.lightbox__nav--next');
+
+    let currentImageIndex = 0;
+
+    function openLightbox(index) {
+      currentImageIndex = index;
+      updateLightbox();
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      stopAutoplay();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function updateLightbox() {
+      const filename = IMAGES_LIST[currentImageIndex];
+      lightboxImg.src = `${folderPath}/${filename}`;
+      lightboxImg.alt = `Imagen ${currentImageIndex + 1} del evento`;
+      lightboxCurrent.textContent = (currentImageIndex + 1);
+      lightboxTotal.textContent = IMAGES_LIST.length;
+      
+      lightboxPrev.disabled = currentImageIndex === 0;
+      lightboxNext.disabled = currentImageIndex === IMAGES_LIST.length - 1;
+      lightboxPrev.style.opacity = currentImageIndex === 0 ? '0.3' : '1';
+      lightboxNext.style.opacity = currentImageIndex === IMAGES_LIST.length - 1 ? '0.3' : '1';
+    }
+
+    track.addEventListener('click', (e) => {
+      const target = e.target;
+      const slide = target.closest('.carousel-slide');
+      if (slide) {
+        const index = parseInt(slide.dataset.index || '0');
+        openLightbox(index);
+      }
+    });
+
+    lightboxPrev.addEventListener('click', () => {
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        updateLightbox();
+      }
+    });
+
+    lightboxNext.addEventListener('click', () => {
+      if (currentImageIndex < IMAGES_LIST.length - 1) {
+        currentImageIndex++;
+        updateLightbox();
+      }
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.querySelector('.lightbox__backdrop').addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft' && currentImageIndex > 0) {
+        currentImageIndex--;
+        updateLightbox();
+      } else if (e.key === 'ArrowRight' && currentImageIndex < IMAGES_LIST.length - 1) {
+        currentImageIndex++;
+        updateLightbox();
+      }
+    });
+
+    let lightboxTouchStartX = 0;
+    lightbox.addEventListener('touchstart', (e) => {
+      lightboxTouchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    lightbox.addEventListener('touchend', (e) => {
+      const diff = lightboxTouchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentImageIndex < IMAGES_LIST.length - 1) {
+          currentImageIndex++;
+          updateLightbox();
+        } else if (diff < 0 && currentImageIndex > 0) {
+          currentImageIndex--;
+          updateLightbox();
+        }
+      }
+    }, { passive: true });
+
+    createSlides();
+    updateCarousel();
+    startAutoplay();
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        itemsPerPage = getItemsPerPage();
+        totalPages = Math.ceil(IMAGES_LIST.length / itemsPerPage);
+        const slides = track.querySelectorAll('.carousel-slide');
+        slides.forEach(slide => {
+          slide.style.flex = `0 0 ${100 / itemsPerPage}%`;
+        });
+        updateCarousel();
+      }, 100);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGallery);
+  } else {
+    initGallery();
+  }
+
+  document.addEventListener('astro:page-load', initGallery);
+</script>

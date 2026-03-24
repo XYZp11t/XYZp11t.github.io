@@ -15,6 +15,7 @@ Documentación detallada de todos los componentes reutilizables del sitio LACIGE
 7. [ArticleCard](#articlecardastro) - Tarjeta de artículo
 8. [FeatureCard](#featurecardastro) - Tarjeta con icono
 9. [SolarImageViewer](#solarimageviewerastro) - Visor de imágenes solares
+10. [EventGallery](#eventgalleryastro) - Carrusel de imágenes de eventos
 
 ---
 
@@ -384,6 +385,127 @@ Para abrir el visor desde cualquier elemento, usa el atributo `data-solar-viewer
   Ver imagen
 </button>
 ```
+
+---
+
+## EventGallery.astro
+
+**Ubicación:** `src/components/EventGallery.astro`
+
+Carrusel interactivo para mostrar galerías de imágenes de eventos con navegación por páginas, autoplay y visor lightbox.
+
+### Props
+
+| Propiedad | Tipo | Requerido | Default | Descripción |
+|-----------|------|-----------|---------|-------------|
+| `folderPath` | `string` | Sí | - | Ruta a la carpeta de imágenes (ej: `"/TTP2026/imagenes"`) |
+| `titulo` | `string` | No | `"Galería de imágenes"` | Título mostrado sobre el carrusel |
+
+### Uso
+
+```astro
+---
+import EventGallery from '../components/EventGallery.astro';
+---
+
+<EventGallery 
+  folderPath="/TTP2026/imagenes"
+  titulo="Galería del Evento"
+/>
+```
+
+### Configuración en Artículos de Divulgación
+
+Para agregar una galería a un artículo de divulgación, añade la configuración `galeria` al frontmatter:
+
+```yaml
+---
+titulo: "Teacher Training Programme (TTP) 2026"
+descripcion: "Resumen del evento..."
+autor: "Dr. Mario Rodríguez Martínez"
+fecha: 2026-03-24
+imagen: "/TTP2026/IAU_SP.png"
+etiquetas: ["astronomía", "eventos"]
+destacado: true
+galeria:
+  ruta: "/TTP2026/imagenes"
+  titulo: "Galería del Evento TTP 2026"
+---
+```
+
+El sistema detectará automáticamente la configuración y renderizará el carrusel al final del artículo.
+
+### Funcionamiento del Carrusel
+
+#### Visualización por Página
+
+El carrusel muestra las imágenes en grupos (páginas):
+
+| Dispositivo | Imágenes por página | Ancho de cada imagen |
+|-------------|---------------------|----------------------|
+| Desktop (≥1024px) | 3 | 33.33% |
+| Tablet (640-1023px) | 2 | 50% |
+| Móvil (<640px) | 1 | 100% |
+
+Ejemplo: Con 58 imágenes en desktop:
+- Página 1: Imágenes 1-3
+- Página 2: Imágenes 4-6
+- ...
+- Página 20: Imágenes 58 (última)
+
+#### Navegación
+
+- **Flechas laterales**: Avanzar/retroceder una página completa
+- **Indicadores (dots)**: Saltar directamente a una página específica
+- **Swipe táctil**: Deslizar en dispositivos móviles
+- **Autoplay**: Cambio automático cada 5 segundos
+
+#### Controles de Reproducción
+
+- **Botón ▶/⏸**: Pausar o reanudar el autoplay
+- **Pausa automática**: Se pausa al hacer hover o al abrir el lightbox
+- **Reanudación**: Al quitar el mouse, el autoplay se reanuda
+
+### Visor Lightbox
+
+Al hacer clic en cualquier imagen del carrusel, se abre un visor a pantalla completa.
+
+#### Funcionalidades del Lightbox
+
+| Acción | Método |
+|--------|--------|
+| Cerrar visor | Botón ✕, tecla `ESC`, o clic en fondo oscuro |
+| Imagen anterior | Flecha izquierda (←) o swipe derecha |
+| Imagen siguiente | Flecha derecha (→) o swipe izquierda |
+| Contador | Muestra "X / 58" indicando la posición actual |
+
+#### Navegación en Lightbox vs Carrusel
+
+- **Carrusel**: Navega por **páginas** (grupos de 3 imágenes)
+- **Lightbox**: Navega por **imágenes individuales** (una por una)
+
+### Estructura de Carpetas de Imágenes
+
+```
+public/
+└── TTP2026/
+    └── imagenes/
+        ├── _DSC4609.jpg
+        ├── _DSC4619.jpg
+        ├── IMG_2234.JPG
+        └── ... (58 imágenes total)
+```
+
+### Lista de Imágenes
+
+El componente incluye internamente la lista de imágenes del evento TTP2026. Para usar el componente con otras galerías, modifica el array `IMAGES_LIST` en el script del componente.
+
+### Buenas Prácticas
+
+1. **Nombres de archivo**: Usar nombres descriptivos o mantener los originales de la cámara
+2. **Formato**: JPG para fotos, máximo 1920px de ancho
+3. **Peso**: Optimizar imágenes para web (menos de 500KB ideal)
+4. **Cantidad**: El carrusel funciona bien con cualquier cantidad de imágenes (se calculan automáticamente las páginas)
 
 ---
 

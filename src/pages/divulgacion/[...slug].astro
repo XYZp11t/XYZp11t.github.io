@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
+import EventGallery from '../../components/EventGallery.astro';
 import '../../styles/article.css';
 
 export async function getStaticPaths() {
@@ -93,6 +94,14 @@ const imageId = articulo.data.imagen ? `card-img-${articulo.data.imagen.replace(
         <div class="prose">
           <Content />
         </div>
+
+        <!-- Galería de imágenes del evento (si existe) -->
+        {articulo.data.galeria && (
+          <EventGallery 
+            folderPath={articulo.data.galeria.ruta} 
+            titulo={articulo.data.galeria.titulo}
+          />
+        )}
 
         <!-- Compartir -->
         <div class="article-share">
