@@ -11,15 +11,15 @@ destacado: true
 <style>
 .ttp-logos {
   display: flex;
-  flex-wrap: nowrap;
+  
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin: 2rem 0;
-  padding: 1rem 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.5em 0.5rem;
   background: #f8f6f3;
   border-radius: 8px;
-  overflow-x: auto;
+  
 }
 .ttp-logos a {
   display: flex;
@@ -33,7 +33,7 @@ destacado: true
   opacity: 0.85;
 }
 .ttp-logos img {
-  height: 55px;
+  height: 80px;
   width: auto;
   max-width: 110px;
   object-fit: contain;
