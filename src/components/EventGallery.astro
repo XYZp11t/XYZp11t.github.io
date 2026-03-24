@@ -51,29 +51,36 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
 
 <!-- Visor Lightbox -->
 <div class="lightbox" id="eventLightbox" aria-hidden="true">
-  <div class="lightbox__backdrop"></div>
+  <!-- Backdrop clickeable para cerrar -->
+  <div class="lightbox__backdrop" data-lightbox-close></div>
   
-  <button class="lightbox__close" aria-label="Cerrar visor">
+  <!-- Botón cerrar (X) -->
+  <button class="lightbox__close" data-lightbox-close aria-label="Cerrar visor">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
   </button>
   
+  <!-- Navegación anterior -->
   <button class="lightbox__nav lightbox__nav--prev" aria-label="Imagen anterior">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="15 18 9 12 15 6"></polyline>
     </svg>
   </button>
   
+  <!-- Navegación siguiente -->
   <button class="lightbox__nav lightbox__nav--next" aria-label="Imagen siguiente">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </button>
   
-  <div class="lightbox__content">
-    <img src="" alt="" class="lightbox__image" id="lightboxImage">
+  <!-- Contenedor de la imagen -->
+  <div class="lightbox__container">
+    <div class="lightbox__image-wrapper">
+      <img src="" alt="" class="lightbox__image" id="lightboxImage">
+    </div>
     <div class="lightbox__counter">
       <span id="lightboxCurrent">1</span> / <span id="lightboxTotal">58</span>
     </div>
@@ -256,7 +263,7 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
     font-style: italic;
   }
 
-  /* Lightbox */
+  /* ========== LIGHTBOX ========== */
   .lightbox {
     position: fixed;
     inset: 0;
@@ -265,37 +272,46 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
   }
 
   .lightbox.is-open {
-    display: block;
-  }
-
-  .lightbox__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-  }
-
-  .lightbox__close {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 48px;
-    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Backdrop - capa oscura de fondo clickeable */
+  .lightbox__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    cursor: pointer;
+    z-index: 999999;
+  }
+
+  /* Botón cerrar (X) en esquina superior derecha */
+  .lightbox__close {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 9999px;
     color: #FFFFFF;
     cursor: pointer;
     transition: all 150ms ease;
-    z-index: 100010;
+    z-index: 1000000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
 
   .lightbox__close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
   }
 
+  /* Botones de navegación izquierda/derecha */
   .lightbox__nav {
     position: fixed;
     top: 50%;
@@ -305,17 +321,18 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 9999px;
     color: #FFFFFF;
     cursor: pointer;
     transition: all 150ms ease;
-    z-index: 100010;
+    z-index: 1000000;
   }
 
   .lightbox__nav:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
   }
 
   .lightbox__nav:disabled {
@@ -333,28 +350,41 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
     }
     .lightbox__nav--prev { left: 10px; }
     .lightbox__nav--next { right: 10px; }
+    .lightbox__close {
+      top: 90px;
+      right: 15px;
+      width: 46px;
+      height: 46px;
+    }
   }
 
-  .lightbox__content {
-    position: fixed;
-    inset: 0;
+  /* Contenedor centrado de la imagen */
+  .lightbox__container {
+    position: relative;
+    z-index: 1000000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 80px 100px;
-    z-index: 100001;
+    max-width: 90vw;
+    max-height: calc(85vh - 80px);
+    margin-top: 80px;
+    padding: 20px;
+    pointer-events: none; /* Permite clicks pasar al backdrop */
   }
 
-  @media (max-width: 768px) {
-    .lightbox__content {
-      padding: 80px 60px;
-    }
+  /* Wrapper de la imagen - aquí SÍ capturamos clicks */
+  .lightbox__image-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto; /* Re-enable clicks para la imagen */
   }
 
   .lightbox__image {
-    max-width: 100%;
-    max-height: calc(100vh - 160px);
+    max-width: 85vw;
+    max-height: calc(85vh - 120px);
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -363,10 +393,11 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
   .lightbox__counter {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 9999px;
     color: #FFFFFF;
     font-size: 0.875rem;
+    pointer-events: auto;
   }
 </style>
 
@@ -422,8 +453,6 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
         const slide = document.createElement('div');
         slide.className = 'carousel-slide';
         slide.dataset.index = index;
-        
-        // Aplicar ancho inline para asegurar que funcione
         slide.style.flex = `0 0 ${100 / itemsPerPage}%`;
         
         const img = document.createElement('img');
@@ -451,7 +480,6 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       if (newItemsPerPage !== itemsPerPage) {
         itemsPerPage = newItemsPerPage;
         totalPages = Math.ceil(IMAGES_LIST.length / itemsPerPage);
-        // Recrear slides con nuevo ancho
         const slides = track.querySelectorAll('.carousel-slide');
         slides.forEach(slide => {
           slide.style.flex = `0 0 ${100 / itemsPerPage}%`;
@@ -575,12 +603,11 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       }
     }, { passive: true });
 
-    // Lightbox
+    // ========== LIGHTBOX ==========
     const lightbox = document.getElementById('eventLightbox');
     const lightboxImg = document.getElementById('lightboxImage');
     const lightboxCurrent = document.getElementById('lightboxCurrent');
     const lightboxTotal = document.getElementById('lightboxTotal');
-    const lightboxClose = lightbox.querySelector('.lightbox__close');
     const lightboxPrev = lightbox.querySelector('.lightbox__nav--prev');
     const lightboxNext = lightbox.querySelector('.lightbox__nav--next');
 
@@ -614,6 +641,7 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       lightboxNext.style.opacity = currentImageIndex === IMAGES_LIST.length - 1 ? '0.3' : '1';
     }
 
+    // Abrir lightbox al hacer clic en una imagen del carrusel
     track.addEventListener('click', (e) => {
       const target = e.target;
       const slide = target.closest('.carousel-slide');
@@ -623,23 +651,42 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       }
     });
 
-    lightboxPrev.addEventListener('click', () => {
+    // Cerrar lightbox: botón X y backdrop
+    const closeElements = lightbox.querySelectorAll('[data-lightbox-close]');
+    closeElements.forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeLightbox();
+      });
+    });
+
+    // Navegación del lightbox
+    lightboxPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (currentImageIndex > 0) {
         currentImageIndex--;
         updateLightbox();
       }
     });
 
-    lightboxNext.addEventListener('click', () => {
+    lightboxNext.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (currentImageIndex < IMAGES_LIST.length - 1) {
         currentImageIndex++;
         updateLightbox();
       }
     });
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.querySelector('.lightbox__backdrop').addEventListener('click', closeLightbox);
+    // Prevenir que clicks en la imagen cierren el lightbox
+    const imageWrapper = lightbox.querySelector('.lightbox__image-wrapper');
+    if (imageWrapper) {
+      imageWrapper.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
 
+    // Teclado
     document.addEventListener('keydown', (e) => {
       if (!lightbox.classList.contains('is-open')) return;
       
@@ -654,6 +701,7 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       }
     });
 
+    // Touch support para lightbox
     let lightboxTouchStartX = 0;
     lightbox.addEventListener('touchstart', (e) => {
       lightboxTouchStartX = e.changedTouches[0].screenX;
@@ -672,10 +720,12 @@ const { folderPath, titulo = "Galería de imágenes" } = Astro.props;
       }
     }, { passive: true });
 
+    // Inicializar
     createSlides();
     updateCarousel();
     startAutoplay();
 
+    // Resize handler
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);

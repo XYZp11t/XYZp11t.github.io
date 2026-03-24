@@ -470,14 +470,25 @@ Ejemplo: Con 58 imágenes en desktop:
 
 Al hacer clic en cualquier imagen del carrusel, se abre un visor a pantalla completa.
 
-#### Funcionalidades del Lightbox
+#### Cómo Cerrar el Lightbox
+
+| Método | Descripción |
+|--------|-------------|
+| **Botón X** | Click en el botón ✕ blanco de la esquina superior derecha (debajo del header) |
+| **Click fuera** | Click en cualquier zona oscura fuera de la imagen |
+| **Tecla ESC** | Presiona la tecla Escape del teclado |
+
+**Nota sobre el diseño:** El botón X aparece en la esquina superior derecha, debajo de la barra de navegación del sitio para evitar que se solape con ella. La imagen se muestra centrada en la pantalla con márgenes ajustados para no quedar detrás del header.
+
+#### Navegación en el Lightbox
 
 | Acción | Método |
 |--------|--------|
-| Cerrar visor | Botón ✕, tecla `ESC`, o clic en fondo oscuro |
-| Imagen anterior | Flecha izquierda (←) o swipe derecha |
-| Imagen siguiente | Flecha derecha (→) o swipe izquierda |
+| Imagen anterior | Flecha izquierda (←) o swipe derecha en móvil |
+| Imagen siguiente | Flecha derecha (→) o swipe izquierda en móvil |
 | Contador | Muestra "X / 58" indicando la posición actual |
+
+**Nota:** Click en la imagen itself no cierra el visor, solo navega si hay controles.
 
 #### Navegación en Lightbox vs Carrusel
 

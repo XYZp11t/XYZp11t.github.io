@@ -325,8 +325,17 @@ Al hacer clic en cualquier imagen del carrusel:
 - Se abre un visor a **pantalla completa**
 - Navegación **imagen por imagen** (no por páginas)
 - Muestra contador "X / 58"
-- **Teclado**: ← → para navegar, ESC para cerrar
-- **Swipe**: En móviles para cambiar de imagen
+
+#### Controles del Lightbox
+
+| Acción | Cómo hacerlo |
+|--------|--------------|
+| **Cerrar visor** | Botón ✕ blanco (esquina superior derecha), click fuera de la imagen, o tecla ESC |
+| **Imagen anterior** | Flecha izquierda (←) o swipe derecha |
+| **Imagen siguiente** | Flecha derecha (→) o swipe izquierda |
+| **Ver contador** | Indicador "X / 58" debajo de la imagen |
+
+**Nota:** El botón de cerrar aparece debajo del header del sitio para evitar solapamientos. La imagen se muestra completamente visible con márgenes ajustados.
 
 ### Preparar Imágenes para la Galería
 
