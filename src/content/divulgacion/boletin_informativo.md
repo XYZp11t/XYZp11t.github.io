@@ -4,7 +4,7 @@ descripcion: "Morelia será sede del Teacher Training Programme (TTP) 2026 de la
 autor: "Dr. Mario Rodríguez Martínez"
 fecha: 2026-03-18
 imagen: "/TTP2026/IAU_SP.png"
-etiquetas: ["astronomía", "eventos", "observación solar"]
+etiquetas: ["astronomía", "eventos", "entrenamiento"]
 destacado: true
 ---
 
