@@ -46,7 +46,6 @@ dist/
 1. Imágenes se guardan en `public/imagen-solar-diaria/`
 2. Al ejecutar `npm run build`, Astro copia las imágenes a `dist/imagen-solar-diaria/`
 3. Apache sirve el contenido de la carpeta `dist/`
-
 ---
 
 ## Formato de Imágenes
