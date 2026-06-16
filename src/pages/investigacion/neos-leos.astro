@@ -1,0 +1,1031 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { readdirSync } from 'fs';
+import { resolve } from 'path';
+
+interface EventInfo {
+  filename: string;
+  type: string;
+  typeKey: string;
+  typeDisplay: string;
+  typeColor: string;
+  location: string;
+  day: string;
+  monthAbbr: string;
+  monthFull: string;
+  year: string;
+  dateISO: string;
+  dateDisplay: string;
+  pdfPath: string;
+}
+
+/**
+ * Convención del nombre de archivo:
+ *
+ *   {Tipo}_{Localización con guiones bajos}-DD-MM-AA.pdf
+ *
+ * El primer guion bajo separa el tipo del resto. Cualquier tipo es
+ * aceptado: el sistema NO está restringido a NEO / LEO / Bólido.
+ */
+
+// Paleta para tipos conocidos. Para tipos nuevos se asigna un color
+// determinístico a partir de la paleta extendida (hash del nombre).
+const KNOWN_TYPE_COLORS: Record<string, string> = {
+  neo:        '#003D79',
+  leo:        '#1b6e4e',
+  bolido:     '#b45309',
+  asteroide:  '#7c3aed',
+  cometa:     '#0891b2',
+  meteoro:    '#dc2626',
+  meteorito:  '#dc2626',
+  satelite:   '#475569',
+  basura:     '#525252',
+};
+
+const FALLBACK_PALETTE = [
+  '#7c3aed', '#0891b2', '#dc2626', '#0d9488', '#d97706',
+  '#5b21b6', '#0e7490', '#9f1239', '#115e59', '#92400e',
+];
+
+function colorForType(typeKey: string): string {
+  if (KNOWN_TYPE_COLORS[typeKey]) return KNOWN_TYPE_COLORS[typeKey];
+  let hash = 0;
+  for (let i = 0; i < typeKey.length; i++) {
+    hash = (hash * 31 + typeKey.charCodeAt(i)) >>> 0;
+  }
+  return FALLBACK_PALETTE[hash % FALLBACK_PALETTE.length];
+}
+
+// Mapeo opcional para casos donde el nombre canónico tiene tilde u otra
+// forma de presentación. Si no está en el mapa, se conserva el nombre tal
+// cual, normalizando solo la primera letra a mayúscula.
+const KNOWN_TYPE_DISPLAY: Record<string, string> = {
+  neo:        'NEO',
+  leo:        'LEO',
+  bolido:     'Bólido',
+  asteroide:  'Asteroide',
+  cometa:     'Cometa',
+  meteoro:    'Meteoro',
+  meteorito:  'Meteorito',
+  satelite:   'Satélite',
+  basura:     'Basura espacial',
+};
+
+function displayForType(rawType: string): string {
+  const key = rawType.toLowerCase();
+  if (KNOWN_TYPE_DISPLAY[key]) return KNOWN_TYPE_DISPLAY[key];
+  // Si el tipo es todo mayúsculas (acrónimo), conservar
+  if (rawType === rawType.toUpperCase()) return rawType;
+  return rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase();
+}
+
+function parseFilename(filename: string): EventInfo | null {
+  const name = filename.replace(/\.pdf$/i, '');
+  const parts = name.split('-');
+  if (parts.length < 4) return null;
+
+  const yy  = parts[parts.length - 1];
+  const mm  = parts[parts.length - 2];
+  const dd  = parts[parts.length - 3];
+  const typeLocation = parts.slice(0, parts.length - 3).join('-');
+
+  if (!/^\d{2}$/.test(dd) || !/^\d{2}$/.test(mm) || !/^\d{2}$/.test(yy)) return null;
+
+  const underscoreIdx = typeLocation.indexOf('_');
+  if (underscoreIdx === -1) return null;
+
+  const rawType     = typeLocation.slice(0, underscoreIdx);
+  const rawLocation = typeLocation.slice(underscoreIdx + 1).replace(/_/g, ' ').trim();
+  if (!rawType || !rawLocation) return null;
+
+  const typeKey = rawType.toLowerCase();
+
+  const monthNames: Record<string, string> = {
+    '01': 'Enero',   '02': 'Febrero',   '03': 'Marzo',
+    '04': 'Abril',   '05': 'Mayo',      '06': 'Junio',
+    '07': 'Julio',   '08': 'Agosto',    '09': 'Septiembre',
+    '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre',
+  };
+
+  const fullYear    = `20${yy}`;
+  const monthFull   = monthNames[mm] ?? mm;
+  const monthAbbr   = monthFull.slice(0, 3).toUpperCase();
+  const dateISO     = `${fullYear}-${mm}-${dd}`;
+  const dateDisplay = `${dd} de ${monthFull} de ${fullYear}`;
+
+  return {
+    filename,
+    type:        rawType,
+    typeKey,
+    typeDisplay: displayForType(rawType),
+    typeColor:   colorForType(typeKey),
+    location:    rawLocation,
+    day:         dd,
+    monthAbbr,
+    monthFull,
+    year:        fullYear,
+    dateISO,
+    dateDisplay,
+    pdfPath: `/Informes-NEOs-LEOs/${filename}`,
+  };
+}
+
+let events: EventInfo[] = [];
+try {
+  const informesDir = resolve('./public/Informes-NEOs-LEOs');
+  events = readdirSync(informesDir)
+    .filter(f => f.toLowerCase().endsWith('.pdf'))
+    .map(parseFilename)
+    .filter((e): e is EventInfo => e !== null)
+    // Más recientes primero
+    .sort((a, b) => b.dateISO.localeCompare(a.dateISO));
+} catch (_) {
+  events = [];
+}
+
+// Agrupar por año (descendente)
+const groupedByYear: Record<string, EventInfo[]> = {};
+for (const event of events) {
+  if (!groupedByYear[event.year]) groupedByYear[event.year] = [];
+  groupedByYear[event.year].push(event);
+}
+const years = Object.keys(groupedByYear).sort((a, b) => b.localeCompare(a));
+
+// Tipos únicos presentes (para la leyenda dinámica), preservando el
+// orden de primera aparición en el array ya ordenado.
+const seenTypes = new Set<string>();
+const uniqueTypes: { key: string; display: string; color: string }[] = [];
+for (const e of events) {
+  if (!seenTypes.has(e.typeKey)) {
+    seenTypes.add(e.typeKey);
+    uniqueTypes.push({ key: e.typeKey, display: e.typeDisplay, color: e.typeColor });
+  }
+}
+uniqueTypes.sort((a, b) => a.display.localeCompare(b.display, 'es'));
+---
+
+<Layout
+  title="Reportes de NEOs y LEOs | LACIGE"
+  description="Reportes técnicos sobre el ingreso de meteoroides, NEOs y LEOs a la atmósfera terrestre, modelados con el código DAEDALUS de la UNAM."
+>
+
+  <!-- ── Encabezado ── -->
+  <section class="neos-header">
+    <div class="container">
+      <span class="neos-header__label">Investigación</span>
+      <h1 class="neos-header__title">Reportes de NEOs y LEOs</h1>
+      <p class="neos-header__subtitle">
+        Near-Earth Objects &amp; Low-Earth Orbit Objects
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Descripción ── -->
+  <section class="neos-intro">
+    <div class="container">
+      <div class="intro-prose">
+        <p>
+          Los reportes técnicos que se presentan en esta sección, relacionados con el ingreso de
+          meteoroides en la atmósfera terrestre, brindan información científica y técnica detallada
+          sobre el desarrollo, evolución y características físicas de eventos observados en el espacio
+          aéreo mexicano. Estos análisis permiten estimar parámetros fundamentales como la velocidad,
+          masa, energía liberada y posible fragmentación de los objetos durante su trayectoria
+          atmosférica, contribuyendo así a una mejor comprensión de estos fenómenos y a la evaluación
+          de riesgos asociados.
+        </p>
+        <p>
+          La generación de dichos reportes hace uso del código <strong>DAEDALUS</strong> de la
+          Universidad Nacional Autónoma de México, desarrollado por Gutiérrez-Zalapa,&nbsp;R.,
+          Aguilar-Rodríguez,&nbsp;E., Rodríguez-Martínez,&nbsp;M., Raga,&nbsp;A., y
+          Estévez-Delgado,&nbsp;J. (2025), descrito en el artículo publicado en
+          <em>International Journal of Modern Physics&nbsp;C</em>.
+          Este código resuelve un sistema de ecuaciones diferenciales acopladas que permiten modelar
+          de manera precisa el ingreso de un objeto cercano a la Tierra (NEO, por sus siglas en inglés)
+          o un objeto en órbita baja (LEO) a la atmósfera terrestre.
+        </p>
+        <p>
+          El modelo considera diversos procesos físicos relevantes, como la interacción aerodinámica
+          con las capas atmosféricas, la ablación del material, la pérdida de masa, la desaceleración
+          por arrastre y los efectos térmicos derivados de la fricción con el aire. Asimismo, permite
+          simular diferentes escenarios dependiendo de las condiciones iniciales del meteoroide, como
+          su composición, ángulo de entrada y velocidad, proporcionando así una herramienta robusta
+          para el análisis y la interpretación de observaciones instrumentales y reportes de eventos
+          luminosos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Línea del tiempo ── -->
+  <section class="timeline-section">
+    <div class="container">
+
+      <div class="timeline-heading">
+        <div class="timeline-heading__main">
+          <span class="timeline-eyebrow" aria-hidden="true">Bitácora científica</span>
+          <h2 class="timeline-title">Registro de eventos</h2>
+          <p class="timeline-count" aria-live="polite">
+            <span class="timeline-count__num">{events.length}</span>
+            <span class="timeline-count__label">
+              {events.length === 1 ? 'reporte registrado' : 'reportes registrados'}
+            </span>
+          </p>
+        </div>
+
+        {uniqueTypes.length > 0 && (
+          <div class="legend" aria-label="Leyenda de tipos de evento">
+            <span class="legend__title" aria-hidden="true">Tipos de evento</span>
+            <ul class="legend__list">
+              {uniqueTypes.map(t => (
+                <li class="legend-item" style={`--type-color:${t.color}`}>
+                  <span class="legend-item__dot" aria-hidden="true"></span>
+                  <span class="legend-item__label">{t.display}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {events.length === 0 ? (
+        <p class="timeline-empty">No se encontraron reportes en este momento.</p>
+      ) : (
+        <ol class="timeline" aria-label="Línea del tiempo de eventos">
+          {years.map(year => (
+            <li class="year-group">
+              <div class="year-sep" aria-label={`Eventos del año ${year}`}>
+                <span class="year-sep__chip">
+                  <span class="year-sep__chip-label" aria-hidden="true">Año</span>
+                  <span class="year-sep__chip-num">{year}</span>
+                </span>
+                <span class="year-sep__line" aria-hidden="true"></span>
+                <span class="year-sep__count" aria-hidden="true">
+                  {groupedByYear[year].length}&nbsp;{groupedByYear[year].length === 1 ? 'evento' : 'eventos'}
+                </span>
+              </div>
+
+              <ul class="year-group__list">
+                {groupedByYear[year].map(event => (
+                  <li class="entry-wrap">
+                    <span class="entry-marker" aria-hidden="true" style={`--type-color:${event.typeColor}`}></span>
+
+                    <article
+                      class="entry"
+                      style={`--type-color:${event.typeColor}`}
+                      aria-label={`${event.typeDisplay} en ${event.location}, ${event.dateDisplay}`}
+                    >
+                      <time class="entry__date" datetime={event.dateISO}>
+                        <span class="entry__day">{event.day}</span>
+                        <span class="entry__month-year">
+                          <span class="entry__month">{event.monthAbbr}</span>
+                          <span class="entry__year">{event.year}</span>
+                        </span>
+                      </time>
+
+                      <div class="entry__body">
+                        <span class="entry__type">{event.typeDisplay}</span>
+                        <h3 class="entry__location">{event.location}</h3>
+                        <p class="entry__date-text">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                               aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                          </svg>
+                          <span>{event.dateDisplay}</span>
+                        </p>
+                      </div>
+
+                      <a
+                        href={event.pdfPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="entry__pdf-btn"
+                        aria-label={`Abrir reporte PDF: ${event.typeDisplay} en ${event.location}`}
+                      >
+                        <svg class="entry__pdf-btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span class="entry__pdf-btn-text">Ver reporte</span>
+                        <svg class="entry__pdf-btn-arrow" xmlns="http://www.w3.org/2000/svg"
+                             width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                             stroke-linejoin="round" aria-hidden="true">
+                          <line x1="7" y1="17" x2="17" y2="7"/>
+                          <polyline points="7 7 17 7 17 17"/>
+                        </svg>
+                      </a>
+                    </article>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  /* ══════════════════════════════════════════════
+     Encabezado
+  ══════════════════════════════════════════════ */
+  .neos-header {
+    padding: var(--space-2xl) 0 var(--space-xl);
+    background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-bottom: 3px solid var(--color-accent);
+  }
+
+  .neos-header__label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+  }
+
+  .neos-header__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0 0 var(--space-sm);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .neos-header__subtitle {
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  /* ══════════════════════════════════════════════
+     Sección introductoria
+  ══════════════════════════════════════════════ */
+  .neos-intro {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+    background-color: var(--color-off-white);
+  }
+
+  /* Ancho editorial: ~70-75 caracteres por línea, sin sentirse encajonado */
+  .intro-prose {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .intro-prose p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--color-gray-600);
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .intro-prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .intro-prose strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .intro-prose em {
+    font-style: italic;
+    color: var(--color-gray-700);
+  }
+
+  /* ══════════════════════════════════════════════
+     Sección de la línea del tiempo
+     —— Bitácora científica accesible ——
+     Reglas: ningún texto < 14 px (0.875 rem); colores de cuerpo
+     siempre con contraste AA sobre el fondo (gray-600/700);
+     etiquetas en pills sólidos para evitar tracking + tamaño
+     pequeño simultáneamente.
+  ══════════════════════════════════════════════ */
+  .timeline-section {
+    padding: var(--space-3xl) 0 var(--space-4xl);
+    background-color: var(--color-off-white);
+    background-image:
+      radial-gradient(circle at 12% 0%, rgba(0, 61, 121, 0.04), transparent 55%),
+      radial-gradient(circle at 88% 100%, rgba(213, 159, 15, 0.05), transparent 60%);
+  }
+
+  /* ── Encabezado de la sección ── */
+  .timeline-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    align-items: end;
+    gap: var(--space-xl);
+    margin: 0 auto var(--space-2xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-gray-300);
+    max-width: 1100px;
+    position: relative;
+  }
+
+  .timeline-heading::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 88px;
+    height: 3px;
+    background-color: var(--color-accent);
+  }
+
+  .timeline-heading__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .timeline-eyebrow {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-accent-dark);
+  }
+
+  .timeline-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    color: var(--color-primary);
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .timeline-count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin: 0.35rem 0 0;
+    font-size: 1rem;
+    color: var(--color-gray-600);
+    font-weight: 500;
+  }
+
+  .timeline-count__num {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+
+  .timeline-count__label {
+    letter-spacing: 0.005em;
+  }
+
+  /* ── Leyenda dinámica ── */
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: flex-end;
+  }
+
+  .legend__title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-gray-600);
+  }
+
+  .legend__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem 0.4rem 0.6rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-left: 4px solid var(--type-color, var(--color-gray-400));
+    border-radius: var(--radius-sm);
+    line-height: 1;
+  }
+
+  .legend-item__dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--type-color, var(--color-gray-400));
+    flex-shrink: 0;
+  }
+
+  .legend-item__label {
+    letter-spacing: 0.01em;
+  }
+
+  .timeline-empty {
+    text-align: center;
+    color: var(--color-gray-600);
+    font-size: 1rem;
+    font-style: italic;
+    padding: var(--space-2xl) 0;
+    background-color: var(--color-white);
+    border: 1px dashed var(--color-gray-300);
+    border-radius: var(--radius-md);
+  }
+
+  /* ══════════════════════════════════════════════
+     Timeline (riel vertical)
+  ══════════════════════════════════════════════ */
+  .timeline {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 1100px;
+    position: relative;
+  }
+
+  /* Riel vertical — alineado con la columna izquierda de las tarjetas */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 18px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--color-gray-300) 4%,
+      var(--color-gray-300) 96%,
+      transparent 100%
+    );
+  }
+
+  .year-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+
+  .year-group + .year-group {
+    margin-top: var(--space-2xl);
+  }
+
+  /* ── Separador de año ── */
+  .year-sep {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0 var(--space-lg);
+    margin-bottom: var(--space-md);
+  }
+
+  .year-sep__chip {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    padding: 0.55rem 1rem 0.55rem 0.85rem;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 14px rgba(0, 61, 121, 0.18);
+    flex-shrink: 0;
+  }
+
+  .year-sep__chip-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .year-sep__chip-num {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-white);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .year-sep__line {
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-gray-300) 0,
+      var(--color-gray-300) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    border-radius: 1px;
+  }
+
+  .year-sep__count {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-gray-600);
+    flex-shrink: 0;
+  }
+
+  .year-group__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* ══════════════════════════════════════════════
+     Marcador del riel + tarjeta de evento
+  ══════════════════════════════════════════════ */
+  .entry-wrap {
+    position: relative;
+    padding-left: 56px;
+  }
+
+  /* Punto sobre el riel, coloreado por tipo */
+  .entry-marker {
+    position: absolute;
+    left: 11px;
+    top: 32px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--type-color, var(--color-primary));
+    box-shadow:
+      0 0 0 4px var(--color-off-white),
+      0 0 0 5px var(--type-color, var(--color-primary));
+    z-index: 1;
+    transition: transform var(--transition-fast);
+  }
+
+  .entry-wrap:hover .entry-marker {
+    transform: scale(1.18);
+  }
+
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    gap: 0 var(--space-xl);
+    padding: var(--space-lg) var(--space-xl);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-left: 5px solid var(--type-color, var(--color-primary));
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--transition-fast),
+      box-shadow var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  .entry:hover,
+  .entry:focus-within {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-gray-300);
+  }
+
+  /* Línea conectora desde el riel hasta la tarjeta */
+  .entry::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 50%;
+    width: 22px;
+    height: 2px;
+    background-color: var(--color-gray-300);
+    transform: translateY(-50%);
+  }
+
+  /* ── Columna de fecha ── */
+  .entry__date {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding-right: var(--space-lg);
+    border-right: 1px solid var(--color-gray-200);
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .entry__day {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+  }
+
+  .entry__month-year {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .entry__month {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray-700);
+  }
+
+  .entry__year {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Columna de contenido ── */
+  .entry__body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .entry__type {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    padding: 0.36rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    /* Tag editorial: fondo teñido (claro) + texto oscurecido del mismo color.
+       Esta combinación pasa AA aún para los colores más claros de la paleta
+       (p.ej. cyan #0891b2) porque el texto se lleva al 80% hacia gray-700. */
+    color: color-mix(in srgb, var(--type-color, var(--color-primary)) 35%, var(--color-gray-700) 65%);
+    background-color: color-mix(in srgb, var(--type-color, var(--color-primary)) 12%, var(--color-white));
+    border: 1px solid color-mix(in srgb, var(--type-color, var(--color-primary)) 30%, transparent);
+    border-radius: var(--radius-sm);
+    line-height: 1.15;
+  }
+
+  .entry__location {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1.8vw, 1.625rem);
+    font-weight: 700;
+    color: var(--color-gray-700);
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .entry__date-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-gray-600);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .entry__date-text svg {
+    flex-shrink: 0;
+    color: var(--color-gray-500);
+  }
+
+  /* ── Botón PDF (CTA con peso visual real) ── */
+  .entry__pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1.1rem;
+    min-height: 44px;  /* Touch target accesible */
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    color: var(--color-white);
+    background-color: var(--type-color, var(--color-primary));
+    border: 2px solid var(--type-color, var(--color-primary));
+    border-radius: var(--radius-sm);
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast),
+      transform var(--transition-fast),
+      box-shadow var(--transition-fast),
+      filter var(--transition-fast);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .entry__pdf-btn:hover {
+    filter: brightness(0.92);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--type-color, var(--color-primary)) 32%, transparent);
+  }
+
+  .entry__pdf-btn:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--type-color, var(--color-primary)) 32%, transparent);
+  }
+
+  .entry__pdf-btn:active {
+    transform: translateY(0);
+  }
+
+  .entry__pdf-btn-icon,
+  .entry__pdf-btn-arrow {
+    flex-shrink: 0;
+  }
+
+  .entry__pdf-btn-arrow {
+    transition: transform var(--transition-fast);
+  }
+
+  .entry__pdf-btn:hover .entry__pdf-btn-arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* ══════════════════════════════════════════════
+     Reduced motion
+  ══════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    .entry,
+    .entry-marker,
+    .entry__pdf-btn,
+    .entry__pdf-btn-arrow {
+      transition: none;
+    }
+    .entry:hover,
+    .entry:focus-within,
+    .entry__pdf-btn:hover {
+      transform: none;
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     Responsivo
+  ══════════════════════════════════════════════ */
+  @media (max-width: 960px) {
+    .timeline-heading {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      align-items: flex-start;
+    }
+
+    .legend {
+      align-items: flex-start;
+    }
+
+    .legend__list {
+      justify-content: flex-start;
+    }
+
+    .entry {
+      grid-template-columns: 84px 1fr;
+      grid-template-areas:
+        "date body"
+        "btn  btn";
+      gap: var(--space-md) var(--space-lg);
+      padding: var(--space-lg);
+    }
+
+    .entry__date  { grid-area: date; }
+    .entry__body  { grid-area: body; }
+    .entry__pdf-btn {
+      grid-area: btn;
+      justify-self: stretch;
+      justify-content: center;
+    }
+
+    .entry__day {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .intro-prose p {
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .timeline-section {
+      padding: var(--space-2xl) 0 var(--space-3xl);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .timeline::before {
+      left: 12px;
+    }
+
+    .entry-wrap {
+      padding-left: 38px;
+    }
+
+    .entry-marker {
+      left: 5px;
+      top: 26px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .entry::before {
+      display: none;
+    }
+
+    .entry {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "date"
+        "body"
+        "btn";
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .entry__date {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding-right: 0;
+      padding-bottom: var(--space-sm);
+      border-right: none;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .entry__day {
+      font-size: 2rem;
+    }
+
+    .entry__month {
+      font-size: 0.875rem;
+    }
+
+    .entry__location {
+      font-size: 1.25rem;
+    }
+
+    .year-sep {
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .year-sep__line {
+      order: 3;
+      width: 100%;
+      flex: none;
+    }
+
+    .year-sep__count {
+      margin-left: auto;
+    }
+
+    .neos-intro {
+      padding: var(--space-xl) 0 var(--space-2xl);
+    }
+  }
+</style>

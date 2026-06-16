@@ -15,6 +15,8 @@ const {
   description = 'Laboratorio de Ciencias Geoespaciales - Investigaci?n, innovaci?n y divulgaci?n en ciencias del espacio y geof?sica.',
   image = '/favicon.svg'
 } = Astro.props;
+
+const favicon = '/favicon.svg';
 ---
 
 <!doctype html>
@@ -22,7 +24,9 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+    <link rel="apple-touch-icon" href="/LACIGE_LOGO_NEGRO_VECT.svg" />
     <meta name="generator" content={Astro.generator} />
     
     <!-- SEO -->

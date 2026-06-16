@@ -1,5 +1,25 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { readdir, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+
+// Detecta automáticamente el video y poster más recientes en public/sw-prediction/
+const swDir = join(process.cwd(), 'public', 'sw-prediction');
+const dirFiles = await readdir(swDir);
+
+const videoPattern = /^cr(\d+)\.mp4$/;
+const videos = dirFiles
+  .filter(f => videoPattern.test(f))
+  .map(f => ({ file: f, cr: parseInt(f.match(videoPattern)![1], 10) }))
+  .sort((a, b) => b.cr - a.cr);
+
+const latest = videos[0];
+const videoSrc = `/sw-prediction/${latest.file}`;
+const posterSrc = `/sw-prediction/poster_cr${latest.cr}.png`;
+
+// Fecha de modificación del video más reciente
+const videoStat = await stat(join(swDir, latest.file));
+const videoDate = videoStat.mtime.toISOString().split('T')[0];
 ---
 
 <Layout 
@@ -48,17 +68,17 @@ import Layout from '../../layouts/Layout.astro';
             preload="metadata"
             controls
             playsinline
-            poster="/sw-prediction/cr2307_sw_plots_001.png"
+            poster={posterSrc}
             data-video>  
             <source
-              src="/sw-prediction/cr2307.mp4"
+              src={videoSrc}
               type="video/mp4">
           </video>
         </div>
       </div>
       <div class="video-info">
         <p class="video-info__timestamp">
-          <strong id="timestamp-label">Actualizado el:</strong> 2026-03-14
+          <strong id="timestamp-label">Actualizado el:</strong> <span id="video-date">{videoDate}</span>
         </p>
         <p class="video-info__description" id="video-description"> 
           Esta visualización muestra las corrientes de viento solar simuladas con el modelo <a href="https://github.com/predsci/sunRunner3D-manuscript" target="_blank" rel="noopener">sunRunner3D</a>, cuyas condiciones de frontera se obtienen de <a href="https://www.predsci.com/" target="_blank" rel="noopener">Predictive Science Inc</a>. La animación abarca el intervalo necesario para alcanzar el estado de relajación del viento solar (aproximadamente 20–30 horas en tiempo físico). A partir de ese estado relajado, se construyen las series de tiempo para compararlas con observaciones in situ de OMNI y de STEREO-A (cuando los datos estén disponibles); por ello, dichas series corresponden a un estado fijo y no representan una evolución temporal del modelo. Este video se actualizará en cada rotación de Carrington, es decir, aproximadamente una vez por mes. Para apreciar mejor los detalles, se sugiere utilizar la función de pantalla completa.

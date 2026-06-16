@@ -13,6 +13,9 @@ Esta carpeta contiene la documentación completa del sitio web del LACIGE. A con
 7. **[07-ESTILOS-Y-DISENO.md](./07-ESTILOS-Y-DISENO.md)** - Guía de estilos, colores y CSS
 8. **[08-CONFIGURACION.md](./08-CONFIGURACION.md)** - Configuración de Astro y build
 9. **[09-COLABORADORES.md](./09-COLABORADORES.md)** - Gestión de investigadores y colaboradores
+10. **[10-NEOS-LEOS.md](./10-NEOS-LEOS.md)** - Página de reportes de NEOs y LEOs con línea del tiempo dinámica
+11. **[11-SUNRUNNER3D.md](./11-SUNRUNNER3D.md)** - Página de simulaciones MHD sunRunner3D con detección automática de video
+12. **[12-GALERIA-EVENTOS.md](./12-GALERIA-EVENTOS.md)** - Componente EventGallery: carrusel de imágenes con lightbox para eventos
 
 ---
 

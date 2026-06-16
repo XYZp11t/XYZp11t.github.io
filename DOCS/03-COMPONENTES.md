@@ -509,7 +509,7 @@ public/
 
 ### Lista de Imágenes
 
-El componente incluye internamente la lista de imágenes del evento TTP2026. Para usar el componente con otras galerías, modifica el array `IMAGES_LIST` en el script del componente.
+El componente lee automáticamente los archivos de la carpeta indicada en `folderPath` en tiempo de build. No es necesario listar las imágenes manualmente. Consulta la guía completa en [12-GALERIA-EVENTOS.md](./12-GALERIA-EVENTOS.md).
 
 ### Buenas Prácticas
 

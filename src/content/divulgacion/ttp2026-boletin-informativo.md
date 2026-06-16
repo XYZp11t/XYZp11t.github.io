@@ -130,6 +130,184 @@ galeria:
     max-width: 90px;
   }
 }
+
+/* ============================================================
+   Carrusel de entrevistas (lista de reproducción TTP 2026)
+   ============================================================ */
+.ttp-videos-section {
+  margin: 2rem auto 1.25rem;
+  max-width: 640px;
+}
+.ttp-videos-intro {
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0 0 1rem 0;
+}
+.ttp-videos-intro a {
+  color: #1565c0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+.ttp-videos-intro a:hover { color: #0d47a1; }
+
+.ttp-carousel {
+  position: relative;
+}
+.ttp-carousel-viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #1a1a1a;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  aspect-ratio: 16 / 9;
+}
+.ttp-carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease;
+}
+.ttp-carousel-slide {
+  flex: 0 0 100%;
+  position: relative;
+  height: 100%;
+}
+.ttp-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+.ttp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+.ttp-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.35) 100%);
+  pointer-events: none;
+}
+.ttp-thumb:hover .ttp-play-icon,
+.ttp-thumb:focus-visible .ttp-play-icon {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+.ttp-thumb:focus-visible {
+  outline: 3px solid #f57f17;
+  outline-offset: -3px;
+}
+.ttp-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55));
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+.ttp-carousel-slide iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.ttp-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a1a1a;
+  font-size: 1.4rem;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ttp-carousel-btn:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+.ttp-carousel-btn:focus-visible {
+  outline: 3px solid #f57f17;
+  outline-offset: 2px;
+}
+.ttp-carousel-btn.ttp-prev { left: 8px; }
+.ttp-carousel-btn.ttp-next { right: 8px; }
+
+.ttp-carousel-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  padding: 0;
+}
+.ttp-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: #c8c4be;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ttp-dot:hover { background: #888; }
+.ttp-dot:focus-visible {
+  outline: 2px solid #f57f17;
+  outline-offset: 2px;
+}
+.ttp-dot[aria-selected="true"] {
+  background: #1a3c1a;
+  transform: scale(1.25);
+}
+
+.ttp-carousel-counter {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #6a6a6a;
+  margin-top: 0.35rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 480px) {
+  .ttp-carousel-btn { width: 34px; height: 34px; font-size: 1.2rem; }
+  .ttp-play-icon { width: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ttp-carousel-track,
+  .ttp-play-icon,
+  .ttp-carousel-btn,
+  .ttp-dot { transition: none !important; }
+}
 </style>
 
 
@@ -264,3 +442,210 @@ galeria:
   </tr>
 </table>
 </div>
+
+<section class="ttp-videos-section" aria-labelledby="ttp-videos-heading">
+
+<h3 id="ttp-videos-heading" class="ttp-title-header"><strong>Entrevistas a participantes</strong></h3>
+
+<p class="ttp-videos-intro">Como parte de la documentación del taller se realizaron entrevistas a docentes, investigadores y especialistas asistentes. También puedes consultar la <a href="https://www.youtube.com/playlist?list=PL_rLqyjE0nMuiBmcruzQ-vQ6qR_QFIuXn" target="_blank" rel="noopener noreferrer">lista de reproducción completa en YouTube</a>.</p>
+
+<div class="ttp-carousel" id="ttp-carousel" aria-roledescription="carrusel" aria-label="Entrevistas TTP 2026">
+  <div class="ttp-carousel-viewport">
+    <div class="ttp-carousel-track">
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="1 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="wLVzurRN2UE" aria-label="Reproducir entrevista 1 de 13">
+          <img src="https://i.ytimg.com/vi/wLVzurRN2UE/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="2 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="DdlEGZa3zhI" aria-label="Reproducir entrevista 2 de 13">
+          <img src="https://i.ytimg.com/vi/DdlEGZa3zhI/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="3 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="GT7K89WJTUg" aria-label="Reproducir entrevista 3 de 13">
+          <img src="https://i.ytimg.com/vi/GT7K89WJTUg/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="4 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="Xw9LKi2j4do" aria-label="Reproducir entrevista 4 de 13">
+          <img src="https://i.ytimg.com/vi/Xw9LKi2j4do/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="5 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="Vu0DNNFhnyM" aria-label="Reproducir entrevista 5 de 13">
+          <img src="https://i.ytimg.com/vi/Vu0DNNFhnyM/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="6 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="893VUgFNGD8" aria-label="Reproducir entrevista 6 de 13">
+          <img src="https://i.ytimg.com/vi/893VUgFNGD8/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="7 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="sqgoF00sDdI" aria-label="Reproducir entrevista 7 de 13">
+          <img src="https://i.ytimg.com/vi/sqgoF00sDdI/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="8 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="jjqfcQyRQtU" aria-label="Reproducir entrevista 8 de 13">
+          <img src="https://i.ytimg.com/vi/jjqfcQyRQtU/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="9 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="rOzk3aMXDIg" aria-label="Reproducir entrevista 9 de 13">
+          <img src="https://i.ytimg.com/vi/rOzk3aMXDIg/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="10 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="W07G37k22U8" aria-label="Reproducir entrevista 10 de 13">
+          <img src="https://i.ytimg.com/vi/W07G37k22U8/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="11 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="6ja5e6l_Etk" aria-label="Reproducir entrevista 11 de 13">
+          <img src="https://i.ytimg.com/vi/6ja5e6l_Etk/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="12 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="sZBIPxtaA9o" aria-label="Reproducir entrevista 12 de 13">
+          <img src="https://i.ytimg.com/vi/sZBIPxtaA9o/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+      <div class="ttp-carousel-slide" role="group" aria-roledescription="diapositiva" aria-label="13 de 13">
+        <button type="button" class="ttp-thumb" data-video-id="GwYpX2DHgX8" aria-label="Reproducir entrevista 13 de 13">
+          <img src="https://i.ytimg.com/vi/GwYpX2DHgX8/hqdefault.jpg" alt="" loading="lazy">
+          <svg class="ttp-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z" fill="#cc0000"/></svg>
+        </button>
+      </div>
+    </div>
+    <button type="button" class="ttp-carousel-btn ttp-prev" aria-label="Video anterior">‹</button>
+    <button type="button" class="ttp-carousel-btn ttp-next" aria-label="Siguiente video">›</button>
+  </div>
+  <div class="ttp-carousel-dots" role="tablist" aria-label="Selección de video"></div>
+  <p class="ttp-carousel-counter" aria-live="polite"><span class="ttp-current">1</span> / <span class="ttp-total">13</span></p>
+</div>
+
+<script>
+(function () {
+  const root = document.getElementById('ttp-carousel');
+  if (!root || root.dataset.init === '1') return;
+  root.dataset.init = '1';
+
+  const track = root.querySelector('.ttp-carousel-track');
+  const slides = Array.from(root.querySelectorAll('.ttp-carousel-slide'));
+  const prevBtn = root.querySelector('.ttp-prev');
+  const nextBtn = root.querySelector('.ttp-next');
+  const dotsBox = root.querySelector('.ttp-carousel-dots');
+  const counterCur = root.querySelector('.ttp-current');
+  const total = slides.length;
+  const AUTOPLAY_MS = 6000;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let current = 0;
+  let timer = null;
+
+  const originalHTML = slides.map(s => s.innerHTML);
+
+  slides.forEach((s, i) => {
+    s.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+  });
+
+  const dots = [];
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('button');
+    d.type = 'button';
+    d.className = 'ttp-dot';
+    d.setAttribute('role', 'tab');
+    d.setAttribute('aria-label', 'Ir al video ' + (i + 1) + ' de ' + total);
+    d.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+    d.addEventListener('click', () => { goTo(i); restart(); });
+    dotsBox.appendChild(d);
+    dots.push(d);
+  }
+
+  function resetSlide(idx) {
+    const s = slides[idx];
+    if (s.querySelector('iframe')) {
+      s.innerHTML = originalHTML[idx];
+      attachThumb(s);
+    }
+  }
+
+  function attachThumb(slide) {
+    const btn = slide.querySelector('.ttp-thumb');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.videoId;
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1';
+      iframe.title = btn.getAttribute('aria-label') || 'Video de YouTube';
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      slide.innerHTML = '';
+      slide.appendChild(iframe);
+      stop();
+    });
+  }
+
+  slides.forEach(attachThumb);
+
+  function goTo(idx) {
+    resetSlide(current);
+    current = ((idx % total) + total) % total;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    slides.forEach((s, i) => s.setAttribute('aria-hidden', i === current ? 'false' : 'true'));
+    dots.forEach((d, i) => d.setAttribute('aria-selected', i === current ? 'true' : 'false'));
+    counterCur.textContent = String(current + 1);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  function start() {
+    if (reduceMotion) return;
+    stop();
+    timer = window.setInterval(next, AUTOPLAY_MS);
+  }
+  function stop() {
+    if (timer) { window.clearInterval(timer); timer = null; }
+  }
+  function restart() { stop(); start(); }
+
+  prevBtn.addEventListener('click', () => { prev(); restart(); });
+  nextBtn.addEventListener('click', () => { next(); restart(); });
+
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+  root.addEventListener('focusin', stop);
+  root.addEventListener('focusout', () => {
+    if (!root.contains(document.activeElement)) start();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop(); else start();
+  });
+
+  root.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); restart(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); restart(); }
+  });
+
+  start();
+})();
+</script>
+
+</section>
